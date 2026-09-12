@@ -1,0 +1,8 @@
+{
+  "name": "LDL Dhenze Residential Building Construction",
+  "description": "Digital flagship headquarters and integrated development platform for construction, civil engineering, renewable energy, and smart infrastructure.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

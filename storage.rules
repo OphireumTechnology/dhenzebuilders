@@ -1,0 +1,61 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.role == 'SYSTEM_ADMIN' ||
+        request.auth.token.role == 'EXECUTIVE'
+      );
+    }
+
+    function isProjectManager() {
+      return isAuthenticated() && (
+        request.auth.token.role == 'PROJECT_MANAGER' ||
+        isAdmin()
+      );
+    }
+
+    // Public Media: Marketing assets, photos, published renders
+    match /public/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin() || isProjectManager();
+    }
+
+    // Corporate Profile Downloads & Public Documents
+    match /documents/public/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Confidential Project Files: Organized by Organization and Project ID
+    match /organizations/{orgId}/projects/{projectId}/{allPaths=**} {
+      // Must be authenticated and assigned to that organization, or admin
+      allow read: if isAuthenticated() && (
+        request.auth.token.organizationId == orgId ||
+        isAdmin() ||
+        isProjectManager()
+      );
+      // Validating file size <= 50MB and allowed extensions (pdf, dwg, rvt, zip, png, jpg)
+      allow write: if isAuthenticated() && (
+        request.auth.token.organizationId == orgId ||
+        isAdmin() ||
+        isProjectManager()
+      ) &&
+      request.resource.size < 50 * 1024 * 1024 &&
+      request.resource.contentType.matches('application/pdf|application/zip|image/.*|application/acad|application/octet-stream');
+    }
+
+    // Supplier & Partner Accreditation Documents
+    match /partners/{partnerId}/{allPaths=**} {
+      allow read: if isAuthenticated() && (request.auth.uid == partnerId || isAdmin());
+      allow write: if isAuthenticated() && (request.auth.uid == partnerId || isAdmin()) &&
+                   request.resource.size < 20 * 1024 * 1024;
+    }
+  }
+}
