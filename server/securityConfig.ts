@@ -1,4 +1,6 @@
 import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
 
 export interface SecurityAuditEvent {
   id: string;
@@ -102,6 +104,42 @@ export const EMERGENCY_ADMIN_ALLOWLIST: string[] = rawEmergencyAdmins
 // ----------------------------------------------------
 const auditLogsStore: SecurityAuditEvent[] = [];
 
+const DATA_DIR = path.join(process.cwd(), 'data');
+const ACCOUNTS_FILE = path.join(DATA_DIR, 'auth_accounts.json');
+const INVITATIONS_FILE = path.join(DATA_DIR, 'auth_invitations.json');
+const AUDIT_LOGS_FILE = path.join(DATA_DIR, 'security_audit_logs.json');
+
+function ensureDataDir(): void {
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+}
+
+export function persistAuditLogs(): void {
+  try {
+    ensureDataDir();
+    fs.writeFileSync(AUDIT_LOGS_FILE, JSON.stringify(auditLogsStore.slice(0, 500), null, 2), 'utf-8');
+  } catch (err) {
+    console.error('[AUTH DB] Failed to persist audit logs:', err);
+  }
+}
+
+export function loadAuditLogs(): void {
+  try {
+    ensureDataDir();
+    if (fs.existsSync(AUDIT_LOGS_FILE)) {
+      const raw = fs.readFileSync(AUDIT_LOGS_FILE, 'utf-8');
+      const data = JSON.parse(raw);
+      if (Array.isArray(data)) {
+        auditLogsStore.length = 0;
+        auditLogsStore.push(...data);
+      }
+    }
+  } catch (err) {
+    console.error('[AUTH DB] Failed to load audit logs from storage:', err);
+  }
+}
+
 export function recordSecurityAudit(event: Omit<SecurityAuditEvent, 'id' | 'timestamp'>): SecurityAuditEvent {
   const fullEvent: SecurityAuditEvent = {
     ...event,
@@ -113,6 +151,9 @@ export function recordSecurityAudit(event: Omit<SecurityAuditEvent, 'id' | 'time
   if (auditLogsStore.length > 1000) {
     auditLogsStore.pop();
   }
+
+  // Persist to disk
+  persistAuditLogs();
 
   // Safe structured output without secrets
   console.log(`[SECURITY AUDIT] ${fullEvent.action} by ${fullEvent.actor.email} [${fullEvent.outcome}] Target: ${fullEvent.target}`);
@@ -127,6 +168,35 @@ export function getSecurityAuditLogs(limit = 100): SecurityAuditEvent[] {
 // INVITATION STORE (Section 4 & 5)
 // ----------------------------------------------------
 const invitationsStore = new Map<string, PortalInvitation>();
+
+export function persistInvitations(): void {
+  try {
+    ensureDataDir();
+    const invObj: Record<string, PortalInvitation> = {};
+    for (const [key, val] of invitationsStore.entries()) {
+      invObj[key] = val;
+    }
+    fs.writeFileSync(INVITATIONS_FILE, JSON.stringify(invObj, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('[AUTH DB] Failed to persist invitations:', err);
+  }
+}
+
+export function loadInvitations(): void {
+  try {
+    ensureDataDir();
+    if (fs.existsSync(INVITATIONS_FILE)) {
+      const raw = fs.readFileSync(INVITATIONS_FILE, 'utf-8');
+      const data = JSON.parse(raw);
+      invitationsStore.clear();
+      for (const [key, val] of Object.entries(data)) {
+        invitationsStore.set(key, val as PortalInvitation);
+      }
+    }
+  } catch (err) {
+    console.error('[AUTH DB] Failed to load invitations from storage:', err);
+  }
+}
 
 export function hashSecret(secret: string): string {
   return crypto.createHash('sha256').update(secret).digest('hex');
@@ -284,6 +354,19 @@ export function generateCryptographicTemporaryPassword(): string {
 // ----------------------------------------------------
 export const userAccountsStore = new Map<string, UserAccount>();
 
+export function persistUserAccounts(): void {
+  try {
+    ensureDataDir();
+    const accountsObj: Record<string, UserAccount> = {};
+    for (const [key, val] of userAccountsStore.entries()) {
+      accountsObj[key] = val;
+    }
+    fs.writeFileSync(ACCOUNTS_FILE, JSON.stringify(accountsObj, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('[AUTH DB] Failed to persist user accounts:', err);
+  }
+}
+
 // Seed default accounts for authorized test/operational domains with hardened initial states
 export function seedEmergencyAccounts(): void {
   const salt = crypto.randomBytes(16).toString('hex');
@@ -292,14 +375,14 @@ export function seedEmergencyAccounts(): void {
   const emergencyAdmin: UserAccount = {
     uid: 'usr-admin-dhenze-01',
     email: 'dhenzebuilders@gmail.com',
-    fullName: 'Executive Security Administrator',
+    fullName: 'Leodenis “Dhenze” Languisan',
     organizationId: 'org-dhenze-internal',
     organizationName: 'LDL Dhenze Residential Building Construction',
     portalType: 'admin',
     role: 'System Administrator',
-    assignedProjects: ['angeles-reserve', 'clark-tower', 'subic-estate'],
+    assignedProjects: ['all'],
     assignedWorkPackages: ['all'],
-    accountStatus: 'ACTIVE',
+    accountStatus: 'PENDING_FIRST_LOGIN',
     mfaEnrolled: true,
     mfaRequired: true,
     isEmailVerified: true,
@@ -312,13 +395,37 @@ export function seedEmergencyAccounts(): void {
 
   userAccountsStore.set(emergencyAdmin.email, emergencyAdmin);
 }
-seedEmergencyAccounts();
+
+export function loadUserAccounts(): void {
+  try {
+    ensureDataDir();
+    if (fs.existsSync(ACCOUNTS_FILE)) {
+      const raw = fs.readFileSync(ACCOUNTS_FILE, 'utf-8');
+      const data = JSON.parse(raw);
+      userAccountsStore.clear();
+      for (const [key, val] of Object.entries(data)) {
+        userAccountsStore.set(key, val as UserAccount);
+      }
+      return;
+    }
+  } catch (err) {
+    console.error('[AUTH DB] Failed to load user accounts from storage:', err);
+  }
+  seedEmergencyAccounts();
+  persistUserAccounts();
+}
+
+// Initialize and hydrate persistent disk stores
+loadAuditLogs();
+loadInvitations();
+loadUserAccounts();
 
 // Session revocation helper
 export function revokeUserSessions(email: string, actor: string): boolean {
   const user = userAccountsStore.get(email.toLowerCase());
   if (!user) return false;
   user.sessionsRevokedAt = new Date().toISOString();
+  persistUserAccounts();
 
   recordSecurityAudit({
     tenantId: 'ldl-dhenze-ph',
@@ -342,6 +449,7 @@ export function setUserLockState(email: string, locked: boolean, actor: string, 
   if (!locked) {
     user.failedLoginAttempts = 0;
   }
+  persistUserAccounts();
 
   recordSecurityAudit({
     tenantId: 'ldl-dhenze-ph',
@@ -362,6 +470,7 @@ export function setUserSuspensionState(email: string, suspended: boolean, actor:
   const user = userAccountsStore.get(email.toLowerCase());
   if (!user) return false;
   user.accountStatus = suspended ? 'SUSPENDED' : 'ACTIVE';
+  persistUserAccounts();
 
   recordSecurityAudit({
     tenantId: 'ldl-dhenze-ph',
@@ -455,7 +564,21 @@ export function evaluateAccessDecision(
     }
   }
 
-  // 5. ABAC: Data Classification & Legal Hold (Section 13 & 14)
+  // 5. ABAC: Data Classification, Legal Holds & Separation of Duties (Section 13 & 14)
+  if (
+    resourceClassification === 'Restricted-Financial' ||
+    resourceClassification === 'Sealed-Bids' ||
+    resourceClassification === 'Executive-Payment-Approval' ||
+    resourceClassification === 'Legal-Hold-Confidential'
+  ) {
+    if (user.role === 'System Administrator') {
+      return {
+        allowed: false,
+        reason: 'Separation of Duties Policy: System Administrators manage IAM/infrastructure and are strictly excluded from sealed bids, executive payment releases, and confidential commercial transactions.',
+      };
+    }
+  }
+
   if (resourceClassification === 'Restricted-Financial') {
     if (user.role !== 'Executive Approver' && user.role !== 'Active Client') {
       return {

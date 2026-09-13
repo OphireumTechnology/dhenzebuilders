@@ -19,6 +19,8 @@ import {
   UserAccount,
   PortalType,
   PortalRole,
+  persistUserAccounts,
+  persistInvitations,
 } from './securityConfig.ts';
 
 export const securityRouter = Router();
@@ -457,6 +459,7 @@ securityRouter.post('/api/admin/temporary-access/create', (req: Request, res: Re
   };
 
   userAccountsStore.set(lowerEmail, tempUser);
+  persistUserAccounts();
 
   recordSecurityAudit({
     tenantId: 'ldl-dhenze-ph',
@@ -527,8 +530,15 @@ securityRouter.post('/api/auth/accept-invitation', (req: Request, res: Response)
   if (newPassword !== confirmPassword) {
     return res.status(400).json({ error: 'Passwords do not match.' });
   }
-  if (newPassword.length < 12) {
-    return res.status(400).json({ error: 'Password must be at least 12 characters and contain uppercase, lowercase, numbers and symbols.' });
+  if (newPassword.length < 16) {
+    return res.status(400).json({ error: 'Password must be at least 16 characters in length.' });
+  }
+  const hasUpper = /[A-Z]/.test(newPassword);
+  const hasLower = /[a-z]/.test(newPassword);
+  const hasNumber = /[0-9]/.test(newPassword);
+  const hasSymbol = /[^A-Za-z0-9]/.test(newPassword);
+  if (!hasUpper || !hasLower || !hasNumber || !hasSymbol) {
+    return res.status(400).json({ error: 'Password must contain uppercase, lowercase, numbers, and symbols.' });
   }
   if (!agreeToTerms) {
     return res.status(400).json({ error: 'You must accept the confidentiality agreement and terms of service.' });
@@ -568,6 +578,9 @@ securityRouter.post('/api/auth/accept-invitation', (req: Request, res: Response)
   inv.status = 'ACCEPTED';
   inv.usedAt = new Date().toISOString();
 
+  persistUserAccounts();
+  persistInvitations();
+
   recordSecurityAudit({
     tenantId: 'ldl-dhenze-ph',
     organizationId: inv.organizationId,
@@ -584,6 +597,70 @@ securityRouter.post('/api/auth/accept-invitation', (req: Request, res: Response)
     success: true,
     message: 'Account successfully activated. You may now sign in.',
     email: newUser.email,
+  });
+});
+
+// Enforce mandatory password change for newly bootstrapped / temporary accounts
+securityRouter.post('/api/auth/change-password', (req: Request, res: Response) => {
+  const { email, currentPassword, newPassword, confirmPassword } = req.body;
+
+  if (!email || !newPassword) {
+    return res.status(400).json({ error: 'Email and new password are required.' });
+  }
+  if (newPassword !== confirmPassword) {
+    return res.status(400).json({ error: 'New passwords do not match.' });
+  }
+  if (newPassword.length < 16) {
+    return res.status(400).json({ error: 'Password must be at least 16 characters in length.' });
+  }
+  const hasUpper = /[A-Z]/.test(newPassword);
+  const hasLower = /[a-z]/.test(newPassword);
+  const hasNumber = /[0-9]/.test(newPassword);
+  const hasSymbol = /[^A-Za-z0-9]/.test(newPassword);
+  if (!hasUpper || !hasLower || !hasNumber || !hasSymbol) {
+    return res.status(400).json({ error: 'Password must contain uppercase, lowercase, numbers, and symbols.' });
+  }
+
+  const user = userAccountsStore.get(email.toLowerCase().trim());
+  if (!user) {
+    return res.status(404).json({ error: 'User account not found.' });
+  }
+
+  // If current password provided, verify it
+  if (currentPassword) {
+    const checkHash = crypto.pbkdf2Sync(currentPassword, user.passwordSalt, 100000, 64, 'sha512').toString('hex');
+    if (checkHash !== user.passwordHash) {
+      return res.status(401).json({ error: 'Current password verification failed.' });
+    }
+  }
+
+  const salt = crypto.randomBytes(16).toString('hex');
+  const passwordHash = crypto.pbkdf2Sync(newPassword, salt, 100000, 64, 'sha512').toString('hex');
+
+  user.passwordHash = passwordHash;
+  user.passwordSalt = salt;
+  user.mustChangePassword = false;
+  user.accountStatus = 'ACTIVE';
+  user.isEmailVerified = true;
+  user.failedLoginAttempts = 0;
+
+  persistUserAccounts();
+
+  recordSecurityAudit({
+    tenantId: 'ldl-dhenze-ph',
+    organizationId: user.organizationId,
+    actor: { uid: user.uid, email: user.email, role: user.role, ip: req.ip },
+    target: `User:${user.uid}`,
+    action: 'PASSWORD_CHANGE_COMPLETED',
+    outcome: 'SUCCESS',
+    sourceContext: 'SecuritySettings',
+    reason: 'Mandatory password replacement satisfied',
+    correlationId: `PWD-CHG-${Date.now()}`,
+  });
+
+  res.json({
+    success: true,
+    message: 'Password successfully updated. Security compliance confirmed.',
   });
 });
 
