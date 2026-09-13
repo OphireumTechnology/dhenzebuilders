@@ -17,6 +17,14 @@ import { BookConsultationPage } from './components/pages/BookConsultationPage';
 import { PortalPage } from './components/pages/PortalPage';
 import { QATestingConsole } from './components/pages/QATestingConsole';
 import { BuilderAssistantModal } from './components/assistant/BuilderAssistantModal';
+import { PrivacyPolicyPage } from './components/pages/legal/PrivacyPolicyPage';
+import { TermsOfServicePage } from './components/pages/legal/TermsOfServicePage';
+import { RegulatoryDisclosuresPage } from './components/pages/legal/RegulatoryDisclosuresPage';
+import { AccessibilityStatementPage } from './components/pages/legal/AccessibilityStatementPage';
+import { AuthPages } from './components/auth/AuthPages';
+import { ProjectDetailPage } from './components/pages/ProjectDetailPage';
+import { InsightDetailPage } from './components/pages/InsightDetailPage';
+import { EnterprisePortalLayout } from './components/portal/EnterprisePortalLayout';
 
 const ROUTE_METADATA: Record<string, { title: string; description: string }> = {
   home: {
@@ -71,6 +79,26 @@ const ROUTE_METADATA: Record<string, { title: string; description: string }> = {
     title: 'Client Portal | Secure Project Workspace | LDL Dhenze',
     description: 'Restricted client workspace for milestones, technical documentation, architectural drawings, and commercial proposals.',
   },
+  privacy: {
+    title: 'Data Privacy & Protection Notice | LDL Dhenze',
+    description: 'Statutory compliance under RA 10173 (Philippine Data Privacy Act of 2012) and National Privacy Commission regulations.',
+  },
+  terms: {
+    title: 'Terms of Service & Commercial Conditions | LDL Dhenze',
+    description: 'Operational and commercial conditions governing client development workspaces, supplier accreditation, and partner tendering.',
+  },
+  'regulatory-disclosures': {
+    title: 'Licensing & Regulatory Disclosures | LDL Dhenze',
+    description: 'Statutory business registrations, DTI certification, tax identification, and professional practice disclosures.',
+  },
+  accessibility: {
+    title: 'Accessibility Statement & WCAG 2.2 AA Compliance | LDL Dhenze',
+    description: 'Commitment to accessible digital engineering across public portals and private enterprise workspaces.',
+  },
+  login: {
+    title: 'Authenticated Workspace Access | LDL Dhenze',
+    description: 'Secure multi-tenant login for clients, suppliers, partner contractors, and project controllers.',
+  },
   'qa-testing': {
     title: 'Automated QA System Console | LDL Dhenze',
     description: 'Interactive diagnostic suite verifying API endpoints, data schema integrity, and security policies.',
@@ -83,6 +111,8 @@ export default function App() {
   const [assistantOpen, setAssistantOpen] = useState<boolean>(false);
   const [selectedCapabilityId, setSelectedCapabilityId] = useState<string | undefined>();
   const [selectedIndustryId, setSelectedIndustryId] = useState<string | undefined>();
+  const [selectedProjectSlug, setSelectedProjectSlug] = useState<string>('angeles-reserve');
+  const [selectedInsightSlug, setSelectedInsightSlug] = useState<string>('art-01');
 
   // Synchronize route with URL hash for browser history & SPA bookmarking
   useEffect(() => {
@@ -91,7 +121,6 @@ export default function App() {
       if (!hash) return;
 
       if (hash === 'pricing') {
-        // Redirect obsolete public pricing link into authenticated client portal
         setCurrentView('portal');
         return;
       }
@@ -108,6 +137,16 @@ export default function App() {
       } else if (hash.startsWith('industries:')) {
         setSelectedIndustryId(hash.split(':')[1]);
         setCurrentView('industries');
+      } else if (hash.startsWith('projects/') || hash.startsWith('projects:')) {
+        const slug = hash.includes('/') ? hash.split('/')[1] : hash.split(':')[1];
+        setSelectedProjectSlug(slug);
+        setCurrentView('project-detail');
+      } else if (hash.startsWith('insights/') || hash.startsWith('insights:')) {
+        const slug = hash.includes('/') ? hash.split('/')[1] : hash.split(':')[1];
+        setSelectedInsightSlug(slug);
+        setCurrentView('insight-detail');
+      } else if (hash.startsWith('portal/') || hash.startsWith('operations/')) {
+        setCurrentView(hash);
       } else if (ROUTE_METADATA[hash]) {
         setCurrentView(hash);
       }
@@ -135,32 +174,36 @@ export default function App() {
 
   // Robust navigation handler
   const handleNavigate = (view: string) => {
-    let targetView = view;
+    let clean = view.replace(/^#\/?/, '').replace(/^\//, '');
+    let targetView = clean;
 
-    if (view === 'pricing') {
-      // Obsolete public pricing redirects to authenticated Client Portal
+    if (clean === 'pricing') {
       targetView = 'portal';
-    } else if (view.startsWith('capability-')) {
-      const capId = view.replace('capability-', '');
+    } else if (clean.startsWith('capability-')) {
+      const capId = clean.replace('capability-', '');
       setSelectedCapabilityId(capId);
       targetView = 'capabilities';
-    } else if (view.startsWith('capabilities:')) {
-      const capId = view.split(':')[1];
+    } else if (clean.startsWith('capabilities:')) {
+      const capId = clean.split(':')[1];
       setSelectedCapabilityId(capId);
       targetView = 'capabilities';
-    } else if (view === 'capabilities') {
-      targetView = 'capabilities';
-    } else if (view.startsWith('industry-')) {
-      const indId = view.replace('industry-', '');
+    } else if (clean.startsWith('industry-')) {
+      const indId = clean.replace('industry-', '');
       setSelectedIndustryId(indId);
       targetView = 'industries';
-    } else if (view.startsWith('industries:')) {
-      const indId = view.split(':')[1];
+    } else if (clean.startsWith('industries:')) {
+      const indId = clean.split(':')[1];
       setSelectedIndustryId(indId);
       targetView = 'industries';
-    } else if (view === 'industries') {
-      targetView = 'industries';
-    } else if (view.includes('#credentials')) {
+    } else if (clean.startsWith('projects/') || clean.startsWith('projects:')) {
+      const slug = clean.includes('/') ? clean.split('/')[1] : clean.split(':')[1];
+      setSelectedProjectSlug(slug);
+      targetView = 'project-detail';
+    } else if (clean.startsWith('insights/') || clean.startsWith('insights:')) {
+      const slug = clean.includes('/') ? clean.split('/')[1] : clean.split(':')[1];
+      setSelectedInsightSlug(slug);
+      targetView = 'insight-detail';
+    } else if (clean.includes('#credentials')) {
       targetView = 'about';
     }
 
@@ -169,7 +212,33 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Dedicated Client Portal Shell: No public-site navigation or footer inside portal
+  // Enterprise Multi-Tenant Portal Routes
+  if (
+    currentView.startsWith('portal/') ||
+    currentView.startsWith('/portal/') ||
+    currentView.startsWith('operations/') ||
+    currentView.startsWith('/operations/')
+  ) {
+    return (
+      <div className="min-h-screen bg-[#061325] text-slate-100 selection:bg-[#C6922D] selection:text-[#071A2F]">
+        <EnterprisePortalLayout
+          currentPath={`/${currentView.replace(/^\//, '')}`}
+          onNavigate={handleNavigate}
+          currentUserRole={currentUserRole}
+          onChangeUserRole={setCurrentUserRole}
+        />
+        <BuilderAssistantModal
+          isOpen={assistantOpen}
+          onClose={() => setAssistantOpen(false)}
+          currentUserRole={currentUserRole}
+          onChangeUserRole={setCurrentUserRole}
+          onNavigate={handleNavigate}
+        />
+      </div>
+    );
+  }
+
+  // Legacy Single Client Portal View
   if (currentView === 'portal') {
     return (
       <div className="min-h-screen bg-[#061325] text-slate-100 selection:bg-[#C6922D] selection:text-[#071A2F]">
@@ -209,7 +278,7 @@ export default function App() {
         onOpenAssistant={() => setAssistantOpen(true)}
       />
 
-      {/* Main Content Area (With pt-[76px] to prevent fixed header overlap) */}
+      {/* Main Content Area */}
       <main id="main-content" tabIndex={-1} className="flex-1 pt-[76px] focus:outline-none">
         {currentView === 'home' && (
           <HomePage
@@ -243,6 +312,13 @@ export default function App() {
           <ProjectsPage onNavigate={handleNavigate} />
         )}
 
+        {currentView === 'project-detail' && (
+          <ProjectDetailPage
+            projectSlug={selectedProjectSlug}
+            onNavigate={handleNavigate}
+          />
+        )}
+
         {currentView === 'sustainability' && (
           <SustainabilityPage onNavigate={handleNavigate} />
         )}
@@ -256,6 +332,13 @@ export default function App() {
 
         {currentView === 'insights' && (
           <InsightsPage onNavigate={handleNavigate} />
+        )}
+
+        {currentView === 'insight-detail' && (
+          <InsightDetailPage
+            articleSlug={selectedInsightSlug}
+            onNavigate={handleNavigate}
+          />
         )}
 
         {currentView === 'partners' && (
@@ -275,6 +358,49 @@ export default function App() {
 
         {currentView === 'book-consultation' && (
           <BookConsultationPage onNavigate={handleNavigate} />
+        )}
+
+        {currentView === 'privacy' && (
+          <PrivacyPolicyPage onNavigate={handleNavigate} />
+        )}
+
+        {currentView === 'terms' && (
+          <TermsOfServicePage onNavigate={handleNavigate} />
+        )}
+
+        {currentView === 'regulatory-disclosures' && (
+          <RegulatoryDisclosuresPage onNavigate={handleNavigate} />
+        )}
+
+        {currentView === 'accessibility' && (
+          <AccessibilityStatementPage onNavigate={handleNavigate} />
+        )}
+
+        {currentView === 'login' && (
+          <AuthPages
+            mode="login"
+            onNavigate={handleNavigate}
+            currentUserRole={currentUserRole}
+            onChangeUserRole={setCurrentUserRole}
+          />
+        )}
+
+        {currentView === 'forgot-password' && (
+          <AuthPages
+            mode="forgot-password"
+            onNavigate={handleNavigate}
+            currentUserRole={currentUserRole}
+            onChangeUserRole={setCurrentUserRole}
+          />
+        )}
+
+        {currentView === 'verify-email' && (
+          <AuthPages
+            mode="verify-email"
+            onNavigate={handleNavigate}
+            currentUserRole={currentUserRole}
+            onChangeUserRole={setCurrentUserRole}
+          />
         )}
 
         {currentView === 'qa-testing' && (

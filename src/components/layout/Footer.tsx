@@ -263,19 +263,33 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenAssistant }) =
             <div>
               &copy; {new Date().getFullYear()} LDL Dhenze Residential Building Construction. All rights reserved.
             </div>
-            <div className="flex flex-wrap gap-4 text-slate-400">
+            <div className="flex flex-wrap gap-3 text-slate-400">
               <button
-                onClick={() => onNavigate('about')}
+                onClick={() => onNavigate('privacy')}
                 className="hover:text-[#C6922D] transition-colors"
               >
-                Company Credentials
+                Privacy Policy
               </button>
               <span>•</span>
               <button
-                onClick={() => onNavigate('contact')}
+                onClick={() => onNavigate('terms')}
                 className="hover:text-[#C6922D] transition-colors"
               >
-                Executive Inquiries
+                Terms of Service
+              </button>
+              <span>•</span>
+              <button
+                onClick={() => onNavigate('regulatory-disclosures')}
+                className="hover:text-[#C6922D] transition-colors"
+              >
+                Regulatory Disclosures
+              </button>
+              <span>•</span>
+              <button
+                onClick={() => onNavigate('accessibility')}
+                className="hover:text-[#C6922D] transition-colors"
+              >
+                Accessibility
               </button>
               <span>•</span>
               <button
