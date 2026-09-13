@@ -21,6 +21,7 @@ export type UserRole =
 
 export type ProjectStage =
   | 'Concept'
+  | 'Conceptual Study'
   | 'Proposed'
   | 'Pre-development'
   | 'In Development'
@@ -46,7 +47,38 @@ export type AnswerConfidence =
   | 'Information Not Found'
   | 'Human Review Recommended'
   | 'Restricted Information'
-  | 'Outside Allowed Scope';
+  | 'Outside Allowed Scope'
+  | 'Current External Research';
+
+export enum AnswerClassification {
+  VERIFIED_COMPANY_INFO = 'VERIFIED COMPANY INFORMATION',
+  GENERAL_GUIDANCE = 'GENERAL INDUSTRY GUIDANCE',
+  CURRENT_RESEARCH = 'CURRENT EXTERNAL RESEARCH',
+  PRELIMINARY_ANALYSIS = 'PRELIMINARY PROJECT ANALYSIS',
+  PRELIMINARY_CONCEPT = 'PRELIMINARY AI-GENERATED CONCEPT',
+  PROFESSIONAL_REVIEW_REQUIRED = 'PROFESSIONAL REVIEW REQUIRED',
+  INFO_NOT_FOUND = 'INFORMATION NOT FOUND',
+  RESTRICTED_INFO = 'RESTRICTED INFORMATION',
+  OUTSIDE_SCOPE = 'OUTSIDE ALLOWED BUSINESS SCOPE',
+  PROMPT_DEFENSE = 'PROMPT INJECTION DEFENSE',
+  COMMERCIAL_INQUIRY = 'COMMERCIAL INQUIRY',
+}
+
+export enum RecommendedNextAction {
+  START_PROJECT = 'Start a Project',
+  REQUEST_ASSESSMENT = 'Request a Project Assessment',
+  GENERATE_CONCEPT = 'Generate a Preliminary Concept',
+  UPLOAD_DOCUMENTS = 'Upload Project Documents',
+  BOOK_CONSULTATION = 'Book a Technical Consultation',
+  BOOK_DISCOVERY = 'Book a Technical Consultation',
+  REQUEST_PROFESSIONAL_REVIEW = 'Request Professional Review',
+  CONTACT_COMPANY = 'Contact LDL Dhenze',
+  ASK_FOLLOWUP = 'Ask a Follow-up Question',
+  EXPLORE_DESIGN_STUDIO = 'Explore AI Design Studio',
+  CONSULT_PROFESSIONAL = 'Consult Licensed Professional',
+  REACH_OUT_OFFICIAL = 'Connect With Project Manager',
+  PURCHASE_SUBSCRIPTION = 'Upgrade Subscription Plan',
+}
 
 export interface CompanyCredentials {
   businessName: string;
@@ -142,13 +174,17 @@ export interface KnowledgeChunk {
 }
 
 export interface AssistantSourceCitation {
-  documentTitle: string;
-  section: string;
-  publicationDate: string;
-  lastUpdatedDate: string;
-  sourceClassification: string;
+  documentTitle?: string;
+  title?: string;
+  section?: string;
+  publicationDate?: string;
+  lastUpdatedDate?: string;
+  sourceClassification?: string;
   url?: string;
   pageNumber?: number | string;
+  sourceId?: string;
+  category?: string;
+  sourceDoc?: string;
 }
 
 export type Citation = AssistantSourceCitation;
@@ -159,11 +195,20 @@ export interface AssistantMessage {
   content: string;
   timestamp: string;
   confidence?: AnswerConfidence;
+  classification?: AnswerClassification;
   citations?: AssistantSourceCitation[];
+  verifiedCompanySources?: AssistantSourceCitation[];
+  externalSources?: AssistantSourceCitation[];
+  assumptions?: string[];
+  limitations?: string[];
+  recommendedNextAction?: RecommendedNextAction;
+  actionView?: string;
   category?: string;
   feedback?: 'positive' | 'negative';
   flaggedForEscalation?: boolean;
   disclaimer?: string;
+  verifiedCompanyCapabilities?: string;
+  generalDevelopmentApproach?: string;
 }
 
 export interface ProjectInquiryData {
@@ -274,7 +319,8 @@ export type CreditTransactionType =
   | 'PROMOTIONAL_CREDIT'
   | 'PURCHASED_ADDON'
   | 'EXPIRATION'
-  | 'ADMIN_CORRECTION';
+  | 'ADMIN_CORRECTION'
+  | 'USAGE_DESIGN_STUDIO';
 
 export interface PlanEntitlements {
   aiChat: boolean;
@@ -372,6 +418,8 @@ export interface CreditLedgerItem {
   idempotencyKey?: string;
   details: string;
   receiptId?: string;
+  description?: string;
+  referenceId?: string;
 }
 
 export interface CreditReservation {
@@ -437,24 +485,34 @@ export interface ProfitabilityMetrics {
   totalCreditsConsumed: number;
   emergencyShutoffActive: boolean;
   marginAlertThreshold: number;
+  tokenInferenceCostUSD?: number;
+  visualizerRenderCostUSD?: number;
 }
 
 export interface PricingReconciliationRecord {
   planId: string;
   planName: string;
   currentConfiguredPrice: string;
+  currentConfiguredPriceUSD?: number;
   previousProposedPrice: string;
+  previousProposedPriceUSD?: number;
   currency: string;
   billingInterval: string;
   taxStatus: string;
   benchmarkSource: string;
   appliedMultiplier: number;
+  multiplierApplied?: number;
   finalApprovedSellingPrice: string;
+  finalApprovedSellingPriceUSD?: number;
   effectiveDate: string;
   approvalStatus: 'PENDING_EXECUTIVE_APPROVAL' | 'APPROVED' | 'DISCREPANCY_FLAGGED';
   maker: string;
   checker: string;
   discrepancyNote: string;
+  discrepancyDetails?: string;
+  benchmarkReference?: string;
+  createdBy?: string;
+  approvedBy?: string;
 }
 
 export interface UnifiedBenchmarkPolicy {
@@ -508,12 +566,16 @@ export interface CreditLifecyclePolicy {
 
 export interface BankTransferRecord {
   transferId: string;
+  id?: string;
   clientEmail: string;
+  userEmail?: string;
   clientName: string;
   organizationName: string;
+  companyName?: string;
   planId: string;
   priceVersionId: string;
   amountUSD: number;
+  amountPHP?: number;
   bankReferenceNumber: string;
   recordedBy: string;
   recordedAt: string;
@@ -522,4 +584,215 @@ export interface BankTransferRecord {
   approvedAt?: string;
   rejectionReason?: string;
 }
+
+// ----------------------------------------------------
+// LDL DHENZE AI DESIGN STUDIO ARCHITECTURE & DATA MODELS
+// ----------------------------------------------------
+
+export type DesignProjectSector =
+  | 'Residential'
+  | 'Commercial'
+  | 'Industrial and Logistics'
+  | 'Institutional'
+  | 'Agriculture and Agro-Industrial'
+  | 'Energy and Environment'
+  | 'Infrastructure and Smart Development';
+
+export type ProfessionalReviewStatus =
+  | 'Preliminary Concept'
+  | 'Client Accepted'
+  | 'Internally Reviewed'
+  | 'Professionally Reviewed'
+  | 'Approved for Presentation'
+  | 'Approved for Permit Development'
+  | 'Approved for Construction';
+
+export type DesignStudioModuleId =
+  | 'project-setup'
+  | 'site-info'
+  | 'requirements-builder'
+  | 'space-programming'
+  | 'concept-generator'
+  | 'site-planning'
+  | 'floor-plan'
+  | 'elevation'
+  | 'section'
+  | 'masterplan'
+  | 'landscape'
+  | 'interior'
+  | 'exterior-viz'
+  | 'structural'
+  | 'electrical'
+  | 'mechanical'
+  | 'plumbing-sanitary'
+  | 'fire-safety'
+  | 'renewable-energy'
+  | 'water-environmental'
+  | 'agro-industrial'
+  | 'smart-building'
+  | 'smart-city'
+  | 'materials-finishes'
+  | 'preliminary-quantities'
+  | 'budget-framework'
+  | 'equipment-planning'
+  | 'construction-schedule'
+  | 'risk-compliance'
+  | 'drawing-set-builder'
+  | 'professional-review'
+  | 'version-comparison'
+  | 'client-presentation'
+  | 'export-center'
+  | 'credit-usage-center';
+
+export interface SpaceProgramItem {
+  id: string;
+  name: string;
+  zone: 'Public' | 'Semi-Public' | 'Private' | 'Service' | 'Circulation' | 'Technical';
+  quantity: number;
+  minAreaSqM: number;
+  targetAreaSqM: number;
+  maxAreaSqM: number;
+  capacityPersons: number;
+  occupancyType: string;
+  adjacencies: string[];
+  privacyLevel: 'Low' | 'Medium' | 'High' | 'Restricted';
+  naturalLight: 'High' | 'Medium' | 'Low' | 'None Required';
+  ventilation: 'Natural' | 'Mechanical' | 'Hybrid' | 'Controlled Clean Room';
+  equipment: string[];
+  notes?: string;
+}
+
+export interface DrawingSheet {
+  id: string;
+  sheetNumber: string;
+  title: string;
+  category: 'Architectural' | 'Structural' | 'Electrical' | 'Mechanical' | 'Sanitary' | 'Site' | 'Landscape' | 'Specialist';
+  scale: string;
+  status: ProfessionalReviewStatus;
+  date: string;
+  version: string;
+  generatedBy: string;
+  reviewerName?: string;
+  reviewStatus: string;
+  qrCode: string;
+  disclaimer: string;
+  notes: string;
+  svgContent?: string;
+}
+
+export interface DesignOption {
+  id: string;
+  optionKey: 'Option A' | 'Option B' | 'Option C';
+  title: string;
+  description: string;
+  floorAreaSqM: number;
+  siteUtilizationPercent: number;
+  capacityOccupants: number;
+  circulationScore: number;
+  naturalLightScore: number;
+  costRangePHP: string;
+  scheduleMonths: number;
+  advantages: string[];
+  limitations: string[];
+  sustainabilityRating: string;
+}
+
+export interface DesignVersion {
+  id: string;
+  versionNumber: string;
+  revisionNumber: number;
+  description: string;
+  timestamp: string;
+  requestedBy: string;
+  generatedBy: string;
+  creditCost: number;
+  reviewStatus: ProfessionalReviewStatus;
+  assumptions: string[];
+  limitations: string[];
+  changesSummary: string;
+}
+
+export interface ProfessionalReviewRecord {
+  id: string;
+  projectId: string;
+  reviewerName: string;
+  profession: 'Architect' | 'Civil Engineer' | 'Structural Engineer' | 'Electrical Engineer' | 'Mechanical Engineer' | 'Sanitary Engineer' | 'Geodetic Engineer' | 'Environmental Specialist' | 'Quantity Surveyor';
+  licenseNumber: string;
+  licenseExpiry: string;
+  verificationSource: string;
+  verifiedDate: string;
+  reviewScope: string;
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CONDITIONALLY_APPROVED';
+  decision: string;
+  comments: string;
+  timestamp: string;
+  conflictOfInterestDeclared: boolean;
+}
+
+export interface DesignProject {
+  id: string;
+  title: string;
+  organizationId: string;
+  clientName: string;
+  clientEmail: string;
+  sector: DesignProjectSector;
+  projectType: string;
+  description: string;
+  location: string;
+  stage: ProjectStage;
+  status: 'Draft' | 'In Design' | 'Under Review' | 'Client Accepted' | 'Proposal Ready';
+  floorAreaSqM: number;
+  lotAreaSqM: number;
+  floorsCount: number;
+  estimatedBudgetPHP: string;
+  targetCommencement: string;
+  targetCompletion: string;
+  createdAt: string;
+  updatedAt: string;
+  currentVersion: string;
+  versionsCount: number;
+  drawingSheetsCount: number;
+  creditsSpent: number;
+  // Detailed module contents
+  siteInfo: {
+    dimensions: string;
+    boundaryNotes: string;
+    roadAccess: string;
+    orientation: string;
+    topography: string;
+    floodRisk: string;
+    zoning: string;
+    setbacks: string;
+    easements: string;
+    heightRestrictions: string;
+  };
+  requirements: {
+    architecturalStyle: string;
+    primaryMaterials: string[];
+    sustainabilityGoals: string[];
+    parkingSlots: number;
+    accessibilityCompliance: boolean;
+    solarReadiness: boolean;
+    rainwaterHarvesting: boolean;
+    bmsAutomation: boolean;
+  };
+  spaceProgram: SpaceProgramItem[];
+  drawingSheets: DrawingSheet[];
+  options: DesignOption[];
+  versions: DesignVersion[];
+  reviews: ProfessionalReviewRecord[];
+}
+
+export interface DesignStudioCreditEstimate {
+  moduleId: DesignStudioModuleId;
+  moduleName: string;
+  baseCredits: number;
+  complexityMultiplier: number;
+  appliedFactors: string[];
+  totalCreditsEstimated: number;
+  availableBalance: number;
+  remainingBalanceAfter: number;
+  processingTimeEstimateSeconds: number;
+}
+
 

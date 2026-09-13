@@ -993,12 +993,12 @@ export const PortalPage: React.FC<PortalPageProps> = ({
                           <div className="text-[10px] text-slate-500 font-mono">ID: {rec.planId} • {rec.billingInterval}</div>
                         </td>
                         <td className="py-3 px-3 text-right font-mono font-bold text-slate-100 whitespace-nowrap">
-                          ${rec.currentConfiguredPriceUSD.toLocaleString()}
-                          <div className="text-[10px] text-slate-400 font-normal">₱{(rec.currentConfiguredPriceUSD * 58.5).toLocaleString()}</div>
+                          ${(Number(rec.currentConfiguredPriceUSD) || 0).toLocaleString()}
+                          <div className="text-[10px] text-slate-400 font-normal">₱{((Number(rec.currentConfiguredPriceUSD) || 0) * 58.5).toLocaleString()}</div>
                         </td>
                         <td className="py-3 px-3 text-right font-mono text-rose-300 whitespace-nowrap">
-                          ${rec.previousProposedPriceUSD.toLocaleString()}
-                          <div className="text-[10px] text-slate-500 font-normal">₱{(rec.previousProposedPriceUSD * 58.5).toLocaleString()}</div>
+                          ${(Number(rec.previousProposedPriceUSD) || 0).toLocaleString()}
+                          <div className="text-[10px] text-slate-500 font-normal">₱{((Number(rec.previousProposedPriceUSD) || 0) * 58.5).toLocaleString()}</div>
                         </td>
                         <td className="py-3 px-3 text-slate-300 max-w-xs text-[11px]">
                           {rec.discrepancyDetails}
@@ -1012,7 +1012,7 @@ export const PortalPage: React.FC<PortalPageProps> = ({
                           </span>
                         </td>
                         <td className="py-3 px-3 text-right font-mono font-bold text-emerald-400 whitespace-nowrap">
-                          ${rec.finalApprovedSellingPriceUSD.toLocaleString()}
+                          ${(Number(rec.finalApprovedSellingPriceUSD) || 0).toLocaleString()}
                         </td>
                         <td className="py-3 px-3 text-[11px] font-mono">
                           <div className="text-slate-300">M: {rec.createdBy}</div>

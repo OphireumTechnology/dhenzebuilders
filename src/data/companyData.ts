@@ -657,7 +657,7 @@ export const INDUSTRIES_DATA: IndustryItem[] = [
       { title: 'Modern Sustainable Residences', description: 'Architecturally designed homes integrating thermal roof insulation and solar rooftop provisions.' },
     ],
     complianceRequirements: 'All residential construction adheres to BP 220, PD 957, and the National Building Code of the Philippines.',
-    heroImage: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+    heroImage: '/dhenzebuilders/assets/images/residential-team.jpg',
   },
   {
     id: 'commercial-development',
@@ -679,7 +679,7 @@ export const INDUSTRIES_DATA: IndustryItem[] = [
       { title: 'Corporate Office Facilities', description: 'Modern building shells pre-provisioned for high-speed fiber-optic backbones and energy-efficient HVAC.' },
     ],
     complianceRequirements: 'Complies with National Building Code commercial occupancy classifications and fire safety regulations.',
-    heroImage: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
+    heroImage: '/dhenzebuilders/assets/images/commercial-build.jpg',
   },
   {
     id: 'industrial-development',
@@ -701,7 +701,7 @@ export const INDUSTRIES_DATA: IndustryItem[] = [
       { title: 'Industrial Manufacturing Plants', description: 'Heavy machinery foundations with isolated vibration dampers and high-volume electrical power substations.' },
     ],
     complianceRequirements: 'Designed to meet PEZA industrial estate specifications, DOLE safety regulations, and environmental standards.',
-    heroImage: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80',
+    heroImage: '/dhenzebuilders/assets/images/agro-solar-logistics.jpg',
   },
   {
     id: 'government-infrastructure',
@@ -723,7 +723,7 @@ export const INDUSTRIES_DATA: IndustryItem[] = [
       { title: 'Flood Mitigation Channels', description: 'Reinforced concrete canals designed to prevent monsoon flood inundation in low-lying barangays.' },
     ],
     complianceRequirements: 'Strictly complies with DPWH standard specifications for highways, bridges, and public buildings.',
-    heroImage: 'https://images.unsplash.com/photo-1545459720-aac8509eb02c?auto=format&fit=crop&w=1200&q=80',
+    heroImage: '/dhenzebuilders/assets/images/civil-roads.jpg',
   },
   {
     id: 'real-estate-property-development',
@@ -748,7 +748,7 @@ export const INDUSTRIES_DATA: IndustryItem[] = [
       { title: 'Mixed-Use Town Center Nodes', description: 'Strategic suburban town centers integrating neighborhood retail, medical clinics, and townhouses.' },
     ],
     complianceRequirements: 'Adheres to DHSUD rules, PD 957, BP 220, and local Comprehensive Land Use Plans (CLUP).',
-    heroImage: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80',
+    heroImage: '/dhenzebuilders/assets/images/township-plan.jpg',
   },
   {
     id: 'agriculture-agro-industrial-development',
@@ -777,7 +777,7 @@ export const INDUSTRIES_DATA: IndustryItem[] = [
       { title: 'Farm Solar Microgrid & Irrigation', description: 'Off-grid solar arrays powering borehole pumps and cold storage compressors with battery backup.' },
     ],
     complianceRequirements: 'Complies with Department of Agriculture guidelines, Bureau of Animal Industry standards, and DENR environmental ECC requirements.',
-    heroImage: 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=1200&q=80',
+    heroImage: '/dhenzebuilders/assets/images/agro-solar-logistics.jpg',
   },
   {
     id: 'hospitality-tourism',
@@ -798,7 +798,7 @@ export const INDUSTRIES_DATA: IndustryItem[] = [
       { title: 'Eco-Resort Pavilions', description: 'Elevated tropical architecture maximizing sea breezes, timber aesthetics, and concealed solar rooftop arrays.' },
     ],
     complianceRequirements: 'Adheres to Department of Tourism (DOT) standards and DENR coastal setback regulations.',
-    heroImage: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80',
+    heroImage: '/dhenzebuilders/assets/images/hero-central-luzon.jpg',
   },
   {
     id: 'healthcare-facilities',
@@ -819,7 +819,7 @@ export const INDUSTRIES_DATA: IndustryItem[] = [
       { title: 'Specialized Medical Centers', description: 'Code-compliant clinical layouts separating sterile and contaminated patient flows with automated touchless doors.' },
     ],
     complianceRequirements: 'Complies with Department of Health (DOH) hospital licensing standards and health facility guidelines.',
-    heroImage: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1200&q=80',
+    heroImage: '/dhenzebuilders/assets/images/healthcare-facility.jpg',
   },
   {
     id: 'education-campuses',
@@ -840,7 +840,7 @@ export const INDUSTRIES_DATA: IndustryItem[] = [
       { title: 'Modern Academic Pavilions', description: 'Durable reinforced concrete school buildings engineered to withstand category-5 typhoons and serve as community shelters.' },
     ],
     complianceRequirements: 'Adheres to DepEd and CHED campus development standards and national fire codes.',
-    heroImage: 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1200&q=80',
+    heroImage: '/dhenzebuilders/assets/images/bim-engineering.jpg',
   },
   {
     id: 'logistics-warehousing',
@@ -861,7 +861,7 @@ export const INDUSTRIES_DATA: IndustryItem[] = [
       { title: 'Regional Distribution Hubs', description: 'Clear-span logistics depots connecting port corridors to provincial consumer markets.' },
     ],
     complianceRequirements: 'Complies with fire safety bureau high-hazard storage standards and structural load limits.',
-    heroImage: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80',
+    heroImage: '/dhenzebuilders/assets/images/agro-solar-logistics.jpg',
   },
   {
     id: 'renewable-energy-utilities',
@@ -882,7 +882,7 @@ export const INDUSTRIES_DATA: IndustryItem[] = [
       { title: 'Solar PV Power Plants', description: 'Utility and commercial scale solar farms built with heavy-duty corrosion-resistant mounting systems.' },
     ],
     complianceRequirements: 'Full alignment with the Renewable Energy Act of 2008 (RA 9513), DOE, and ERC guidelines.',
-    heroImage: 'https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=1200&q=80',
+    heroImage: '/dhenzebuilders/assets/images/solar-storage.jpg',
   },
   {
     id: 'technology-infrastructure',
@@ -903,7 +903,7 @@ export const INDUSTRIES_DATA: IndustryItem[] = [
       { title: 'Edge Data Centers', description: 'Hardened modular server facilities engineered for regional cloud hosting and telecom peering.' },
     ],
     complianceRequirements: 'Engineered to TIA-942 Data Center standards and NTC regulatory frameworks.',
-    heroImage: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=80',
+    heroImage: '/dhenzebuilders/assets/images/smart-building.jpg',
   },
   {
     id: 'transportation-civil-works',
@@ -924,7 +924,7 @@ export const INDUSTRIES_DATA: IndustryItem[] = [
       { title: 'Intermodal Bus Terminals', description: 'Weather-protected passenger concourses with organized ticketing, waiting lounges, and organized bus bays.' },
     ],
     complianceRequirements: 'Complies with DPWH highway design standards and DOTr guidelines.',
-    heroImage: 'https://images.unsplash.com/photo-1545459720-aac8509eb02c?auto=format&fit=crop&w=1200&q=80',
+    heroImage: '/dhenzebuilders/assets/images/civil-roads.jpg',
   },
   {
     id: 'township-development',
@@ -945,7 +945,7 @@ export const INDUSTRIES_DATA: IndustryItem[] = [
       { title: 'Integrated Smart Townships', description: 'Forward-looking community developments providing residents with complete walkability, green energy, and digital connectivity.' },
     ],
     complianceRequirements: 'Coordination with provincial and municipal masterplans, DENR, and regulatory agencies.',
-    heroImage: 'https://images.unsplash.com/photo-1477959858617-67f30bc75b82?auto=format&fit=crop&w=1200&q=80',
+    heroImage: '/dhenzebuilders/assets/images/township-plan.jpg',
   },
   {
     id: 'smart-cities',
@@ -1014,6 +1014,44 @@ export const INDUSTRIES_DATA: IndustryItem[] = [
 
 export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
   {
+    id: 'san-fernando-commercial-shell',
+    name: 'San Fernando Commercial Structural Shell & Civil Works',
+    code: 'LDL-PRJ-2023-001',
+    sector: 'Commercial & Hospitality',
+    location: 'San Fernando, Pampanga',
+    stage: 'Completed',
+    clientDisclosureStatus: 'Public',
+    scope: 'Turnkey structural civil execution, reinforced concrete columns and shear walls, perimeter retaining barrier, and high-load commercial parking apron.',
+    servicesByLdlDhenze: [
+      'Engineered excavation, soil compaction, and foundation pouring',
+      'Class-A reinforced concrete structural columns and slabs',
+      'Civil drainage installation and asphaltic concrete pavement',
+      'Direct heavy machinery mobilization and aggregate logistics',
+    ],
+    servicesByPartners: [
+      'Architectural master design signed & sealed by licensed PRC Architect',
+      'Structural seismic calculations by licensed Civil/Structural Engineer',
+      'Sanitary and mechanical ventilation engineering sign-off',
+    ],
+    challenge: 'Tight urban commercial site envelope with active adjacent retail traffic requiring zero-incident perimeter safety shields and just-in-time ready-mix transit.',
+    solution: 'Modular steel formwork system with off-peak evening concrete pouring and dedicated flagger-controlled transit lanes.',
+    verifiedMetrics: [
+      { label: 'Built Footprint', value: '2,800 sq.m' },
+      { label: 'Safety Milestone', value: 'Zero Lost-Time Incidents' },
+      { label: 'Structural Grade', value: '4,000 PSI Compressive' },
+      { label: 'Turnover Status', value: 'Certified Occupancy Issued' },
+    ],
+    heroImage: '/dhenzebuilders/assets/images/commercial-build.jpg',
+    gallery: [
+      '/dhenzebuilders/assets/images/commercial-build.jpg',
+      '/dhenzebuilders/assets/images/civil-roads.jpg',
+      '/dhenzebuilders/assets/images/heavy-equipment.jpg',
+    ],
+    isConceptual: false,
+    sustainableFeatures: ['High-albedo reflective roof surface', 'Permeable interlocking concrete pavers'],
+    year: '2023–2024',
+  },
+  {
     id: 'pampanga-residential-cluster',
     name: 'Angeles City Residential Villa Cluster',
     code: 'LDL-PRJ-2024-001',
@@ -1041,11 +1079,11 @@ export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
       { label: 'Safety Record', value: 'Zero Lost-Time Incidents' },
       { label: 'Structure', value: 'Reinforced Concrete Class A' },
     ],
-    heroImage: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+    heroImage: '/dhenzebuilders/assets/images/residential-team.jpg',
     gallery: [
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1541888946425-d0fbb186c5f8?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80',
+      '/dhenzebuilders/assets/images/residential-team.jpg',
+      '/dhenzebuilders/assets/images/bim-engineering.jpg',
+      '/dhenzebuilders/assets/images/smart-building.jpg',
     ],
     isConceptual: false,
     sustainableFeatures: ['Solar-ready conduits', 'Rainwater collection downspouts', 'Cross-ventilation orientation'],
@@ -1078,10 +1116,11 @@ export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
       { label: 'Cold Storage Capacity', value: '3,000 MT (Planned)' },
       { label: 'Internal Roadway', value: '1.2 km Paved' },
     ],
-    heroImage: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80',
+    heroImage: '/dhenzebuilders/assets/images/agro-solar-logistics.jpg',
     gallery: [
-      'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?auto=format&fit=crop&w=1200&q=80',
+      '/dhenzebuilders/assets/images/agro-solar-logistics.jpg',
+      '/dhenzebuilders/assets/images/heavy-equipment.jpg',
+      '/dhenzebuilders/assets/images/water-utilities.jpg',
     ],
     isConceptual: false,
     sustainableFeatures: ['500 kWp rooftop solar PV provision', 'Retention pond for farm irrigation reuse'],
@@ -1113,10 +1152,10 @@ export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
       { label: 'Annual Yield Est.', value: '365,000 kWh' },
       { label: 'CO2 Offset', value: '240 Tons/year' },
     ],
-    heroImage: 'https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=1200&q=80',
+    heroImage: '/dhenzebuilders/assets/images/solar-storage.jpg',
     gallery: [
-      'https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1477959858617-67f30bc75b82?auto=format&fit=crop&w=1200&q=80',
+      '/dhenzebuilders/assets/images/solar-storage.jpg',
+      '/dhenzebuilders/assets/images/smart-building.jpg',
     ],
     isConceptual: true,
     sustainableFeatures: ['100% clean solar daytime energy', 'Peak load shaving through BESS storage'],
@@ -1128,7 +1167,7 @@ export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
     code: 'LDL-PRJ-2025-004',
     sector: 'Smart Cities & Township Development',
     location: 'Central Luzon Growth Corridor',
-    stage: 'Concept',
+    stage: 'Conceptual Study',
     clientDisclosureStatus: 'Public',
     scope: 'Visionary masterplan framework exploring the convergence of sustainable residential housing, agro-tourism farming, solar microgrids, and IoT urban environmental sensors.',
     servicesByLdlDhenze: [
@@ -1148,10 +1187,10 @@ export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
       { label: 'Zoned Clusters', value: '4 Distinct Districts' },
       { label: 'Project Status', value: 'Conceptual Vision (Not Built)' },
     ],
-    heroImage: 'https://images.unsplash.com/photo-1477959858617-67f30bc75b82?auto=format&fit=crop&w=1200&q=80',
+    heroImage: '/dhenzebuilders/assets/images/township-plan.jpg',
     gallery: [
-      'https://images.unsplash.com/photo-1477959858617-67f30bc75b82?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=1200&q=80',
+      '/dhenzebuilders/assets/images/township-plan.jpg',
+      '/dhenzebuilders/assets/images/hero-central-luzon.jpg',
     ],
     isConceptual: true,
     sustainableFeatures: ['Agrivoltaic solar zones', 'Full circular water recycling', 'EV charging hubs'],
