@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Shield } from 'lucide-react';
 import { UserRole } from './types';
 import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
@@ -250,19 +251,19 @@ export default function App() {
     currentView.startsWith('portal/') ||
     currentView.startsWith('/portal/') ||
     currentView.startsWith('operations/') ||
-    currentView.startsWith('/operations/');
+    currentView.startsWith('/operations/') ||
+    currentView === 'admin' ||
+    currentView.startsWith('admin/') ||
+    currentView.startsWith('/admin/') ||
+    currentView.startsWith('projects/private/') ||
+    currentView.startsWith('/projects/private/');
 
   // 1. Emergency Portal Lock Guard (Section 1)
   if (isPortalPath && !portalsEnabled && !isEmergencyAdmin) {
     return (
       <EmergencyPortalLockScreen
         onNavigate={handleNavigate}
-        onEmergencyUnlockSuccess={(adminUser) => {
-          setIsEmergencyAdmin(true);
-          setPortalsEnabled(true);
-          setAuthenticatedUser(adminUser);
-          setCurrentUserRole('SYSTEM_ADMIN');
-        }}
+        currentUser={authenticatedUser}
       />
     );
   }
@@ -278,7 +279,10 @@ export default function App() {
           onChangeUserRole={setCurrentUserRole}
           onLoginSuccess={(user) => {
             setAuthenticatedUser(user);
-            if (user.role === 'System Administrator' || user.email === 'dhenzebuilders@gmail.com') {
+            const isAllowlistedAdmin =
+              (user.role === 'System Administrator' || user.role === 'SYSTEM_ADMIN') &&
+              ['dhenzebuilders@gmail.com', 'info@dhenzebuilder.com'].includes((user.email || '').toLowerCase());
+            if (isAllowlistedAdmin) {
               setIsEmergencyAdmin(true);
             }
           }}
@@ -288,7 +292,37 @@ export default function App() {
   }
 
   // 3. System Administrator IAM & Access Management Console (Section 5 & 17)
-  if (currentView === 'admin' || currentView === 'admin/access') {
+  if (currentView === 'admin' || currentView.startsWith('admin/') || currentView.startsWith('/admin/')) {
+    if (currentUserRole !== 'SYSTEM_ADMIN') {
+      return (
+        <div className="min-h-screen bg-[#050E1A] text-slate-100 flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-[#08182B] border border-rose-500/30 rounded-2xl p-6 sm:p-8 text-center space-y-4">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20">
+              <Shield className="w-6 h-6" />
+            </div>
+            <h2 className="text-xl font-serif font-bold text-white">403 Forbidden: Administrator Only</h2>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Access to the System Administration and IAM Console is strictly restricted to accounts with the verified <code className="text-[#C6922D] font-mono">System Administrator</code> role.
+            </p>
+            <div className="pt-2 flex justify-center gap-3">
+              <button
+                onClick={() => handleNavigate('home')}
+                className="px-4 py-2 text-xs font-semibold text-slate-300 hover:text-white bg-white/5 border border-white/10 rounded-lg"
+              >
+                Return Home
+              </button>
+              <button
+                onClick={() => handleNavigate('operations/overview')}
+                className="px-4 py-2 text-xs font-semibold text-[#071A2F] bg-[#C6922D] hover:bg-[#d8a339] rounded-lg"
+              >
+                Go to Workspace
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="min-h-screen bg-[#050E1A] text-slate-100 p-4 sm:p-8 blueprint-grid">
         <div className="max-w-7xl mx-auto space-y-4">
@@ -301,7 +335,7 @@ export default function App() {
             </button>
             <div className="flex items-center gap-3">
               <span className="text-xs font-mono text-[#C6922D]">
-                Session: {authenticatedUser?.email || 'dhenzebuilders@gmail.com'}
+                Session: {authenticatedUser?.email || 'Authorized Administrator'}
               </span>
               <button
                 onClick={() => handleNavigate('operations/overview')}

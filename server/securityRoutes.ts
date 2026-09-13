@@ -78,19 +78,26 @@ export function portalLockMiddleware(req: Request, res: Response, next: NextFunc
     const emergencyHeader = (req.headers['x-emergency-admin-email'] as string) || '';
     const emergencyKey = (req.headers['x-emergency-key'] as string) || '';
 
-    // Allow explicitly allowlisted emergency administrators with verified credentials
+    // Allow explicitly allowlisted emergency administrators with verified session
     const candidateEmail = emergencyHeader.toLowerCase().trim();
     const isAllowlisted = EMERGENCY_ADMIN_ALLOWLIST.includes(candidateEmail);
+    const user = userAccountsStore.get(candidateEmail);
 
-    if (isAllowlisted && (emergencyKey === 'EmergencyAdminPass#2026' || authHeader.includes('Bearer emergency-admin-token'))) {
+    if (
+      isAllowlisted &&
+      user &&
+      user.role === 'System Administrator' &&
+      user.accountStatus === 'ACTIVE' &&
+      authHeader.startsWith('Bearer sess_')
+    ) {
       recordSecurityAudit({
         tenantId: 'ldl-dhenze-ph',
         actor: { uid: candidateEmail, email: candidateEmail, role: 'Emergency Administrator', ip: req.ip },
         target: req.originalUrl,
-        action: 'EMERGENCY_PORTAL_BYPASS_ACCESS',
+        action: 'EMERGENCY_PORTAL_ADMIN_ACCESS',
         outcome: 'SUCCESS',
-        sourceContext: 'EmergencyPortalLockBypass',
-        reason: 'Authorized emergency admin accessing locked system for verification',
+        sourceContext: 'EmergencyPortalLockMiddleware',
+        reason: 'Authorized emergency administrator accessing system under controlled oversight',
         correlationId: `EMERGENCY-ACCESS-${Date.now()}`,
       });
       return next();
@@ -135,7 +142,7 @@ securityRouter.get('/api/security/portal-status', (req: Request, res: Response) 
 });
 
 securityRouter.post('/api/security/emergency-unlock-toggle', (req: Request, res: Response) => {
-  const { email, emergencyKey, enabled, reason } = req.body;
+  const { email, password, enabled, reason } = req.body;
   const lowerEmail = (email || '').toLowerCase().trim();
 
   if (!EMERGENCY_ADMIN_ALLOWLIST.includes(lowerEmail)) {
@@ -152,8 +159,25 @@ securityRouter.post('/api/security/emergency-unlock-toggle', (req: Request, res:
     return res.status(403).json({ error: 'Unauthorized. Email address is not in the Emergency Administrator allowlist.' });
   }
 
-  if (emergencyKey !== 'EmergencyAdminPass#2026') {
-    return res.status(401).json({ error: 'Invalid emergency credential key.' });
+  const user = userAccountsStore.get(lowerEmail);
+  if (!user || user.accountStatus !== 'ACTIVE' || user.role !== 'System Administrator') {
+    return res.status(403).json({ error: 'Unauthorized. Account is not an active System Administrator.' });
+  }
+
+  // Cryptographic PBKDF2 password verification
+  const computedHash = crypto.pbkdf2Sync(password || '', user.passwordSalt, 100000, 64, 'sha512').toString('hex');
+  if (computedHash !== user.passwordHash) {
+    recordSecurityAudit({
+      tenantId: 'ldl-dhenze-ph',
+      actor: { uid: user.uid, email: lowerEmail, ip: req.ip },
+      target: 'FeatureFlag:PORTALS_ENABLED',
+      action: 'EMERGENCY_LOCK_TOGGLE_BAD_PASSWORD',
+      outcome: 'DENIED',
+      sourceContext: 'EmergencyUnlockEndpoint',
+      reason: 'Invalid cryptographic password supplied for emergency lock toggle',
+      correlationId: `SEC-ERR-${Date.now()}`,
+    });
+    return res.status(401).json({ error: 'Invalid administrator credentials.' });
   }
 
   setPortalsEnabled(Boolean(enabled), lowerEmail);

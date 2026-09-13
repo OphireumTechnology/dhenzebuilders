@@ -1,83 +1,28 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   ShieldAlert,
   Lock,
   ArrowLeft,
   Key,
   CheckCircle2,
-  AlertCircle,
-  FileCheck2,
-  RefreshCw,
   EyeOff,
-  UserCheck,
-  Server,
   Terminal,
 } from 'lucide-react';
 import { BrandLogo } from '../common/BrandLogo';
 
 interface EmergencyPortalLockScreenProps {
   onNavigate: (view: string) => void;
-  onEmergencyUnlockSuccess?: (adminUser: any) => void;
+  currentUser?: any;
 }
 
 export const EmergencyPortalLockScreen: React.FC<EmergencyPortalLockScreenProps> = ({
   onNavigate,
-  onEmergencyUnlockSuccess,
+  currentUser,
 }) => {
-  const [adminModalOpen, setAdminModalOpen] = useState(false);
-  const [adminEmail, setAdminEmail] = useState('dhenzebuilders@gmail.com');
-  const [emergencyKey, setEmergencyKey] = useState('EmergencyAdminPass#2026');
-  const [adminLoading, setAdminLoading] = useState(false);
-  const [adminError, setAdminError] = useState<string | null>(null);
-  const [adminSuccess, setAdminSuccess] = useState<string | null>(null);
-
-  const handleEmergencyVerify = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAdminError(null);
-    setAdminSuccess(null);
-    setAdminLoading(true);
-
-    try {
-      const res = await fetch('/api/security/emergency-unlock-toggle', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: adminEmail,
-          emergencyKey,
-          enabled: true, // unlock for emergency administrative session
-          reason: 'Authorized Emergency Administrator diagnostic sign-in',
-        }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        setAdminError(data.error || 'Emergency verification failed.');
-        setAdminLoading(false);
-        return;
-      }
-
-      setAdminSuccess('Emergency identity verified. Portal lock temporarily lifted for authorized administrator session.');
-      setTimeout(() => {
-        setAdminLoading(false);
-        setAdminModalOpen(false);
-        if (onEmergencyUnlockSuccess) {
-          onEmergencyUnlockSuccess({
-            uid: 'usr-admin-dhenze-01',
-            email: adminEmail,
-            role: 'System Administrator',
-            fullName: 'Executive Emergency Administrator',
-            organizationId: 'org-dhenze-internal',
-            organizationName: 'LDL Dhenze Residential Building Construction',
-            portalType: 'admin',
-          });
-        }
-        onNavigate('operations/overview');
-      }, 1000);
-    } catch (err: any) {
-      setAdminError(err.message || 'Connection to security server failed.');
-      setAdminLoading(false);
-    }
-  };
+  const isEmergencyAdmin =
+    currentUser &&
+    currentUser.role === 'System Administrator' &&
+    ['dhenzebuilders@gmail.com', 'info@dhenzebuilder.com'].includes((currentUser.email || '').toLowerCase());
 
   return (
     <div className="min-h-screen bg-[#050E1A] text-slate-100 flex flex-col justify-between blueprint-grid relative overflow-hidden">
@@ -155,102 +100,26 @@ export const EmergencyPortalLockScreen: React.FC<EmergencyPortalLockScreenProps>
               <span>Return to Public Website</span>
             </button>
 
-            <button
-              onClick={() => setAdminModalOpen(true)}
-              className="w-full sm:w-auto px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#071A2F] bg-[#C6922D] hover:bg-[#d8a339] rounded-lg transition-all shadow-lg flex items-center justify-center gap-2"
-            >
-              <Key className="w-4 h-4" />
-              <span>Emergency Admin Access</span>
-            </button>
+            {isEmergencyAdmin ? (
+              <button
+                onClick={() => onNavigate('operations/overview')}
+                className="w-full sm:w-auto px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#071A2F] bg-[#C6922D] hover:bg-[#d8a339] rounded-lg transition-all shadow-lg flex items-center justify-center gap-2"
+              >
+                <Key className="w-4 h-4" />
+                <span>Enter Emergency Operations Console</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => onNavigate('auth/login')}
+                className="w-full sm:w-auto px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#071A2F] bg-[#C6922D] hover:bg-[#d8a339] rounded-lg transition-all shadow-lg flex items-center justify-center gap-2"
+              >
+                <Key className="w-4 h-4" />
+                <span>Administrator Identity Sign In</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
-
-      {/* Emergency Admin Modal */}
-      {adminModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
-          <div className="max-w-md w-full bg-[#081B2F] border border-[#C6922D]/40 rounded-2xl p-6 sm:p-8 shadow-2xl relative">
-            <div className="flex items-center justify-between mb-6 pb-3 border-b border-white/10">
-              <div className="flex items-center gap-2">
-                <UserCheck className="w-5 h-5 text-[#C6922D]" />
-                <h3 className="text-base font-serif font-bold text-white">Emergency Administrator Verification</h3>
-              </div>
-              <button
-                onClick={() => setAdminModalOpen(false)}
-                className="text-slate-400 hover:text-white text-sm"
-              >
-                ✕
-              </button>
-            </div>
-
-            {adminError && (
-              <div className="mb-4 p-3 bg-rose-950/70 border border-rose-800 rounded-lg text-xs text-rose-200 flex items-start gap-2">
-                <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
-                <span>{adminError}</span>
-              </div>
-            )}
-
-            {adminSuccess && (
-              <div className="mb-4 p-3 bg-emerald-950/70 border border-emerald-800 rounded-lg text-xs text-emerald-200 flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <span>{adminSuccess}</span>
-              </div>
-            )}
-
-            <form onSubmit={handleEmergencyVerify} className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  Allowlisted Administrator Email
-                </label>
-                <input
-                  type="email"
-                  value={adminEmail}
-                  onChange={(e) => setAdminEmail(e.target.value)}
-                  className="w-full px-3 py-2 bg-[#051322] border border-white/10 rounded-lg text-sm text-white font-mono focus:border-[#C6922D] focus:outline-none"
-                  placeholder="dhenzebuilders@gmail.com"
-                  required
-                />
-                <p className="text-[11px] text-slate-400 mt-1">Must match registered emergency allowlist.</p>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  Emergency Security Passkey
-                </label>
-                <input
-                  type="password"
-                  value={emergencyKey}
-                  onChange={(e) => setEmergencyKey(e.target.value)}
-                  className="w-full px-3 py-2 bg-[#051322] border border-white/10 rounded-lg text-sm text-white font-mono focus:border-[#C6922D] focus:outline-none"
-                  placeholder="••••••••••••"
-                  required
-                />
-                <p className="text-[11px] text-slate-400 mt-1">Default test passkey: <code className="text-[#C6922D]">EmergencyAdminPass#2026</code></p>
-              </div>
-
-              <div className="pt-3">
-                <button
-                  type="submit"
-                  disabled={adminLoading}
-                  className="w-full py-2.5 bg-[#C6922D] hover:bg-[#d8a339] text-[#071A2F] text-xs font-bold uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  {adminLoading ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      <span>Verifying Cryptographic Credentials...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Key className="w-4 h-4" />
-                      <span>Authenticate & Enter Workspace</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       {/* Footer */}
       <footer className="py-4 px-6 text-center text-xs text-slate-500 border-t border-white/5">

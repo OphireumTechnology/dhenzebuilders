@@ -35,8 +35,8 @@ export const AuthPages: React.FC<AuthPagesProps> = ({
   );
 
   // Login Form State
-  const [email, setEmail] = useState('dhenzebuilders@gmail.com');
-  const [password, setPassword] = useState('AdminSecure#2026');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [mfaCode, setMfaCode] = useState('');
   const [mfaStep, setMfaStep] = useState(false);
 

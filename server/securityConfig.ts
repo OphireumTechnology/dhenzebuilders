@@ -306,7 +306,7 @@ export function seedEmergencyAccounts(): void {
     failedLoginAttempts: 0,
     passwordHash: defaultHash,
     passwordSalt: salt,
-    mustChangePassword: false,
+    mustChangePassword: true,
     createdAt: '2026-09-01T00:00:00Z',
   };
 
