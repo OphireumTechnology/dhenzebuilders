@@ -4,8 +4,8 @@ import path from 'path';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  // Required because the repository is named "dhenzebuilders"
-  base: '/dhenzebuilders/',
+  // Custom domain: https://dhenzebuilder.com
+  base: '/',
 
   plugins: [
     react(),
