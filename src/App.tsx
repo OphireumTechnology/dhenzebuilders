@@ -27,6 +27,9 @@ import { InsightDetailPage } from './components/pages/InsightDetailPage';
 import { EnterprisePortalLayout } from './components/portal/EnterprisePortalLayout';
 import { EmergencyPortalLockScreen } from './components/security/EmergencyPortalLockScreen';
 import { AdminAccessConsole } from './components/security/AdminAccessConsole';
+import { CeoCornerPage } from './components/pages/CeoCornerPage';
+import { CompanyProfilePage } from './components/pages/CompanyProfilePage';
+import { CompanyProfileAdminConsole } from './components/admin/CompanyProfileAdminConsole';
 
 const ROUTE_METADATA: Record<string, { title: string; description: string }> = {
   home: {
@@ -104,6 +107,18 @@ const ROUTE_METADATA: Record<string, { title: string; description: string }> = {
   'qa-testing': {
     title: 'Automated QA System Console | LDL Dhenze',
     description: 'Interactive diagnostic suite verifying API endpoints, data schema integrity, and security policies.',
+  },
+  'ceo-corner': {
+    title: 'Founder’s Message & CEO Corner | LDL Dhenze Residential Building Construction',
+    description: 'Official leadership message, founder pledge, and governance principles by Leodenis “Dhenze” Languisan, Founder, President and CEO.',
+  },
+  'company-profile': {
+    title: 'Corporate Profile & Statutory Registrations | LDL Dhenze',
+    description: 'Official comprehensive Corporate Profile, DTI Certificate No. 4812272, BIR Form 2303, PSIC 42900, and nine registered business fields.',
+  },
+  'company-profile-admin': {
+    title: 'Corporate Profile Publication Console | LDL Dhenze Admin',
+    description: 'Dual-custody verification, automated safety checks, and publication lifecycle management for official corporate profile.',
   },
 };
 
@@ -517,6 +532,24 @@ export default function App() {
 
         {currentView === 'qa-testing' && (
           <QATestingConsole onNavigate={handleNavigate} />
+        )}
+
+        {currentView === 'ceo-corner' && (
+          <CeoCornerPage
+            onNavigate={handleNavigate}
+            onOpenAssistant={() => setAssistantOpen(true)}
+          />
+        )}
+
+        {currentView === 'company-profile' && (
+          <CompanyProfilePage
+            onNavigate={handleNavigate}
+            onOpenAssistant={() => setAssistantOpen(true)}
+          />
+        )}
+
+        {currentView === 'company-profile-admin' && (
+          <CompanyProfileAdminConsole onNavigate={handleNavigate} />
         )}
       </main>
 

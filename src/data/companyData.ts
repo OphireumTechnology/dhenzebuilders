@@ -10,33 +10,38 @@ import {
   IndustryItem,
   PortfolioProject,
 } from '../types';
+import { CORPORATE_INFO } from './corporateInfo';
 
 export const COMPANY_CREDENTIALS: CompanyCredentials = {
-  businessName: 'LDL DHENZE RESIDENTIAL BUILDING CONSTRUCTION',
-  proprietor: 'Leodenis Deveza Languisan',
-  businessStructure: 'Single Proprietorship duly organized and existing under the laws of the Republic of the Philippines',
-  dtiRegistrationNumber: '4812272',
-  dtiValidity: '22 March 2023 to 22 March 2028, inclusive',
-  dtiTerritorialScope: 'City/Municipality',
-  dtiLocality: 'Quezon City, National Capital Region, Second District',
-  birRegisteredTradeName: 'LDL Dhenze Residential Building Construction',
-  birLineOfBusiness: 'Construction of Other Civil Engineering Projects',
-  psicCode: '42900 — Construction of Other Civil Engineering Projects',
-  tin: '306-113-062-00000',
-  rdo: 'Revenue District Office No. 214A North Pampanga (Revenue Region No. 004 - City of San Fernando, Pampanga)',
-  birCertificateDate: 'March 17, 2025',
-  birForm2303Ocn: '21ARC2025000002189',
-  registeredAddress: 'KMC | One West Aeropark, Clark Freeport Zone, Mabalacat City, 2010 Pampanga, Philippines',
-  contactPhone: '',
-  contactEmail: 'info@dhenzebuilder.com',
-  website: 'https://dhenzebuilder.com',
+  businessName: CORPORATE_INFO.registrations.businessName,
+  proprietor: CORPORATE_INFO.registrations.proprietor,
+  businessStructure: CORPORATE_INFO.registrations.businessStructure,
+  dtiRegistrationNumber: CORPORATE_INFO.registrations.dtiNumber,
+  dtiValidity: CORPORATE_INFO.registrations.dtiValidity,
+  dtiTerritorialScope: CORPORATE_INFO.registrations.dtiTerritorialScope,
+  dtiLocality: CORPORATE_INFO.registrations.dtiLocality,
+  birRegisteredTradeName: CORPORATE_INFO.registrations.birTradeName,
+  birLineOfBusiness: CORPORATE_INFO.registrations.birLineOfBusiness,
+  psicCode: CORPORATE_INFO.registrations.psicCode,
+  tin: CORPORATE_INFO.registrations.tin,
+  rdo: CORPORATE_INFO.registrations.rdo,
+  birCertificateDate: CORPORATE_INFO.registrations.birCertificateDate,
+  birForm2303Ocn: CORPORATE_INFO.registrations.birForm2303Ocn,
+  registeredAddress: CORPORATE_INFO.headquarters.fullFormatted,
+  contactPhone: CORPORATE_INFO.contacts.telephoneDisplay,
+  contactEmail: CORPORATE_INFO.contacts.primaryEmail,
+  website: CORPORATE_INFO.contacts.website,
 };
 
-export const OFFICIAL_TAGLINE = 'BUILDING TODAY. ENGINEERING TOMORROW. POWERING THE FUTURE.';
+export const OFFICIAL_TAGLINE = CORPORATE_INFO.tagline;
 
 export const FOUNDER_INFO = {
-  name: 'Leodenis Deveza Languisan',
-  title: 'Founder, President & Chief Executive Officer',
+  name: CORPORATE_INFO.executive.legalName,
+  displayName: CORPORATE_INFO.executive.publicDisplayName,
+  title: CORPORATE_INFO.executive.professionalTitle,
+  phone: CORPORATE_INFO.contacts.telephoneDisplay,
+  phoneLink: CORPORATE_INFO.contacts.telephoneLink,
+  email: CORPORATE_INFO.contacts.primaryEmail,
   education: [
     {
       degree: 'Bachelor of Commerce, Major in Banking and Finance',
@@ -1292,7 +1297,11 @@ export const COMPANY_PROFILE = {
 export const LEADERSHIP_PROFILES = [
   {
     name: FOUNDER_INFO.name,
+    displayName: FOUNDER_INFO.displayName,
     title: FOUNDER_INFO.title,
+    phone: FOUNDER_INFO.phone,
+    phoneLink: FOUNDER_INFO.phoneLink,
+    email: FOUNDER_INFO.email,
     bio: FOUNDER_INFO.bio,
     bankingBackground:
       'Extensive background with JPMorgan Chase Bank in mortgage and loan operations, instilling institutional risk controls, documentation integrity, and regulatory compliance.',

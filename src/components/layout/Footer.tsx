@@ -1,13 +1,17 @@
 import React from 'react';
 import { BrandLogo } from '../common/BrandLogo';
 import { COMPANY_CREDENTIALS } from '../../data/companyData';
+import { CORPORATE_INFO } from '../../data/corporateInfo';
 import {
   ShieldCheck,
   MapPin,
   Mail,
+  Phone,
   ArrowUpRight,
   Lock,
   Compass,
+  FileText,
+  UserCheck,
 } from 'lucide-react';
 
 interface FooterProps {
@@ -35,19 +39,43 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenAssistant }) =
             </div>
 
             {/* Verified Contact Details */}
-            <div className="space-y-2 pt-2 text-xs text-slate-300">
-              <div className="flex items-start gap-2">
+            <div className="space-y-2.5 pt-2 text-xs text-slate-300">
+              <div className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 text-[#C6922D] shrink-0 mt-0.5" />
-                <span className="leading-snug">{COMPANY_CREDENTIALS.registeredAddress}</span>
+                <div className="leading-snug">
+                  <div className="font-semibold text-slate-200">
+                    {CORPORATE_INFO.headquarters.facility}
+                  </div>
+                  <div className="text-slate-400 text-[11px]">
+                    {CORPORATE_INFO.headquarters.city}, {CORPORATE_INFO.headquarters.country}
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-[#C6922D] shrink-0" />
+              <div className="flex items-center gap-2.5">
+                <Phone className="w-4 h-4 text-[#C6922D] shrink-0" />
                 <a
-                  href={`mailto:${COMPANY_CREDENTIALS.contactEmail}`}
-                  className="hover:text-[#C6922D] transition-colors"
+                  href={CORPORATE_INFO.contacts.telephoneLink}
+                  className="font-medium text-slate-200 hover:text-[#C6922D] transition-colors"
                 >
-                  {COMPANY_CREDENTIALS.contactEmail}
+                  {CORPORATE_INFO.contacts.telephoneDisplay}
                 </a>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <Mail className="w-4 h-4 text-[#C6922D] shrink-0 mt-0.5" />
+                <div className="space-y-0.5">
+                  <a
+                    href={`mailto:${CORPORATE_INFO.contacts.primaryEmail}`}
+                    className="hover:text-[#C6922D] transition-colors block text-slate-200 font-medium"
+                  >
+                    {CORPORATE_INFO.contacts.primaryEmail}
+                  </a>
+                  <a
+                    href={`mailto:${CORPORATE_INFO.contacts.secondaryEmail}`}
+                    className="hover:text-[#C6922D] transition-colors block text-slate-400 text-[11px]"
+                  >
+                    {CORPORATE_INFO.contacts.secondaryEmail}
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -193,11 +221,20 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenAssistant }) =
               </li>
               <li>
                 <button
-                  onClick={() => onNavigate('login')}
-                  className="hover:text-[#C6922D] text-slate-200 transition-colors text-left flex items-center gap-1"
+                  onClick={() => onNavigate('ceo-corner')}
+                  className="hover:text-[#C6922D] transition-colors text-left flex items-center gap-1.5 font-medium text-slate-200"
                 >
-                  <Lock className="w-3 h-3 text-[#C6922D]" />
-                  Account Login
+                  <UserCheck className="w-3.5 h-3.5 text-[#C6922D]" />
+                  Founder's Message & CEO Corner
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigate('company-profile')}
+                  className="hover:text-[#C6922D] transition-colors text-left flex items-center gap-1.5 font-medium text-slate-200"
+                >
+                  <FileText className="w-3.5 h-3.5 text-[#C6922D]" />
+                  Company Profile & Registrations
                 </button>
               </li>
               <li>
@@ -205,7 +242,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenAssistant }) =
                   onClick={() => onNavigate('about')}
                   className="hover:text-[#C6922D] transition-colors text-left"
                 >
-                  Company & Leadership
+                  Company & Governance
                 </button>
               </li>
               <li>
@@ -222,6 +259,15 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenAssistant }) =
                   className="hover:text-[#C6922D] transition-colors text-left"
                 >
                   Executive Insights
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigate('login')}
+                  className="hover:text-[#C6922D] text-slate-300 transition-colors text-left flex items-center gap-1"
+                >
+                  <Lock className="w-3 h-3 text-[#C6922D]" />
+                  Client & Partner Login
                 </button>
               </li>
             </ul>

@@ -157,7 +157,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, onOpenAssistan
                 LDL
               </div>
               <h3 className="text-lg font-bold text-white font-['Montserrat']">
-                {founder.name}
+                {founder.displayName || founder.name}
               </h3>
               <p className="text-xs text-[#C6922D] font-semibold mt-0.5">
                 {founder.title}
@@ -165,6 +165,20 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, onOpenAssistan
               <div className="mt-4 pt-4 border-t border-white/10 text-[11px] text-slate-400 space-y-1">
                 <div>B.Comm in Banking & Finance (STI College)</div>
                 <div>B.S. Information Technology (DCCP)</div>
+              </div>
+              <div className="mt-4 pt-4 border-t border-white/10 space-y-2">
+                <button
+                  onClick={() => onNavigate('ceo-corner')}
+                  className="w-full py-2 px-3 rounded-lg bg-[#C6922D] hover:bg-[#d8a339] text-[#071A2F] font-bold text-[11px] uppercase tracking-wider transition-colors inline-flex items-center justify-center gap-1.5 shadow"
+                >
+                  <span>Founder’s Message &amp; Pledge</span>
+                </button>
+                <button
+                  onClick={() => onNavigate('company-profile')}
+                  className="w-full py-2 px-3 rounded-lg bg-white/5 hover:bg-white/10 text-slate-200 border border-white/15 text-[11px] font-medium transition-colors inline-flex items-center justify-center gap-1.5"
+                >
+                  <span>Company Profile &amp; Registrations</span>
+                </button>
               </div>
             </div>
 

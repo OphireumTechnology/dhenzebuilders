@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { COMPANY_PROFILE } from '../../data/companyData';
+import { CORPORATE_INFO } from '../../data/corporateInfo';
 import {
   MapPin,
   Mail,
@@ -81,22 +81,34 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onNavigate, onOpenAssi
             <div className="bg-[#09223d] border border-[#C6922D]/30 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl">
               <div>
                 <h3 className="text-lg font-bold text-white font-['Montserrat']">
-                  Registered Corporate Office
+                  Executive Headquarters &amp; Registered Office
                 </h3>
-                <p className="text-xs text-slate-400 mt-1">
-                  Republic of the Philippines
+                <p className="text-xs text-[#C6922D] mt-1 font-mono">
+                  {CORPORATE_INFO.companyName}
                 </p>
               </div>
 
               <div className="space-y-4 text-xs text-slate-300">
                 <div className="flex items-start gap-3.5">
                   <div className="w-9 h-9 rounded-lg bg-[#C6922D]/15 text-[#C6922D] flex items-center justify-center shrink-0 mt-0.5">
+                    <Building className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="text-[10px] text-slate-400 uppercase font-semibold">Executive Headquarters</div>
+                    <div className="text-white font-medium mt-0.5 leading-relaxed">
+                      {CORPORATE_INFO.headquarters.fullFormatted}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3.5">
+                  <div className="w-9 h-9 rounded-lg bg-[#C6922D]/15 text-[#C6922D] flex items-center justify-center shrink-0 mt-0.5">
                     <MapPin className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className="text-[10px] text-slate-400 uppercase font-semibold">Address</div>
+                    <div className="text-[10px] text-slate-400 uppercase font-semibold">Tax Registered Address (BIR Form 2303)</div>
                     <div className="text-white font-medium mt-0.5 leading-relaxed">
-                      {COMPANY_PROFILE.registeredAddress}
+                      {CORPORATE_INFO.registrations.taxRegisteredAddress}
                     </div>
                   </div>
                 </div>
@@ -106,9 +118,24 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onNavigate, onOpenAssi
                     <Mail className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className="text-[10px] text-slate-400 uppercase font-semibold">Email</div>
-                    <div className="text-white font-medium mt-0.5">
-                      {COMPANY_PROFILE.email}
+                    <div className="text-[10px] text-slate-400 uppercase font-semibold">Official Corporate Email</div>
+                    <div className="text-white font-medium mt-0.5 space-y-0.5">
+                      <div>
+                        <a
+                          href={`mailto:${CORPORATE_INFO.contacts.primaryEmail}`}
+                          className="text-[#C6922D] hover:underline"
+                        >
+                          {CORPORATE_INFO.contacts.primaryEmail}
+                        </a>
+                      </div>
+                      <div className="text-slate-400 text-[11px]">
+                        <a
+                          href={`mailto:${CORPORATE_INFO.contacts.secondaryEmail}`}
+                          className="hover:text-slate-200"
+                        >
+                          {CORPORATE_INFO.contacts.secondaryEmail}
+                        </a>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -118,9 +145,14 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onNavigate, onOpenAssi
                     <Phone className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className="text-[10px] text-slate-400 uppercase font-semibold">Telephone & Mobile</div>
-                    <div className="text-white font-medium mt-0.5">
-                      {COMPANY_PROFILE.phone}
+                    <div className="text-[10px] text-slate-400 uppercase font-semibold">Direct Executive Line</div>
+                    <div className="mt-0.5">
+                      <a
+                        href={CORPORATE_INFO.contacts.telephoneLink}
+                        className="text-white font-medium hover:text-[#C6922D] transition-colors"
+                      >
+                        {CORPORATE_INFO.contacts.telephoneDisplay}
+                      </a>
                     </div>
                   </div>
                 </div>
@@ -130,9 +162,9 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onNavigate, onOpenAssi
                     <Clock className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className="text-[10px] text-slate-400 uppercase font-semibold">Business Hours</div>
+                    <div className="text-[10px] text-slate-400 uppercase font-semibold">Operating Hours</div>
                     <div className="text-white font-medium mt-0.5">
-                      {COMPANY_PROFILE.operatingHours}
+                      {CORPORATE_INFO.contacts.operatingHours}
                     </div>
                   </div>
                 </div>
@@ -141,11 +173,15 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onNavigate, onOpenAssi
               <div className="pt-4 border-t border-white/10 text-xs text-slate-400 space-y-2">
                 <div className="flex justify-between">
                   <span>DTI Registration:</span>
-                  <span className="font-mono text-white">4812272 (2023–2028)</span>
+                  <span className="font-mono text-white">BN {CORPORATE_INFO.registrations.dtiNumber} (2023–2028)</span>
                 </div>
                 <div className="flex justify-between">
                   <span>BIR TIN:</span>
-                  <span className="font-mono text-white">306-113-062-00000</span>
+                  <span className="font-mono text-white">{CORPORATE_INFO.registrations.tin}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>PSIC Code:</span>
+                  <span className="font-mono text-[#C6922D]">{CORPORATE_INFO.registrations.psicCode}</span>
                 </div>
               </div>
             </div>

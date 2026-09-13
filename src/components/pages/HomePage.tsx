@@ -6,6 +6,8 @@ import {
   FOUNDER_INFO,
   COMPANY_CREDENTIALS,
 } from '../../data/companyData';
+import { CORPORATE_INFO } from '../../data/corporateInfo';
+import { CeoCornerSection } from '../company/CeoCornerSection';
 import {
   ArrowRight,
   ShieldCheck,
@@ -112,20 +114,75 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenAssistant 
       </section>
 
       {/* ---------------------------------------------------- */}
-      {/* 2. CORPORATE POSITIONING STATEMENT */}
+      {/* 2. INSTITUTIONAL STEWARDSHIP (ASYMMETRIC TWO-COLUMN LAYOUT) */}
       {/* ---------------------------------------------------- */}
-      <section className="py-20 lg:py-24 bg-[#061325] border-b border-white/5 relative">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-block text-[#C6922D] text-xs font-mono uppercase tracking-widest mb-4">
-            Institutional Stewardship
-          </div>
-          <p className="font-serif-display text-2xl sm:text-3xl lg:text-4xl text-slate-100 leading-relaxed font-normal">
-            “LDL Dhenze Residential Building Construction is a Philippine development and construction enterprise coordinating the commercial, technical, and operational disciplines required to transform ambitious concepts into enduring assets. Our approach combines responsible governance, qualified professional collaboration, transparent project controls, and long-term development thinking.”
-          </p>
-          <div className="mt-8 flex items-center justify-center gap-3 text-xs text-slate-400">
-            <span className="w-8 h-[1px] bg-[#C6922D]/40" />
-            <span className="font-semibold text-slate-300">LDL Dhenze Executive Committee</span>
-            <span className="w-8 h-[1px] bg-[#C6922D]/40" />
+      <section className="py-20 lg:py-28 bg-[#061325] border-b border-[#C6922D]/20 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+            {/* Column A: Left 7 Columns - Narrative & Strategic Context */}
+            <div className="lg:col-span-7 space-y-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C6922D]/10 border border-[#C6922D]/30 text-[#C6922D] text-xs font-mono font-bold uppercase tracking-widest">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>{CORPORATE_INFO.stewardship.eyebrow}</span>
+              </div>
+
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white font-['Montserrat'] tracking-tight leading-tight">
+                {CORPORATE_INFO.stewardship.heading}
+              </h2>
+
+              <div className="space-y-4 text-base sm:text-lg text-slate-300 leading-relaxed font-sans font-normal">
+                <p>{CORPORATE_INFO.stewardship.body1}</p>
+                <p>{CORPORATE_INFO.stewardship.body2}</p>
+              </div>
+
+              <p className="text-xs sm:text-sm text-slate-400 italic pt-2 border-t border-white/10 font-serif">
+                {CORPORATE_INFO.stewardship.supportingStatement}
+              </p>
+
+              <div className="pt-2">
+                <button
+                  onClick={() => onNavigate(CORPORATE_INFO.stewardship.actionRoute)}
+                  className="px-6 py-3 rounded-lg bg-[#C6922D] hover:bg-[#d8a339] text-[#071A2F] font-bold text-xs uppercase tracking-wider transition-colors inline-flex items-center gap-2 shadow-lg"
+                >
+                  <span>{CORPORATE_INFO.stewardship.actionLabel}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Column B: Right 5 Columns - Stewardship Three-Pillar Framework */}
+            <div className="lg:col-span-5 space-y-4">
+              <div className="text-xs font-mono uppercase tracking-widest text-[#C6922D] font-bold pb-1">
+                Core Governance Framework
+              </div>
+
+              {CORPORATE_INFO.stewardship.framework.map((item) => (
+                <div
+                  key={item.number}
+                  className="bg-[#071A2F] border border-white/10 rounded-xl p-5 hover:border-[#C6922D]/40 transition-colors space-y-2 group"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-sm font-bold text-[#C6922D] group-hover:text-[#e5b95d]">
+                      {item.number}
+                    </span>
+                    <span className="text-[10px] uppercase tracking-wider font-mono text-slate-500">
+                      Discipline
+                    </span>
+                  </div>
+                  <h3 className="text-base font-bold text-white font-['Montserrat']">
+                    {item.title}
+                  </h3>
+                  <p className="text-xs text-slate-300 leading-relaxed font-sans">
+                    {item.description}
+                  </p>
+                </div>
+              ))}
+
+              <div className="bg-[#071A2F]/60 border border-white/5 rounded-xl p-4 text-[11px] text-slate-400 flex items-center gap-2.5">
+                <Scale className="w-4 h-4 text-[#C6922D] shrink-0" />
+                <span>Strict statutory compliance under RA 9266 and Philippine building laws.</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -471,6 +528,11 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenAssistant 
           </div>
         </div>
       </section>
+
+      {/* ---------------------------------------------------- */}
+      {/* CEO CORNER & FOUNDER'S SOLEMN PLEDGE (PHASE 2) */}
+      {/* ---------------------------------------------------- */}
+      <CeoCornerSection onNavigate={onNavigate} />
 
       {/* ---------------------------------------------------- */}
       {/* 7. PRIVATE CONSULTATION CTA */}

@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 120" width="500" height="120" fill="none">
+  <!-- Gradient definitions -->
+  <defs>
+    <linearGradient id="goldGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E5B95D"/>
+      <stop offset="50%" stop-color="#C6922D"/>
+      <stop offset="100%" stop-color="#8E6516"/>
+    </linearGradient>
+    <linearGradient id="navyTone" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0E2B4C"/>
+      <stop offset="100%" stop-color="#071A2F"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Left Geometric Monogram & Tower Cluster -->
+  <g transform="translate(10, 10)">
+    <!-- Architectural Louvers / Towers -->
+    <rect x="36" y="32" width="3.5" height="24" rx="0.5" fill="#38BDF8" />
+    <rect x="42" y="27" width="3.5" height="29" rx="0.5" fill="#38BDF8" />
+    <rect x="48" y="21" width="3.5" height="35" rx="0.5" fill="#38BDF8" />
+
+    <!-- Center Skyscraper -->
+    <path d="M 54 60 L 54 18 L 62 10 L 62 60 Z" fill="#071A2F" stroke="url(#goldGlow)" stroke-width="1" />
+
+    <!-- Right Modern Stepped High-Rise -->
+    <path d="M 62 60 L 62 26 L 68 26 L 68 33 L 74 33 L 74 60 Z" fill="#1E3A8A" />
+
+    <!-- Interlocking Monogram LDL -->
+    <!-- First 'L' -->
+    <path d="M 12 20 L 22 20 L 22 55 L 42 55 L 42 65 L 12 65 Z" fill="url(#goldGlow)" />
+    <!-- Center 'D' Frame -->
+    <path d="M 38 15 L 62 15 C 78 15 88 28 88 45 C 88 62 78 75 L 38 75 Z M 48 25 L 48 65 L 60 65 C 70 65 76 57 76 45 C 76 33 70 25 60 25 Z" fill="#0E2B4C" stroke="url(#goldGlow)" stroke-width="1.5" />
+    <!-- Final 'L' -->
+    <path d="M 72 32 L 82 32 L 82 62 L 98 62 L 98 72 L 72 72 Z" fill="url(#goldGlow)" />
+    
+    <!-- Base Foundation Line -->
+    <rect x="8" y="78" width="94" height="3.5" rx="1.5" fill="url(#goldGlow)" />
+  </g>
+
+  <!-- Typography Cluster -->
+  <g transform="translate(130, 20)">
+    <!-- Primary Entity Name -->
+    <text x="0" y="32" font-family="'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="900" fill="#071A2F" letter-spacing="0.06em">
+      LDL DHENZE
+    </text>
+    <text x="0" y="52" font-family="'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#C6922D" letter-spacing="0.14em">
+      RESIDENTIAL BUILDING CONSTRUCTION
+    </text>
+
+    <!-- Subtitle / Motto -->
+    <text x="0" y="70" font-family="'Cinzel', 'Playfair Display', Georgia, serif" font-size="8.5" font-weight="700" fill="#475569" letter-spacing="0.16em">
+      BUILDING TODAY • ENGINEERING TOMORROW • POWERING THE FUTURE
+    </text>
+  </g>
+</svg>
