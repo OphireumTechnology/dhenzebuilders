@@ -14,71 +14,65 @@ import { PartnersPage } from './components/pages/PartnersPage';
 import { ContactPage } from './components/pages/ContactPage';
 import { StartProjectWizard } from './components/pages/StartProjectWizard';
 import { BookConsultationPage } from './components/pages/BookConsultationPage';
-import { PricingPage } from './components/pages/PricingPage';
 import { PortalPage } from './components/pages/PortalPage';
 import { QATestingConsole } from './components/pages/QATestingConsole';
 import { BuilderAssistantModal } from './components/assistant/BuilderAssistantModal';
-import { Sparkles } from 'lucide-react';
 
 const ROUTE_METADATA: Record<string, { title: string; description: string }> = {
   home: {
-    title: 'LDL Dhenze Residential Building Construction | Building Today. Engineering Tomorrow. Powering the Future.',
-    description: 'Integrated development, construction, civil works, renewable energy, and smart infrastructure across Central Luzon and the Philippines.',
+    title: 'LDL Dhenze | Private Development, Engineering & Infrastructure',
+    description: 'LDL Dhenze brings disciplined development planning, coordinated engineering, construction execution, and resilient infrastructure together for private, institutional, and strategic projects across the Philippines.',
   },
   about: {
-    title: 'About LDL Dhenze | Corporate Identity, Governance & Statutory Compliance',
-    description: 'DTI-registered construction enterprise (BN 4812272) led by Leodenis Deveza Languisan with institutional banking governance and compliance rigor.',
+    title: 'Company & Governance | LDL Dhenze Residential Building Construction',
+    description: 'Philippine development and construction enterprise coordinating commercial, technical, and operational disciplines with institutional banking governance.',
   },
   capabilities: {
-    title: 'Capabilities | 14 Integrated Lines of Business & Services | LDL Dhenze',
-    description: 'Comprehensive scope: civil works, direct supply networks, heavy fleet mobilization, architecture coordination, solar PV microgrids, and smart telemetry.',
+    title: 'Strategic Disciplines & Expertise | LDL Dhenze',
+    description: 'Development advisory, coordinated architecture and engineering, civil infrastructure, renewable utilities, and project controls across the Philippines.',
   },
   industries: {
-    title: 'Industries Served | Strategic Market Sectors | LDL Dhenze',
-    description: 'Delivering tailored engineering solutions for residential developments, agro-industrial cold storage, clean energy, civil roads, and smart townships.',
+    title: 'Strategic Development Sectors | LDL Dhenze',
+    description: 'Private residential estates, mixed-use commercial, hospitality, healthcare, logistics, and renewable microgrids across the Philippines.',
   },
   projects: {
-    title: 'Verified Project Portfolio | Projects & Studies | LDL Dhenze',
-    description: 'Explore completed, under-construction, in-development, proposed, and conceptual developments with verified metrics and statutory disclaimers.',
+    title: 'Selected Work & Developments | LDL Dhenze',
+    description: 'Verified portfolio of completed, under-construction, and planned development projects across the Philippines with rigorous status classification.',
   },
   sustainability: {
-    title: 'Sustainability & ESG | Renewable Energy & Decarbonization | LDL Dhenze',
-    description: 'Alignment with RA 9513 Renewable Energy Act, rooftop solar PV, BESS storage, water conservation, and low-carbon construction practices.',
+    title: 'Sustainability & Resilient Utilities | LDL Dhenze',
+    description: 'Alignment with RA 9513 Renewable Energy Act, commercial rooftop solar PV, BESS storage, water conservation, and resilient construction practices.',
   },
   technology: {
-    title: 'Technology & Applied Innovation | BIM, Digital Twins & IoT | LDL Dhenze',
-    description: 'Modern infrastructure technology: Building Information Modeling (BIM), 4D timeline simulation, IoT sensor networks, and autonomous site management.',
-  },
-  pricing: {
-    title: 'Pricing & Commercial Structure | Transparent Unit Economics | LDL Dhenze',
-    description: 'Institutional-grade commercial transparency: cost breakdowns, unit rates, AI engineering tier pricing, and direct bank reconciliation.',
+    title: 'Building Technology & Digital Project Controls | LDL Dhenze',
+    description: 'Building Information Modeling (BIM), 4D timeline simulation, IoT telemetry, and transparent digital milestone tracking.',
   },
   insights: {
-    title: 'Industry Insights & Technical Publications | LDL Dhenze',
+    title: 'Executive Insights & Technical Publications | LDL Dhenze',
     description: 'Philippine building code analysis, renewable microgrid engineering white papers, and regional infrastructure development intelligence.',
   },
   partners: {
-    title: 'Partner Ecosystem & Subcontractor Onboarding | LDL Dhenze',
+    title: 'Professional Partners & Ecosystem | LDL Dhenze',
     description: 'Collaborating with PRC-licensed professionals, accredited material suppliers, and specialized engineering contractors.',
   },
   contact: {
-    title: 'Contact Engineering Headquarters | Inquiries & Consultation | LDL Dhenze',
-    description: 'Connect with LDL Dhenze in San Fernando, Pampanga. Direct phone, email, and location channels for commercial and technical inquiries.',
+    title: 'Executive Inquiries & Headquarters | LDL Dhenze',
+    description: 'Direct inquiries to LDL Dhenze executive offices at KMC | One West Aeropark, Clark Freeport Zone, Pampanga.',
   },
   'start-project': {
-    title: 'Project Opportunity Wizard | Start a Project | LDL Dhenze',
-    description: 'Structured 6-step project qualification wizard for developers, landowners, and commercial investors in the Philippines.',
+    title: 'Discuss a Project | Development Inquiry | LDL Dhenze',
+    description: 'Structured development qualification for developers, landowners, family offices, and commercial investors in the Philippines.',
   },
   'book-consultation': {
-    title: 'Book Technical Consultation | Engineering & Permitting Review | LDL Dhenze',
-    description: 'Schedule a structured technical consultation with senior engineering and compliance specialists.',
+    title: 'Request a Private Consultation | LDL Dhenze',
+    description: 'Schedule a confidential consultation with senior development advisory and engineering specialists.',
   },
   portal: {
-    title: 'Client & Partner Project Room | Secure Dashboard | LDL Dhenze',
-    description: 'Real-time project room for milestone tracking, document verification, submittals, and multi-role audit logs.',
+    title: 'Client Portal | Secure Project Workspace | LDL Dhenze',
+    description: 'Restricted client workspace for milestones, technical documentation, architectural drawings, and commercial proposals.',
   },
   'qa-testing': {
-    title: 'Automated 20-Point QA System Console | LDL Dhenze',
+    title: 'Automated QA System Console | LDL Dhenze',
     description: 'Interactive diagnostic suite verifying API endpoints, data schema integrity, and security policies.',
   },
 };
@@ -95,6 +89,12 @@ export default function App() {
     const parseHash = () => {
       const hash = window.location.hash.replace(/^#\/?/, '').trim();
       if (!hash) return;
+
+      if (hash === 'pricing') {
+        // Redirect obsolete public pricing link into authenticated client portal
+        setCurrentView('portal');
+        return;
+      }
 
       if (hash.startsWith('capability-')) {
         setSelectedCapabilityId(hash.replace('capability-', ''));
@@ -137,7 +137,10 @@ export default function App() {
   const handleNavigate = (view: string) => {
     let targetView = view;
 
-    if (view.startsWith('capability-')) {
+    if (view === 'pricing') {
+      // Obsolete public pricing redirects to authenticated Client Portal
+      targetView = 'portal';
+    } else if (view.startsWith('capability-')) {
       const capId = view.replace('capability-', '');
       setSelectedCapabilityId(capId);
       targetView = 'capabilities';
@@ -162,10 +165,31 @@ export default function App() {
     }
 
     setCurrentView(targetView);
-    window.location.hash = view;
+    window.location.hash = targetView;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Dedicated Client Portal Shell: No public-site navigation or footer inside portal
+  if (currentView === 'portal') {
+    return (
+      <div className="min-h-screen bg-[#061325] text-slate-100 selection:bg-[#C6922D] selection:text-[#071A2F]">
+        <PortalPage
+          currentUserRole={currentUserRole}
+          onChangeUserRole={setCurrentUserRole}
+          onNavigate={handleNavigate}
+        />
+        <BuilderAssistantModal
+          isOpen={assistantOpen}
+          onClose={() => setAssistantOpen(false)}
+          currentUserRole={currentUserRole}
+          onChangeUserRole={setCurrentUserRole}
+          onNavigate={handleNavigate}
+        />
+      </div>
+    );
+  }
+
+  // Public Website Shell
   return (
     <div className="min-h-screen flex flex-col bg-[#071A2F] text-slate-100 selection:bg-[#C6922D] selection:text-[#071A2F]">
       {/* Accessibility: Skip to Content */}
@@ -253,21 +277,6 @@ export default function App() {
           <BookConsultationPage onNavigate={handleNavigate} />
         )}
 
-        {currentView === 'pricing' && (
-          <PricingPage
-            onNavigate={handleNavigate}
-            onOpenAssistant={() => setAssistantOpen(true)}
-          />
-        )}
-
-        {currentView === 'portal' && (
-          <PortalPage
-            currentUserRole={currentUserRole}
-            onChangeUserRole={setCurrentUserRole}
-            onNavigate={handleNavigate}
-          />
-        )}
-
         {currentView === 'qa-testing' && (
           <QATestingConsole onNavigate={handleNavigate} />
         )}
@@ -279,20 +288,7 @@ export default function App() {
         onOpenAssistant={() => setAssistantOpen(true)}
       />
 
-      {/* Floating Action Button for Builder Assistant */}
-      <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3">
-        <button
-          id="floating-assistant-btn"
-          onClick={() => setAssistantOpen(true)}
-          className="px-4 py-3 bg-[#C6922D] hover:bg-[#d8a339] text-[#071A2F] font-bold rounded-full shadow-2xl flex items-center gap-2 text-xs uppercase tracking-wider transition-all hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C6922D]"
-          aria-label="Open LDL Dhenze Builder AI Assistant"
-        >
-          <Sparkles className="w-4 h-4 fill-current" />
-          <span className="hidden sm:inline">Builder Assistant</span>
-        </button>
-      </div>
-
-      {/* Grounded Builder Assistant Modal */}
+      {/* Builder Assistant Modal */}
       <BuilderAssistantModal
         isOpen={assistantOpen}
         onClose={() => setAssistantOpen(false)}

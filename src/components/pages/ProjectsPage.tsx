@@ -39,15 +39,15 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({ onNavigate }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="max-w-3xl mb-8">
-          <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#C6922D] mb-3 font-['Montserrat']">
+          <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#C6922D] mb-3">
             <Building2 className="w-4 h-4" />
-            <span>Project Pipeline & Portfolio</span>
+            <span>Selected Work & Project Studies</span>
           </div>
-          <h1 className="text-3xl sm:text-5xl font-black text-white font-['Montserrat'] tracking-tight">
+          <h1 className="font-serif-display text-4xl sm:text-6xl font-normal text-white tracking-tight">
             Verified Developments & Engineering Pipeline
           </h1>
-          <p className="text-sm sm:text-base text-slate-300 mt-4 leading-relaxed">
-            Every undertaking is cataloged with strict stage attribution. We uphold absolute honesty: conceptual frameworks and 3D renders are clearly delineated from active physical construction.
+          <p className="font-sans-body text-base text-slate-300 mt-4 leading-relaxed">
+            Every undertaking is cataloged with strict stage attribution. We uphold absolute honesty: conceptual frameworks and 3D architectural renders are clearly delineated from active physical construction.
           </p>
         </div>
 

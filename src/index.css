@@ -9,16 +9,24 @@
     --graphite: #25282A;
   }
 
-  body {
+    body {
     background-color: #071A2F;
     color: #f1f5f9;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
     letter-spacing: -0.015em;
   }
+}
+
+.font-serif-display {
+  font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+}
+
+.font-sans-body {
+  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 /* Technical Blueprint Grid Lines */

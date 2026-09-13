@@ -45,6 +45,20 @@ import {
   Terminal,
   Server,
   Play,
+  Sun,
+  Moon,
+  LayoutDashboard,
+  FolderKanban,
+  Milestone,
+  Compass,
+  CheckSquare,
+  Calendar,
+  MessageSquare,
+  Bell,
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  Menu,
 } from 'lucide-react';
 
 interface PortalPageProps {
@@ -58,6 +72,18 @@ export const PortalPage: React.FC<PortalPageProps> = ({
   onChangeUserRole,
   onNavigate,
 }) => {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
+  const [portalTheme, setPortalTheme] = useState<'dark' | 'light'>(() => {
+    return (localStorage.getItem('portal_theme') as 'dark' | 'light') || 'dark';
+  });
+  const [activeSection, setActiveSection] = useState<string>('overview');
+
+  const toggleTheme = () => {
+    const next = portalTheme === 'dark' ? 'light' : 'dark';
+    setPortalTheme(next);
+    localStorage.setItem('portal_theme', next);
+  };
+
   const [activeTab, setActiveTab] = useState<'client' | 'billing' | 'partner' | 'admin'>('client');
   const [inquiries, setInquiries] = useState<any[]>([]);
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
@@ -350,107 +376,318 @@ export const PortalPage: React.FC<PortalPageProps> = ({
     }
   };
 
+  const portalNavItems = [
+    { id: 'overview', label: 'Overview', icon: LayoutDashboard, tab: 'client' as const },
+    { id: 'projects', label: 'My Projects', icon: FolderKanban, tab: 'client' as const },
+    { id: 'milestones', label: 'Project Milestones', icon: Milestone, tab: 'client' as const },
+    { id: 'documents', label: 'Documents', icon: FileText, tab: 'client' as const },
+    { id: 'drawings', label: 'Drawings and Plans', icon: Compass, tab: 'client' as const },
+    { id: 'approvals', label: 'Approvals', icon: CheckSquare, tab: 'client' as const },
+    { id: 'consultations', label: 'Consultations', icon: Calendar, tab: 'client' as const },
+    { id: 'messages', label: 'Messages', icon: MessageSquare, tab: 'client' as const },
+    { id: 'assistant', label: 'Builder Assistant', icon: Sparkles, tab: 'client' as const },
+    { id: 'proposals', label: 'Proposals and Offerings', icon: CreditCard, tab: 'billing' as const },
+    { id: 'invoices', label: 'Invoices and Payments', icon: Receipt, tab: 'billing' as const },
+    { id: 'notifications', label: 'Notifications', icon: Bell, tab: 'admin' as const },
+    { id: 'account', label: 'Account and Security', icon: ShieldCheck, tab: 'admin' as const },
+  ];
+
+  const handleSelectNav = (item: typeof portalNavItems[0]) => {
+    setActiveSection(item.id);
+    setActiveTab(item.tab);
+  };
+
   return (
-    <div className="min-h-screen bg-[#071A2F] text-slate-100 pt-32 pb-24 px-4 blueprint-grid">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Portal Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-          <div>
-            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#C6922D] mb-2 font-['Montserrat']">
-              <ShieldCheck className="w-4 h-4" />
-              <span>Enterprise Command Center</span>
+    <div className={`min-h-screen flex ${portalTheme === 'light' ? 'bg-[#f4f6f9] text-slate-900' : 'bg-[#061325] text-slate-100'}`}>
+      {/* ---------------------------------------------------- */}
+      {/* COLLAPSIBLE PORTAL SIDEBAR */}
+      {/* ---------------------------------------------------- */}
+      <aside
+        id="portal-sidebar"
+        className={`shrink-0 transition-all duration-300 border-r flex flex-col justify-between z-30 ${
+          portalTheme === 'light'
+            ? 'bg-[#071A2F] text-slate-200 border-slate-700/40'
+            : 'bg-[#040e1b] text-slate-200 border-white/10'
+        } ${sidebarCollapsed ? 'w-20' : 'w-64'}`}
+      >
+        <div className="p-4">
+          {/* Portal Brand Badge */}
+          <div className="flex items-center justify-between gap-2 pb-4 mb-3 border-b border-white/10">
+            <div className={`flex items-center gap-2.5 overflow-hidden ${sidebarCollapsed ? 'justify-center w-full' : ''}`}>
+              <div className="w-9 h-9 rounded-lg bg-[#C6922D] text-[#071A2F] flex items-center justify-center font-black text-sm shrink-0 shadow-md">
+                LD
+              </div>
+              {!sidebarCollapsed && (
+                <div className="truncate">
+                  <div className="font-bold text-xs tracking-wider text-white uppercase font-['Montserrat'] truncate">
+                    LDL Dhenze
+                  </div>
+                  <div className="text-[10px] text-[#e5b95d] font-mono tracking-widest uppercase truncate">
+                    Client Portal
+                  </div>
+                </div>
+              )}
             </div>
-            <h1 className="text-2xl sm:text-4xl font-black text-white font-['Montserrat'] tracking-tight">
-              Portal Management & Progress Room
-            </h1>
+            {!sidebarCollapsed && (
+              <button
+                onClick={() => setSidebarCollapsed(true)}
+                className="p-1 rounded text-slate-400 hover:text-white hover:bg-white/10"
+                title="Collapse sidebar"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+            )}
           </div>
 
-          {/* Quick Role Tester Switcher */}
-          <div className="bg-[#09223d] border border-[#C6922D]/30 p-2.5 rounded-xl flex items-center gap-2 text-xs">
-            <span className="text-slate-400 font-semibold">Active Role:</span>
-            <select
-              value={currentUserRole}
-              onChange={(e) => onChangeUserRole(e.target.value as UserRole)}
-              className="bg-[#051322] border border-white/10 rounded px-2.5 py-1 text-[#C6922D] font-bold focus:outline-none"
-            >
-              <option value="ANONYMOUS_VISITOR">Public Visitor</option>
-              <option value="PROSPECTIVE_CLIENT">Prospective Client</option>
-              <option value="VERIFIED_CLIENT">Verified Client (Angeles Villa)</option>
-              <option value="PARTNER_SUPPLIER">Partner / Supplier</option>
-              <option value="PROJECT_MANAGER">Project Manager</option>
-              <option value="COMPLIANCE_REVIEWER">Compliance Reviewer</option>
-              <option value="SYSTEM_ADMIN">System Administrator</option>
-            </select>
-            <button
-              onClick={fetchData}
-              title="Refresh Data"
-              className="p-1.5 hover:bg-white/10 rounded text-slate-300"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            </button>
-          </div>
+          {sidebarCollapsed && (
+            <div className="flex justify-center pb-2">
+              <button
+                onClick={() => setSidebarCollapsed(false)}
+                className="p-1.5 rounded text-slate-400 hover:text-white hover:bg-white/10"
+                title="Expand sidebar"
+              >
+                <ChevronRight className="w-4 h-4 text-[#C6922D]" />
+              </button>
+            </div>
+          )}
+
+          {/* 13 Portal Navigation Links */}
+          <nav className="space-y-1 mt-2">
+            {portalNavItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeSection === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleSelectNav(item)}
+                  title={sidebarCollapsed ? item.label : undefined}
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
+                    isActive
+                      ? 'bg-[#C6922D] text-[#071A2F] font-bold shadow-md'
+                      : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                  } ${sidebarCollapsed ? 'justify-center px-2' : ''}`}
+                >
+                  <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#071A2F]' : 'text-[#C6922D]'}`} />
+                  {!sidebarCollapsed && <span className="truncate">{item.label}</span>}
+                </button>
+              );
+            })}
+          </nav>
         </div>
 
-        {/* Action notification banner */}
-        {actionMessage && (
-          <div className="mb-6 p-4 rounded-xl bg-emerald-950/60 border border-emerald-500/50 text-emerald-200 text-xs flex items-center justify-between animate-in fade-in">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>{actionMessage}</span>
+        {/* Sidebar Footer */}
+        <div className="p-4 border-t border-white/10 space-y-2">
+          {!sidebarCollapsed && (
+            <div className="text-[11px] text-slate-400 px-1">
+              <div className="font-semibold text-slate-300 truncate">Workspace Session</div>
+              <div className="text-[10px] text-slate-500 font-mono truncate">{currentUserRole}</div>
             </div>
-            <button
-              onClick={() => setActionMessage(null)}
-              className="text-emerald-400 hover:text-white text-xs font-bold"
-            >
-              Dismiss
-            </button>
-          </div>
-        )}
-
-        {/* Portal Navigation Tabs */}
-        <div className="flex border-b border-white/10 mb-8 space-x-2 sm:space-x-4 overflow-x-auto">
+          )}
           <button
-            onClick={() => setActiveTab('client')}
-            className={`pb-3 text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors border-b-2 whitespace-nowrap ${
-              activeTab === 'client'
-                ? 'border-[#C6922D] text-[#C6922D]'
-                : 'border-transparent text-slate-400 hover:text-white'
+            onClick={() => onNavigate('home')}
+            className={`w-full py-2 px-3 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 flex items-center gap-2 border border-white/10 transition-colors ${
+              sidebarCollapsed ? 'justify-center' : ''
             }`}
+            title="Exit to Public Site"
           >
-            Client Progress Room
-          </button>
-          <button
-            onClick={() => setActiveTab('billing')}
-            className={`pb-3 text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors border-b-2 whitespace-nowrap flex items-center gap-1.5 ${
-              activeTab === 'billing'
-                ? 'border-[#C6922D] text-[#C6922D]'
-                : 'border-transparent text-slate-400 hover:text-white'
-            }`}
-          >
-            <Coins className="w-3.5 h-3.5 text-[#C6922D]" />
-            <span>Builder AI Credits & Wallet</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('partner')}
-            className={`pb-3 text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors border-b-2 whitespace-nowrap ${
-              activeTab === 'partner'
-                ? 'border-[#C6922D] text-[#C6922D]'
-                : 'border-transparent text-slate-400 hover:text-white'
-            }`}
-          >
-            Supplier & Partner Hub
-          </button>
-          <button
-            onClick={() => setActiveTab('admin')}
-            className={`pb-3 text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors border-b-2 whitespace-nowrap ${
-              activeTab === 'admin'
-                ? 'border-[#C6922D] text-[#C6922D]'
-                : 'border-transparent text-slate-400 hover:text-white'
-            }`}
-          >
-            Administrator & Governance
+            <ArrowLeft className="w-3.5 h-3.5 text-[#C6922D]" />
+            {!sidebarCollapsed && <span>Exit to Public Site</span>}
           </button>
         </div>
+      </aside>
+
+      {/* ---------------------------------------------------- */}
+      {/* MAIN PORTAL WORKSPACE BODY */}
+      {/* ---------------------------------------------------- */}
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
+        {/* Portal Top Bar */}
+        <header
+          id="portal-topbar"
+          className={`sticky top-0 z-20 px-6 py-3.5 border-b flex items-center justify-between gap-4 backdrop-blur-md ${
+            portalTheme === 'light'
+              ? 'bg-white/95 border-slate-200 text-slate-800'
+              : 'bg-[#071A2F]/95 border-white/10 text-slate-100'
+          }`}
+        >
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              className="p-1.5 rounded hover:bg-black/5 dark:hover:bg-white/5 text-slate-400 hover:text-slate-200"
+              title="Toggle sidebar"
+            >
+              <Menu className="w-4 h-4" />
+            </button>
+            <div>
+              <div className="text-[10px] uppercase font-mono tracking-widest text-[#C6922D]">
+                LDL Dhenze Workspace
+              </div>
+              <h1 className="text-base font-bold capitalize truncate">
+                {portalNavItems.find((i) => i.id === activeSection)?.label || 'Overview'}
+              </h1>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            {/* Theme Toggle Button */}
+            <button
+              id="portal-theme-toggle-btn"
+              onClick={toggleTheme}
+              className={`p-2 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+                portalTheme === 'light'
+                  ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300'
+                  : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10'
+              }`}
+              title={`Switch to ${portalTheme === 'dark' ? 'Light' : 'Dark'} mode`}
+            >
+              {portalTheme === 'dark' ? (
+                <>
+                  <Sun className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="text-[11px] hidden sm:inline">Light Mode</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-3.5 h-3.5 text-slate-600" />
+                  <span className="text-[11px] hidden sm:inline">Dark Mode</span>
+                </>
+              )}
+            </button>
+
+            {/* Active Role Selector */}
+            <div
+              className={`p-1.5 rounded-lg border flex items-center gap-2 text-xs ${
+                portalTheme === 'light'
+                  ? 'bg-slate-100 border-slate-300 text-slate-700'
+                  : 'bg-[#09223d] border-[#C6922D]/30 text-slate-300'
+              }`}
+            >
+              <span className="text-[11px] text-slate-400 font-semibold hidden md:inline">Role:</span>
+              <select
+                value={currentUserRole}
+                onChange={(e) => onChangeUserRole(e.target.value as UserRole)}
+                className={`bg-transparent text-xs font-bold text-[#C6922D] focus:outline-none cursor-pointer`}
+              >
+                <option value="ANONYMOUS_VISITOR">Public Visitor</option>
+                <option value="PROSPECTIVE_CLIENT">Prospective Client</option>
+                <option value="VERIFIED_CLIENT">Verified Client</option>
+                <option value="PARTNER_SUPPLIER">Partner / Supplier</option>
+                <option value="PROJECT_MANAGER">Project Manager</option>
+                <option value="COMPLIANCE_REVIEWER">Compliance Reviewer</option>
+                <option value="SYSTEM_ADMIN">System Admin</option>
+              </select>
+              <button
+                onClick={fetchData}
+                title="Refresh Data"
+                className="p-1 hover:bg-black/10 dark:hover:bg-white/10 rounded"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+              </button>
+            </div>
+          </div>
+        </header>
+
+        {/* Workspace Content Area */}
+        <main className="p-6 sm:p-8 max-w-7xl w-full mx-auto space-y-6">
+          {/* Anonymous Gate Warning */}
+          {currentUserRole === 'ANONYMOUS_VISITOR' && (
+            <div className="bg-amber-950/40 border border-amber-500/40 rounded-2xl p-6 text-xs text-amber-200 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <Lock className="w-5 h-5 shrink-0 text-amber-400 mt-0.5" />
+                <div>
+                  <h3 className="font-bold text-sm text-white mb-1">Restricted Client Workspace</h3>
+                  <p className="text-amber-200/90 leading-relaxed">
+                    You are currently viewing with the Public Visitor role. Authenticate below as an authorized project stakeholder to view live construction telemetry, architectural submittals, and commercial proposals.
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2 shrink-0">
+                <button
+                  onClick={() => onChangeUserRole('VERIFIED_CLIENT')}
+                  className="px-3 py-1.5 bg-[#C6922D] text-[#071A2F] font-bold rounded-lg hover:bg-[#d8a339] transition-all"
+                >
+                  Enter as Verified Client
+                </button>
+                <button
+                  onClick={() => onChangeUserRole('PROJECT_MANAGER')}
+                  className="px-3 py-1.5 bg-white/10 text-white font-semibold rounded-lg hover:bg-white/20 transition-all"
+                >
+                  Project Manager
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Action notification banner */}
+          {actionMessage && (
+            <div className="p-4 rounded-xl bg-emerald-950/60 border border-emerald-500/50 text-emerald-200 text-xs flex items-center justify-between animate-in fade-in">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>{actionMessage}</span>
+              </div>
+              <button
+                onClick={() => setActionMessage(null)}
+                className="text-emerald-400 hover:text-white text-xs font-bold"
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
+
+          {/* Tab Navigation Controls (Quick filter bar) */}
+          <div className="flex border-b border-white/10 mb-6 space-x-2 sm:space-x-4 overflow-x-auto">
+            <button
+              onClick={() => {
+                setActiveTab('client');
+                setActiveSection('overview');
+              }}
+              className={`pb-3 text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors border-b-2 whitespace-nowrap ${
+                activeTab === 'client'
+                  ? 'border-[#C6922D] text-[#C6922D]'
+                  : 'border-transparent text-slate-400 hover:text-white'
+              }`}
+            >
+              Client Progress Room
+            </button>
+            <button
+              onClick={() => {
+                setActiveTab('billing');
+                setActiveSection('proposals');
+              }}
+              className={`pb-3 text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors border-b-2 whitespace-nowrap flex items-center gap-1.5 ${
+                activeTab === 'billing'
+                  ? 'border-[#C6922D] text-[#C6922D]'
+                  : 'border-transparent text-slate-400 hover:text-white'
+              }`}
+            >
+              <Coins className="w-3.5 h-3.5 text-[#C6922D]" />
+              <span>Proposals, Wallet & Economic Audits</span>
+            </button>
+            <button
+              onClick={() => {
+                setActiveTab('partner');
+                setActiveSection('messages');
+              }}
+              className={`pb-3 text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors border-b-2 whitespace-nowrap ${
+                activeTab === 'partner'
+                  ? 'border-[#C6922D] text-[#C6922D]'
+                  : 'border-transparent text-slate-400 hover:text-white'
+              }`}
+            >
+              Supplier & Partner Hub
+            </button>
+            <button
+              onClick={() => {
+                setActiveTab('admin');
+                setActiveSection('account');
+              }}
+              className={`pb-3 text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors border-b-2 whitespace-nowrap ${
+                activeTab === 'admin'
+                  ? 'border-[#C6922D] text-[#C6922D]'
+                  : 'border-transparent text-slate-400 hover:text-white'
+              }`}
+            >
+              Governance & QA Suite
+            </button>
+          </div>
 
         {/* ---------------------------------------------------- */}
         {/* 1. CLIENT PROGRESS ROOM TAB */}
@@ -1857,6 +2094,7 @@ export const PortalPage: React.FC<PortalPageProps> = ({
             </div>
           </div>
         )}
+        </main>
       </div>
     </div>
   );
