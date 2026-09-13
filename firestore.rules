@@ -2,274 +2,344 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper functions
-    function isAuthenticated() {
-      return request.auth != null;
+    // ====================================================
+    // DEFAULT-DENY SECURITY POLICY
+    // ====================================================
+    // Any document or collection not explicitly permitted below is strictly DENIED.
+
+    // ====================================================
+    // CORE AUTHENTICATION & ATTRIBUTE VALIDATION HELPERS
+    // ====================================================
+    function isSignedIn() {
+      return request.auth != null && request.auth.uid != null;
     }
 
-    function getUserData() {
+    function isEmailVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function getUserDoc() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
     }
 
+    function isAccountActive() {
+      return isSignedIn() &&
+        (request.auth.token.accountStatus == 'ACTIVE' || getUserDoc().accountStatus == 'ACTIVE') &&
+        (request.auth.token.locked != true && getUserDoc().locked != true);
+    }
+
     function hasRole(role) {
-      return isAuthenticated() && (
+      return isAccountActive() && (
         request.auth.token.role == role ||
-        getUserData().role == role
+        getUserDoc().role == role
       );
     }
 
-    function isAdmin() {
-      return hasRole('SYSTEM_ADMIN') || hasRole('EXECUTIVE');
+    function isSystemAdmin() {
+      return hasRole('System Administrator') || hasRole('SYSTEM_ADMIN');
+    }
+
+    function isExecutiveApprover() {
+      return hasRole('Executive Approver') || hasRole('EXECUTIVE_APPROVER');
     }
 
     function isComplianceReviewer() {
-      return hasRole('COMPLIANCE_REVIEWER') || isAdmin();
+      return hasRole('Compliance Reviewer') || hasRole('COMPLIANCE_REVIEWER');
     }
 
     function isProjectManager() {
-      return hasRole('PROJECT_MANAGER') || isAdmin();
+      return hasRole('Project Manager') || hasRole('PROJECT_MANAGER');
     }
 
-    function isMemberOfOrg(orgId) {
-      return isAuthenticated() && (
-        getUserData().organizationId == orgId ||
-        isAdmin()
+    function isAuditor() {
+      return hasRole('Auditor') || hasRole('AUDITOR');
+    }
+
+    function isInternalOperations() {
+      return isSystemAdmin() || isExecutiveApprover() || isComplianceReviewer() || isProjectManager() || isAuditor();
+    }
+
+    function belongsToOrganization(orgId) {
+      return isAccountActive() && (
+        request.auth.token.organizationId == orgId ||
+        getUserDoc().organizationId == orgId ||
+        isSystemAdmin() ||
+        isAuditor()
       );
     }
 
-    // Public collections (read-only for public, write for admin/editor)
+    function isAssignedToProject(projectId) {
+      return isAccountActive() && (
+        isSystemAdmin() ||
+        isAuditor() ||
+        isExecutiveApprover() ||
+        (getUserDoc().assignedProjects != null &&
+         (projectId in getUserDoc().assignedProjects || 'all' in getUserDoc().assignedProjects))
+      );
+    }
+
+    function canReadClassification(classification) {
+      return classification == 'Public' ||
+        (isAccountActive() && (
+          (classification == 'Internal' && isInternalOperations()) ||
+          (classification == 'Confidential' && (isInternalOperations() || hasRole('Active Client'))) ||
+          (classification == 'Restricted-Financial' && (isExecutiveApprover() || hasRole('Active Client')))
+        ));
+    }
+
+    function recordIsNotFrozen() {
+      return resource.data.isFrozen != true &&
+             resource.data.legalHold != true;
+    }
+
+    // ====================================================
+    // 1. PUBLIC MARKETING & CORPORATE INFORMATION (READ-ONLY)
+    // ====================================================
+    match /publicCompanyProfile/{docId} {
+      allow read: if true;
+      allow write: if isSystemAdmin();
+    }
+
     match /capabilities/{capabilityId} {
       allow read: if true;
-      allow write: if isAdmin() || hasRole('CONTENT_EDITOR');
+      allow write: if isSystemAdmin();
     }
 
     match /industries/{industryId} {
       allow read: if true;
-      allow write: if isAdmin() || hasRole('CONTENT_EDITOR');
+      allow write: if isSystemAdmin();
     }
 
-    match /portfolioProjects/{projectId} {
-      allow read: if resource.data.clientDisclosureStatus == 'Public' || isAdmin() || isMemberOfOrg(resource.data.ownerOrganizationId);
-      allow write: if isAdmin() || isProjectManager();
+    match /verifiedPublicProjects/{projectId} {
+      allow read: if resource.data.isPublic == true;
+      allow write: if isSystemAdmin() || isProjectManager();
     }
 
-    match /insights/{articleId} {
-      allow read: if resource.data.publicationStatus == 'Published' || isAdmin() || hasRole('CONTENT_EDITOR');
-      allow write: if isAdmin() || hasRole('CONTENT_EDITOR');
+    match /publicInsights/{articleId} {
+      allow read: if resource.data.published == true;
+      allow write: if isSystemAdmin();
     }
 
-    // Inquiries: Anyone can submit, only admins and project managers can view and process
+    // Inquiries: Anyone can submit inquiries, but only authorized internal staff can view/process
     match /inquiries/{inquiryId} {
       allow create: if request.resource.data.privacyConsent == true &&
                        request.resource.data.accuracyConfirmed == true;
-      allow read, update: if isAdmin() || isProjectManager();
-      allow delete: if isAdmin();
+      allow read: if isInternalOperations();
+      allow update: if isInternalOperations() && recordIsNotFrozen();
+      allow delete: if isSystemAdmin();
     }
 
-    // Consultations & Bookings
+    // Bookings & Consultations
     match /bookings/{bookingId} {
       allow create: if true;
-      allow read: if isAuthenticated() && (
+      allow read: if isSignedIn() && (
         resource.data.clientEmail == request.auth.token.email ||
-        isAdmin() ||
-        isProjectManager()
+        isInternalOperations()
       );
-      allow update, delete: if isAdmin() || isProjectManager();
+      allow update, delete: if isInternalOperations();
     }
 
-    // Partner and Supplier Registrations
-    match /supplierProfiles/{profileId} {
-      allow create: if true;
-      allow read: if isAuthenticated() && (
-        request.auth.uid == profileId ||
-        isAdmin() ||
-        hasRole('FINANCE_STAFF')
-      );
-      allow update: if isAuthenticated() && (request.auth.uid == profileId || isAdmin());
-      allow delete: if isAdmin();
+    // ====================================================
+    // 2. USER ACCOUNTS & INVITATIONS
+    // ====================================================
+    match /users/{userId} {
+      // Users can only read their own profile; admins and auditors can read
+      allow read: if isSignedIn() && (request.auth.uid == userId || isSystemAdmin() || isAuditor());
+      // Users can NEVER alter their own roles, organization, or accountStatus
+      allow create: if isSystemAdmin();
+      allow update: if isSystemAdmin() ||
+        (isSignedIn() && request.auth.uid == userId &&
+         !request.resource.data.diff(resource.data).affectedKeys()
+           .hasAny(['role', 'organizationId', 'portalType', 'assignedProjects', 'accountStatus', 'locked', 'mfaEnrolled', 'mfaRequired']));
+      allow delete: if false; // Soft-delete or deactivation only
     }
 
-    // Client Projects (Organization isolated)
+    match /invitations/{invitationId} {
+      // Only System Administrators can create or view invitations
+      allow read: if isSystemAdmin() || isAuditor();
+      allow create: if isSystemAdmin();
+      allow update: if isSystemAdmin();
+      allow delete: if false;
+    }
+
+    // ====================================================
+    // 3. TENANT & CLIENT WORKSPACES
+    // ====================================================
+    match /tenants/{tenantId}/organizations/{orgId} {
+      allow read: if belongsToOrganization(orgId);
+      allow write: if isSystemAdmin();
+
+      match /clients/{clientId} {
+        allow read: if belongsToOrganization(orgId);
+        allow write: if isSystemAdmin() || isProjectManager();
+      }
+
+      match /suppliers/{supplierId} {
+        // Supplier can only read its own organization records
+        allow read: if belongsToOrganization(orgId);
+        allow write: if isSystemAdmin() || (belongsToOrganization(orgId) && recordIsNotFrozen());
+      }
+
+      match /partners/{partnerId} {
+        // Partner can only read its own organization records
+        allow read: if belongsToOrganization(orgId);
+        allow write: if isSystemAdmin() || (belongsToOrganization(orgId) && recordIsNotFrozen());
+      }
+    }
+
+    // ====================================================
+    // 4. MULTI-TENANT PROJECT ISOLATION (ABAC)
+    // ====================================================
+    match /tenants/{tenantId}/projects/{projectId} {
+      allow read: if isAssignedToProject(projectId) &&
+                     belongsToOrganization(resource.data.ownerOrganizationId);
+      allow create: if isSystemAdmin() || isProjectManager();
+      allow update: if (isSystemAdmin() || isProjectManager()) && recordIsNotFrozen();
+      allow delete: if false;
+
+      // Project Documents & Controlled Drawing Sets
+      match /documents/{docId} {
+        allow read: if isAssignedToProject(projectId) &&
+                       canReadClassification(resource.data.classification);
+        allow create: if (isProjectManager() || isSystemAdmin()) && recordIsNotFrozen();
+        // Modification of versioned records forbidden (append new version record instead)
+        allow update, delete: if isSystemAdmin() && !recordIsNotFrozen();
+      }
+
+      // RFIs, Submittals & Site Work Packages
+      match /workPackages/{pkgId} {
+        allow read: if isAssignedToProject(projectId);
+        allow write: if (isProjectManager() || isSystemAdmin()) && recordIsNotFrozen();
+      }
+
+      match /rfis/{rfiId} {
+        allow read: if isAssignedToProject(projectId);
+        allow create, update: if isAssignedToProject(projectId) && recordIsNotFrozen();
+        allow delete: if isSystemAdmin();
+      }
+
+      // Sealed Bids & Tenders: Competitors can NEVER see each other's bids
+      match /tenders/{tenderId} {
+        allow read: if isInternalOperations() ||
+                       (isSignedIn() && resource.data.submittedByOrganizationId == getUserDoc().organizationId);
+        // Only internal staff or the submitting bidder can create; never update after sealing
+        allow create: if isSignedIn() && request.resource.data.submittedByOrganizationId == getUserDoc().organizationId;
+        allow update, delete: if false; // Immutable sealed bids
+      }
+    }
+
+    // Legacy projects fallback mapping
     match /projects/{projectId} {
-      allow read: if isAuthenticated() && (
-        isMemberOfOrg(resource.data.organizationId) ||
-        isAdmin() ||
-        isProjectManager()
-      );
-      allow write: if isAdmin() || isProjectManager();
+      allow read: if isAssignedToProject(projectId) &&
+                     belongsToOrganization(resource.data.organizationId);
+      allow write: if isSystemAdmin() || isProjectManager();
     }
 
-    // Project Documents with version control
     match /projectDocuments/{docId} {
-      allow read: if isAuthenticated() && (
-        isMemberOfOrg(resource.data.organizationId) ||
-        isAdmin() ||
-        isProjectManager()
-      );
-      allow create: if isAuthenticated() && (
-        isMemberOfOrg(request.resource.data.organizationId) ||
-        isAdmin() ||
-        isProjectManager()
-      );
-      // No overwriting old document records; new versions create documentVersions records
-      allow update, delete: if isAdmin();
+      allow read: if isAssignedToProject(resource.data.projectId) &&
+                     canReadClassification(resource.data.classification);
+      allow create: if (isProjectManager() || isSystemAdmin()) && recordIsNotFrozen();
+      allow update, delete: if isSystemAdmin();
     }
 
-    match /documentVersions/{versionId} {
-      allow read: if isAuthenticated() && (
-        isMemberOfOrg(resource.data.organizationId) ||
-        isAdmin() ||
-        isProjectManager()
-      );
-      allow create: if isAuthenticated();
-      allow update, delete: if false; // Immutable audit versioning
+    // ====================================================
+    // 5. INTERNAL OPERATIONS & COMPLIANCE
+    // ====================================================
+    match /tenants/{tenantId}/operations/{opId} {
+      allow read: if isInternalOperations();
+      // Separation of Duties: Project Manager cannot remove compliance holds or approve payments
+      allow write: if isInternalOperations() &&
+        !(isProjectManager() && request.resource.data.complianceHoldStatus != resource.data.complianceHoldStatus);
     }
 
-    // RFI, Submittals, Change Requests
-    match /rfiRecords/{rfiId} {
-      allow read, write: if isAuthenticated() && (
-        isMemberOfOrg(resource.data.organizationId) ||
-        isAdmin() ||
-        isProjectManager()
-      );
-    }
-
-    match /submittals/{submittalId} {
-      allow read, write: if isAuthenticated() && (
-        isMemberOfOrg(resource.data.organizationId) ||
-        isAdmin() ||
-        isProjectManager()
-      );
-    }
-
-    match /changeRequests/{requestId} {
-      allow read: if isAuthenticated() && (
-        isMemberOfOrg(resource.data.organizationId) ||
-        isAdmin() ||
-        isProjectManager()
-      );
-      allow write: if isAdmin() || isProjectManager();
-    }
-
-    // Invoices and Payments
-    match /invoices/{invoiceId} {
-      allow read: if isAuthenticated() && (
-        isMemberOfOrg(resource.data.organizationId) ||
-        isAdmin() ||
-        hasRole('FINANCE_STAFF')
-      );
-      allow write: if isAdmin() || hasRole('FINANCE_STAFF');
-    }
-
-    match /payments/{paymentId} {
-      allow read: if isAuthenticated() && (
-        isMemberOfOrg(resource.data.organizationId) ||
-        isAdmin() ||
-        hasRole('FINANCE_STAFF')
-      );
-      allow write: if isAdmin() || hasRole('FINANCE_STAFF');
-    }
-
-    // Knowledge Sources for Builder Assistant (RAG)
-    match /knowledgeSources/{sourceId} {
-      allow read: if resource.data.classification == 'Public' && resource.data.approvalStatus == 'Approved' ||
-                     (isAuthenticated() && (
-                        (resource.data.classification == 'Client-Private' && isMemberOfOrg(resource.data.ownerOrganizationId)) ||
-                        (resource.data.classification == 'Internal' && (isAdmin() || isProjectManager()))
-                     ));
-      allow write: if isAdmin() || isComplianceReviewer();
-    }
-
-    match /assistantConversations/{conversationId} {
-      allow read, write: if isAuthenticated() && resource.data.userId == request.auth.uid;
-      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
-      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
-    }
-
-    match /escalationRequests/{escalationId} {
-      allow create: if true;
-      allow read, write: if isAdmin() || isProjectManager();
-    }
-
-    // Security & Audit Logs: strictly append-only or admin read
+    // ====================================================
+    // 6. IMMUTABLE AUDIT LOGS (Section 18)
+    // ====================================================
     match /auditLogs/{logId} {
-      allow read: if isAdmin();
-      allow write: if isAuthenticated() || isAdmin();
+      // Only System Administrators and Auditors can read audit logs
+      allow read: if isSystemAdmin() || isAuditor();
+      // Server-side append only
+      allow create: if isSignedIn();
+      allow update, delete: if false; // Absolute immutability
     }
 
     match /securityEvents/{eventId} {
-      allow read: if isAdmin();
-      allow write: if true; // System-triggered events
+      allow read: if isSystemAdmin() || isAuditor();
+      allow create: if true;
+      allow update, delete: if false;
     }
 
-    // Commercial Pricing Governance & Price Versions (Maker-Checker Enforced in Rules)
+    // ====================================================
+    // 7. COMMERCIAL PRICING & PROPOSALS (PRIVATE TO AUTHENTICATED)
+    // ====================================================
+    // Public cannot view pricing or price versions (Section 3)
     match /priceVersions/{versionId} {
-      allow read: if true;
-      allow create: if isAdmin() || hasRole('FINANCE_STAFF');
-      // Maker-Checker Separation of Duties: Creator cannot approve their own version!
-      allow update: if (isAdmin() || hasRole('EXECUTIVE')) &&
+      allow read: if isAccountActive();
+      allow create: if isSystemAdmin() || hasRole('FINANCE_STAFF');
+      // Maker-Checker Separation of Duties: Creator cannot approve their own proposed version
+      allow update: if (isSystemAdmin() || isExecutiveApprover()) &&
                        request.auth.token.email != resource.data.createdBy;
-      allow delete: if isAdmin();
+      allow delete: if isSystemAdmin();
     }
 
-    // Subscriptions & Entitlements (Server authoritative only; users cannot alter status)
     match /userSubscriptions/{subId} {
-      allow read: if isAuthenticated() && (
+      allow read: if isAccountActive() && (
         resource.data.userId == request.auth.uid ||
-        isAdmin() ||
-        hasRole('FINANCE_STAFF')
+        isSystemAdmin() ||
+        isAuditor()
       );
-      // Users can NEVER alter their own subscription tier or active status
-      allow write: if isAdmin();
+      allow write: if isSystemAdmin();
     }
 
-    // Credit Wallets (Strictly server-authoritative; zero client-side direct writes)
     match /creditWallets/{walletId} {
-      allow read: if isAuthenticated() && (
-        walletId == request.auth.uid ||
-        isAdmin()
-      );
-      // Direct client Firestore balance modification is strictly forbidden
-      allow write: if false;
+      allow read: if isAccountActive() && (walletId == request.auth.uid || isSystemAdmin());
+      allow write: if false; // Strictly server-authoritative
     }
 
-    // Credit Ledger (Append-only immutable audit trail; direct client writes forbidden)
     match /creditLedger/{ledgerId} {
-      allow read: if isAuthenticated() && (
+      allow read: if isAccountActive() && (
         resource.data.userId == request.auth.uid ||
-        isAdmin() ||
-        hasRole('FINANCE_STAFF')
+        isSystemAdmin() ||
+        isAuditor()
       );
-      allow create, update, delete: if false;
+      allow create, update, delete: if false; // Immutable ledger
     }
 
-    // Credit Reservations (Two-phase reservation records; client cannot alter)
-    match /creditReservations/{reservationId} {
-      allow read: if isAuthenticated() && (
-        resource.data.userId == request.auth.uid ||
-        isAdmin()
-      );
-      allow write: if false;
-    }
-
-    // Manual Bank Transfers (Maker-Checker separation of duties)
+    // Bank Transfers (Maker-Checker enforced)
     match /bankTransfers/{transferId} {
-      allow read: if isAuthenticated() && (
+      allow read: if isAccountActive() && (
         resource.data.clientEmail == request.auth.token.email ||
-        isAdmin() ||
-        hasRole('FINANCE_STAFF')
+        isSystemAdmin() ||
+        isExecutiveApprover() ||
+        isAuditor()
       );
-      allow create: if isAuthenticated();
-      // Approver cannot be the same staff member who recorded the payment!
-      allow update: if (isAdmin() || hasRole('FINANCE_STAFF')) &&
+      allow create: if isAccountActive();
+      allow update: if (isSystemAdmin() || isExecutiveApprover()) &&
                        request.auth.token.email != resource.data.recordedBy;
-      allow delete: if isAdmin();
+      allow delete: if isSystemAdmin();
     }
 
-    // Users & Roles
-    match /users/{userId} {
-      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
-      allow write: if isAdmin();
+    // Knowledge sources for AI Assistant (RAG)
+    match /knowledgeSources/{sourceId} {
+      allow read: if resource.data.classification == 'Public' && resource.data.approvalStatus == 'Approved' ||
+        (isAccountActive() && (
+          (resource.data.classification == 'Client-Private' && belongsToOrganization(resource.data.ownerOrganizationId)) ||
+          (resource.data.classification == 'Internal' && isInternalOperations())
+        ));
+      allow write: if isSystemAdmin() || isComplianceReviewer();
+    }
+
+    match /assistantConversations/{conversationId} {
+      allow read, write: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // ====================================================
+    // CATCH-ALL DEFAULT REJECTION
+    // ====================================================
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

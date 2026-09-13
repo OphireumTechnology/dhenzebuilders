@@ -260,7 +260,7 @@ export const SupplierPortalView: React.FC<SupplierPortalViewProps> = ({
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-mono font-bold text-[#C6922D]">{po.poNumber}</span>
                       <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
-                        ₱{(po.totalAmountPHP / 1e6).toFixed(2)}M
+                        ₱{(((po?.totalAmountPHP ?? 0)) / 1e6).toFixed(2)}M
                       </span>
                     </div>
                     <p className={`text-xs font-medium ${headerText} mt-1`}>Terms: {po.paymentTerms}</p>

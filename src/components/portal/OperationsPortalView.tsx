@@ -209,7 +209,7 @@ export const OperationsPortalView: React.FC<OperationsPortalViewProps> = ({
                       <span className={`text-xs font-semibold ${headerText}`}>{item.description}</span>
                     </div>
                     <p className={`text-xs ${mutedText} mt-1`}>
-                      Initiated by: {item.maker} • Value: {item.amountPHP > 0 ? `₱${(item.amountPHP / 1e6).toFixed(2)}M` : 'Governance Policy'}
+                      Initiated by: {item.maker} • Value: {(item?.amountPHP ?? 0) > 0 ? `₱${(((item?.amountPHP ?? 0)) / 1e6).toFixed(2)}M` : 'Governance Policy'}
                     </p>
                     <p className={`text-[11px] ${mutedText}`}>Timestamp: {item.createdDate} • Status: {item.status}</p>
                   </div>

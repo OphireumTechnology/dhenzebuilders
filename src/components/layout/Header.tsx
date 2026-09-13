@@ -136,14 +136,14 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Desktop Actions Cluster */}
           <div className="hidden sm:flex items-center gap-2.5 shrink-0">
-            {/* Outlined Client Portal Button */}
+            {/* Outlined Login Button (Strict public website boundary) */}
             <button
-              id="header-client-portal-btn"
-              onClick={() => handleNavClick('portal')}
+              id="header-login-btn"
+              onClick={() => handleNavClick('login')}
               className="px-3.5 py-2 text-xs font-semibold tracking-wider text-slate-200 hover:text-white border border-[#C6922D]/40 hover:border-[#C6922D] hover:bg-[#C6922D]/10 rounded-md transition-all inline-flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C6922D]"
             >
               <Lock className="w-3.5 h-3.5 text-[#C6922D]" />
-              <span>Client Portal</span>
+              <span>Login</span>
             </button>
 
             {/* Primary CTA: Discuss a Project */}
@@ -160,11 +160,11 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Mobile & Tablet Hamburger Toggle */}
           <div className="flex items-center gap-2 lg:hidden">
             <button
-              onClick={() => handleNavClick('portal')}
+              onClick={() => handleNavClick('login')}
               className="sm:hidden px-2.5 py-1.5 text-[11px] font-semibold text-slate-200 border border-[#C6922D]/40 rounded inline-flex items-center gap-1"
             >
               <Lock className="w-3 h-3 text-[#C6922D]" />
-              <span>Portal</span>
+              <span>Login</span>
             </button>
 
             <button
@@ -212,11 +212,11 @@ export const Header: React.FC<HeaderProps> = ({
 
             <div className="pt-4 border-t border-white/10 space-y-3">
               <button
-                onClick={() => handleNavClick('portal')}
+                onClick={() => handleNavClick('login')}
                 className="w-full py-3 px-4 rounded-lg font-semibold text-xs tracking-wider text-slate-100 border border-[#C6922D]/40 bg-white/5 hover:bg-[#C6922D]/15 flex items-center justify-center gap-2"
               >
                 <Lock className="w-4 h-4 text-[#C6922D]" />
-                <span>Client Portal Access</span>
+                <span>Account Login</span>
               </button>
 
               <button

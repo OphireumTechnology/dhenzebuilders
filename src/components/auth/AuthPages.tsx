@@ -1,72 +1,229 @@
-import React, { useState } from 'react';
-import { ShieldCheck, Lock, Mail, Key, ArrowRight, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import {
+  Lock,
+  Mail,
+  Key,
+  ArrowRight,
+  CheckCircle2,
+  AlertCircle,
+  RefreshCw,
+  ShieldAlert,
+  ArrowLeft,
+  Check,
+  ShieldCheck,
+  Info,
+} from 'lucide-react';
 import { UserRole } from '../../types';
 
 interface AuthPagesProps {
-  mode: 'login' | 'forgot-password' | 'verify-email';
+  mode: 'login' | 'forgot-password' | 'verify-email' | 'accept-invitation';
   onNavigate: (view: string) => void;
   currentUserRole: UserRole;
   onChangeUserRole: (role: UserRole) => void;
+  onLoginSuccess?: (user: any) => void;
 }
 
 export const AuthPages: React.FC<AuthPagesProps> = ({
-  mode,
+  mode: initialMode,
   onNavigate,
   currentUserRole,
   onChangeUserRole,
+  onLoginSuccess,
 }) => {
-  const [email, setEmail] = useState('client@angelesholding.ph');
-  const [password, setPassword] = useState('••••••••••••');
-  const [invitationCode, setInvitationCode] = useState('');
-  const [referralCode, setReferralCode] = useState('DHENZE-CLARK-2026');
+  const [currentMode, setCurrentMode] = useState<'login' | 'forgot-password' | 'accept-invitation'>(
+    initialMode === 'verify-email' ? 'login' : initialMode
+  );
+
+  // Login Form State
+  const [email, setEmail] = useState('dhenzebuilders@gmail.com');
+  const [password, setPassword] = useState('AdminSecure#2026');
   const [mfaCode, setMfaCode] = useState('');
-  const [mfaRequired, setMfaRequired] = useState(false);
+  const [mfaStep, setMfaStep] = useState(false);
+
+  // Mandatory password change state (for temporary access accounts)
+  const [mustChangePassword, setMustChangePassword] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+
+  // Invitation Acceptance State
+  const [inviteToken, setInviteToken] = useState('');
+  const [invitationData, setInvitationData] = useState<any | null>(null);
+  const [invitePassword, setInvitePassword] = useState('');
+  const [inviteConfirmPassword, setInviteConfirmPassword] = useState('');
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
+
+  // Status & Feedback
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  // Parse invite-token from hash if present on mount
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash.includes('invite-token=')) {
+      const token = hash.split('invite-token=')[1]?.split('&')[0];
+      if (token) {
+        setInviteToken(token);
+        setCurrentMode('accept-invitation');
+        verifyToken(token);
+      }
+    }
+  }, []);
+
+  const verifyToken = async (token: string) => {
+    setLoading(true);
+    setErrorMessage(null);
+    try {
+      const res = await fetch('/api/auth/verify-invitation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setErrorMessage(data.error || 'Invitation is invalid or has expired.');
+        setInvitationData(null);
+      } else {
+        setInvitationData(data.invitation);
+      }
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Verification failed.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+    setStatusMessage(null);
     setLoading(true);
 
-    setTimeout(() => {
-      setLoading(false);
-      // If client or admin, simulate MFA step-up
-      if (['SYSTEM_ADMIN', 'EXECUTIVE_APPROVER', 'ACTIVE_CLIENT', 'VERIFIED_CLIENT'].includes(currentUserRole) && !mfaRequired) {
-        setMfaRequired(true);
-        setStatusMessage('Two-Factor Authentication required for high-tier organization profile. Enter your 6-digit security key.');
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          password,
+          mfaCode: mfaStep ? mfaCode : undefined,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setErrorMessage(data.error || 'Authentication failed.');
+        setLoading(false);
         return;
       }
 
-      // Successful login redirect based on role
-      if (['SUPPLIER_ADMIN', 'SUPPLIER_CATALOG_MANAGER', 'SUPPLIER_BIDDER', 'SUPPLIER_FINANCE_USER'].includes(currentUserRole)) {
-        onNavigate('/portal/supplier/overview');
-      } else if (['PARTNER_ADMIN', 'PARTNER_BID_MANAGER', 'PARTNER_PROJECT_USER'].includes(currentUserRole)) {
-        onNavigate('/portal/partner/overview');
-      } else if (['PROJECT_MANAGER', 'CONSTRUCTION_MANAGER', 'PROCUREMENT_OFFICER', 'QUANTITY_SURVEYOR', 'FINANCE_OFFICER', 'DOCUMENT_CONTROLLER', 'COMPLIANCE_REVIEWER', 'EXECUTIVE_APPROVER', 'SYSTEM_ADMIN', 'SECURITY_ADMIN', 'AUDITOR'].includes(currentUserRole)) {
-        onNavigate('/operations/overview');
-      } else {
-        onNavigate('/portal/client/overview');
+      // Check if MFA is required
+      if (data.mfaRequired && !mfaStep) {
+        setMfaStep(true);
+        setStatusMessage(data.message || 'Enter your 6-digit TOTP verification code.');
+        setLoading(false);
+        return;
       }
-    }, 400);
+
+      // Check if temporary password requires immediate change
+      if (data.user?.mustChangePassword) {
+        setMustChangePassword(true);
+        setStatusMessage('Security Directive: Temporary credential detected. You must set a permanent password before proceeding.');
+        setLoading(false);
+        return;
+      }
+
+      // Authentication successful
+      setStatusMessage('Identity verified. Loading authorized tenant workspace...');
+      if (onLoginSuccess) {
+        onLoginSuccess(data.user);
+      }
+
+      // Map role to app type
+      setTimeout(() => {
+        setLoading(false);
+        const role = data.user.role;
+        if (role === 'System Administrator' || role === 'SYSTEM_ADMIN') {
+          onChangeUserRole('SYSTEM_ADMIN');
+          onNavigate('operations/overview');
+        } else if (role === 'Project Manager') {
+          onChangeUserRole('PROJECT_MANAGER');
+          onNavigate('operations/overview');
+        } else if (role === 'Compliance Reviewer') {
+          onChangeUserRole('COMPLIANCE_REVIEWER');
+          onNavigate('operations/overview');
+        } else if (role === 'Executive Approver') {
+          onChangeUserRole('EXECUTIVE_APPROVER');
+          onNavigate('operations/overview');
+        } else if (role === 'Auditor') {
+          onChangeUserRole('AUDITOR');
+          onNavigate('operations/overview');
+        } else if (role === 'Supplier') {
+          onChangeUserRole('SUPPLIER_ADMIN');
+          onNavigate('portal/supplier/overview');
+        } else if (role === 'Partner') {
+          onChangeUserRole('PARTNER_ADMIN');
+          onNavigate('portal/partner/overview');
+        } else {
+          onChangeUserRole('ACTIVE_CLIENT');
+          onNavigate('portal/client/overview');
+        }
+      }, 600);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Network error during authentication.');
+      setLoading(false);
+    }
   };
 
-  const handleMfaSubmit = (e: React.FormEvent) => {
+  const handleAcceptInvitation = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!mfaCode || mfaCode.length < 4) {
-      setErrorMessage('Please enter a valid 6-digit verification code.');
+    if (invitePassword !== inviteConfirmPassword) {
+      setErrorMessage('Passwords do not match.');
       return;
     }
+    if (invitePassword.length < 12) {
+      setErrorMessage('Password must be at least 12 characters and contain uppercase, lowercase, numbers and symbols.');
+      return;
+    }
+    if (!agreeToTerms) {
+      setErrorMessage('You must accept the confidentiality agreement and terms of service.');
+      return;
+    }
+
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      if (['PROJECT_MANAGER', 'COMPLIANCE_REVIEWER', 'SYSTEM_ADMIN', 'EXECUTIVE_APPROVER'].includes(currentUserRole)) {
-        onNavigate('/operations/overview');
-      } else {
-        onNavigate('/portal/client/overview');
+    setErrorMessage(null);
+
+    try {
+      const res = await fetch('/api/auth/accept-invitation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token: inviteToken,
+          newPassword: invitePassword,
+          confirmPassword: inviteConfirmPassword,
+          agreeToTerms,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setErrorMessage(data.error || 'Failed to activate invitation.');
+        setLoading(false);
+        return;
       }
-    }, 400);
+
+      setStatusMessage('Account successfully activated! Redirecting to secure login...');
+      setTimeout(() => {
+        setLoading(false);
+        setEmail(data.email || '');
+        setPassword('');
+        setCurrentMode('login');
+      }, 1500);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Network error.');
+      setLoading(false);
+    }
   };
 
   const handleForgotPassword = (e: React.FormEvent) => {
@@ -74,185 +231,248 @@ export const AuthPages: React.FC<AuthPagesProps> = ({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      setStatusMessage(`Password recovery link securely dispatched to ${email}. If the address is verified, follow the instructions in the email.`);
-    }, 500);
-  };
-
-  const handleVerifyEmail = (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setStatusMessage('Email address verified successfully. Your tenant credentials are now fully active.');
-      setTimeout(() => onNavigate('/portal/client/overview'), 1200);
-    }, 500);
+      // Generic confirmation message to prevent user enumeration
+      setStatusMessage('If an account is associated with this email address, a secure password recovery link has been dispatched. Links expire in 15 minutes.');
+    }, 600);
   };
 
   return (
-    <div className="min-h-screen bg-[#071A2F] text-slate-100 flex items-center justify-center py-20 px-4 sm:px-6 lg:px-8 blueprint-grid">
-      <div className="max-w-md w-full bg-[#0c223c]/90 border border-slate-800 rounded-2xl p-8 shadow-2xl backdrop-blur-md">
+    <div className="min-h-screen bg-[#071A2F] text-slate-100 flex items-center justify-center py-16 px-4 sm:px-6 lg:px-8 blueprint-grid">
+      <div className="max-w-md w-full bg-[#08182B]/95 border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl backdrop-blur-md">
         {/* Brand Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#C6922D]/10 border border-[#C6922D]/30 text-[#C6922D] mb-4">
             <Lock className="w-6 h-6" />
           </div>
           <h2 className="text-2xl font-serif text-white tracking-tight">
-            LDL DHENZE PRIVATE WORKSPACE
+            LDL DHENZE
           </h2>
+          <p className="text-xs font-mono text-[#C6922D] uppercase tracking-wider mt-1">
+            Private Multi-Tenant Gateway
+          </p>
           <p className="text-xs text-slate-400 mt-1">
-            Authenticated Access Gateway & Enterprise Tenant Security
+            Invitation-Only Access • Section 4 & 5 Security Policy
           </p>
         </div>
 
-        {/* Status or Error Notifications */}
+        {/* Notifications */}
         {errorMessage && (
-          <div className="mb-6 p-3 rounded-lg bg-red-950/50 border border-red-800 text-red-300 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
-            <span>{errorMessage}</span>
+          <div className="mb-6 p-3 rounded-lg bg-rose-950/60 border border-rose-800 text-rose-200 text-xs flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-400 mt-0.5" />
+            <span className="font-sans leading-relaxed">{errorMessage}</span>
           </div>
         )}
 
         {statusMessage && (
-          <div className="mb-6 p-3 rounded-lg bg-emerald-950/50 border border-emerald-800 text-emerald-300 text-xs flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
-            <span>{statusMessage}</span>
+          <div className="mb-6 p-3 rounded-lg bg-emerald-950/60 border border-emerald-800 text-emerald-200 text-xs flex items-start gap-2">
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400 mt-0.5" />
+            <span className="font-sans leading-relaxed">{statusMessage}</span>
           </div>
         )}
 
-        {/* View Mode Switcher */}
-        {mode === 'login' && !mfaRequired && (
+        {/* MODE: LOGIN */}
+        {currentMode === 'login' && !mustChangePassword && (
           <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1">
-                Corporate or Personal Email
-              </label>
-              <div className="relative">
-                <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="w-full bg-[#071A2F] border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-[#C6922D]"
-                  placeholder="name@organization.ph"
-                />
-              </div>
-            </div>
+            {!mfaStep ? (
+              <>
+                <div>
+                  <label className="block text-xs uppercase tracking-wider text-slate-300 font-semibold mb-1">
+                    Corporate Email Address
+                  </label>
+                  <div className="relative">
+                    <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="w-full bg-[#051322] border border-white/10 rounded-lg pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-[#C6922D]"
+                      placeholder="name@organization.ph"
+                    />
+                  </div>
+                </div>
 
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <label className="block text-xs uppercase tracking-wider text-slate-400 font-semibold">
-                  Encrypted Password
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs uppercase tracking-wider text-slate-300 font-semibold">
+                      Account Password
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setErrorMessage(null);
+                        setStatusMessage(null);
+                        setCurrentMode('forgot-password');
+                      }}
+                      className="text-[11px] text-[#C6922D] hover:underline"
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <Key className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="w-full bg-[#051322] border border-white/10 rounded-lg pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-[#C6922D]"
+                      placeholder="••••••••••••"
+                    />
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div>
+                <label className="block text-xs uppercase tracking-wider text-slate-300 font-semibold mb-1">
+                  Two-Factor Authentication Code (TOTP)
                 </label>
+                <div className="relative">
+                  <Key className="w-4 h-4 text-[#C6922D] absolute left-3 top-3" />
+                  <input
+                    type="text"
+                    value={mfaCode}
+                    onChange={(e) => setMfaCode(e.target.value)}
+                    required
+                    maxLength={6}
+                    className="w-full bg-[#051322] border border-[#C6922D] rounded-lg pl-9 pr-3 py-2 text-sm text-white font-mono tracking-widest text-center focus:outline-none"
+                    placeholder="889210"
+                  />
+                </div>
+                <p className="text-[11px] text-slate-400 mt-1 text-center font-mono">
+                  Test TOTP code: <code className="text-[#C6922D]">889210</code>
+                </p>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-2.5 px-4 rounded-lg bg-[#C6922D] hover:bg-[#d8a339] text-[#071A2F] font-bold text-xs uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
+            >
+              {loading ? (
+                <>
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  <span>Verifying Credentials...</span>
+                </>
+              ) : (
+                <>
+                  <span>{mfaStep ? 'Verify 2FA & Sign In' : 'Sign In to Workspace'}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
+            </button>
+
+            {/* Invitation Notice */}
+            <div className="mt-6 pt-4 border-t border-white/10 text-center">
+              <p className="text-[11px] text-slate-400 font-sans leading-relaxed">
+                Have a single-use invitation token?{' '}
                 <button
                   type="button"
-                  onClick={() => onNavigate('/forgot-password')}
-                  className="text-xs text-[#C6922D] hover:underline"
+                  onClick={() => {
+                    setErrorMessage(null);
+                    setStatusMessage(null);
+                    setCurrentMode('accept-invitation');
+                  }}
+                  className="text-[#C6922D] hover:underline font-semibold"
                 >
-                  Forgot?
+                  Activate Invitation
+                </button>
+              </p>
+            </div>
+          </form>
+        )}
+
+        {/* MODE: ACCEPT INVITATION */}
+        {currentMode === 'accept-invitation' && (
+          <form onSubmit={handleAcceptInvitation} className="space-y-4">
+            <div>
+              <label className="block text-xs uppercase tracking-wider text-slate-300 font-semibold mb-1">
+                Single-Use Invitation Token
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={inviteToken}
+                  onChange={(e) => setInviteToken(e.target.value)}
+                  required
+                  placeholder="Paste 64-character token..."
+                  className="flex-1 bg-[#051322] border border-white/10 rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-[#C6922D]"
+                />
+                <button
+                  type="button"
+                  onClick={() => verifyToken(inviteToken)}
+                  className="px-3 py-2 bg-white/10 hover:bg-white/20 text-xs font-semibold rounded-lg text-white"
+                >
+                  Verify
                 </button>
               </div>
-              <div className="relative">
-                <Key className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="w-full bg-[#071A2F] border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-[#C6922D]"
-                />
+            </div>
+
+            {invitationData && (
+              <div className="p-3 bg-[#051322] border border-[#C6922D]/40 rounded-xl space-y-1.5 text-xs font-mono">
+                <div className="text-[#C6922D] font-bold">● Validated Token Scope</div>
+                <div className="text-slate-300">Recipient: {invitationData.fullName}</div>
+                <div className="text-slate-400">Email: {invitationData.email}</div>
+                <div className="text-slate-400">Org: {invitationData.organizationName}</div>
+                <div className="text-slate-400">Assigned Role: {invitationData.initialRole}</div>
               </div>
-            </div>
+            )}
 
             <div>
-              <label className="block text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1">
-                Invitation / Referral Code (If New Registration)
+              <label className="block text-xs uppercase tracking-wider text-slate-300 font-semibold mb-1">
+                Create Permanent Password
               </label>
               <input
-                type="text"
-                value={referralCode}
-                onChange={(e) => setReferralCode(e.target.value)}
-                className="w-full bg-[#071A2F] border border-slate-700 rounded-lg px-3 py-2 text-xs text-amber-300 font-mono focus:outline-none focus:border-[#C6922D]"
-                placeholder="Optional referral key"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full mt-2 py-2.5 px-4 rounded-lg bg-[#C6922D] hover:bg-[#dfad4b] text-slate-950 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
-            >
-              {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
-              <span>Authenticate & Enter Portal</span>
-            </button>
-          </form>
-        )}
-
-        {/* MFA Step */}
-        {mode === 'login' && mfaRequired && (
-          <form onSubmit={handleMfaSubmit} className="space-y-4">
-            <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg text-xs text-amber-300">
-              High-privilege account detected. Please enter the 6-digit TOTP code generated by your authenticator app.
-            </div>
-
-            <div>
-              <label className="block text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1">
-                Security Passcode
-              </label>
-              <input
-                type="text"
-                maxLength={6}
-                value={mfaCode}
-                onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, ''))}
+                type="password"
+                value={invitePassword}
+                onChange={(e) => setInvitePassword(e.target.value)}
                 required
-                className="w-full bg-[#071A2F] border border-slate-700 rounded-lg px-4 py-3 text-center text-lg tracking-widest text-white font-mono focus:outline-none focus:border-[#C6922D]"
-                placeholder="000000"
+                placeholder="Min 12 chars: uppercase, lowercase, numbers, symbols"
+                className="w-full bg-[#051322] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C6922D]"
               />
             </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-2.5 px-4 rounded-lg bg-[#C6922D] hover:bg-[#dfad4b] text-slate-950 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
-            >
-              {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <ShieldCheck className="w-4 h-4" />}
-              <span>Verify & Complete Login</span>
-            </button>
-          </form>
-        )}
-
-        {/* Forgot Password Mode */}
-        {mode === 'forgot-password' && (
-          <form onSubmit={handleForgotPassword} className="space-y-4">
-            <p className="text-xs text-slate-300 leading-relaxed">
-              Enter your registered corporate email address. We will verify your tenant association and issue a cryptographic single-use reset token.
-            </p>
 
             <div>
-              <label className="block text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1">
-                Registered Email
+              <label className="block text-xs uppercase tracking-wider text-slate-300 font-semibold mb-1">
+                Confirm Permanent Password
               </label>
               <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="password"
+                value={inviteConfirmPassword}
+                onChange={(e) => setInviteConfirmPassword(e.target.value)}
                 required
-                className="w-full bg-[#071A2F] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#C6922D]"
+                placeholder="Re-type password"
+                className="w-full bg-[#051322] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C6922D]"
               />
+            </div>
+
+            <div className="flex items-start gap-2 pt-1">
+              <input
+                type="checkbox"
+                id="termsCheck"
+                checked={agreeToTerms}
+                onChange={(e) => setAgreeToTerms(e.target.checked)}
+                className="rounded bg-[#051322] border-white/20 text-[#C6922D] mt-0.5"
+              />
+              <label htmlFor="termsCheck" className="text-[11px] text-slate-400 leading-snug">
+                I agree to the LDL Dhenze Confidentiality Agreement, Data Privacy terms (RA 10173), and multi-tenant isolation protocols.
+              </label>
             </div>
 
             <button
               type="submit"
-              disabled={loading}
-              className="w-full py-2.5 px-4 rounded-lg bg-[#C6922D] hover:bg-[#dfad4b] text-slate-950 font-bold text-xs uppercase tracking-wider transition-colors disabled:opacity-50"
+              disabled={loading || !invitationData}
+              className="w-full py-2.5 px-4 rounded-lg bg-[#C6922D] hover:bg-[#d8a339] text-[#071A2F] font-bold text-xs uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
             >
-              Send Secure Reset Link
+              {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+              <span>Activate Account & Enroll MFA</span>
             </button>
 
             <div className="text-center pt-2">
               <button
                 type="button"
-                onClick={() => onNavigate('/login')}
+                onClick={() => setCurrentMode('login')}
                 className="text-xs text-slate-400 hover:text-white"
               >
                 ← Return to Login
@@ -261,124 +481,55 @@ export const AuthPages: React.FC<AuthPagesProps> = ({
           </form>
         )}
 
-        {/* Verify Email Mode */}
-        {mode === 'verify-email' && (
-          <form onSubmit={handleVerifyEmail} className="space-y-4">
-            <p className="text-xs text-slate-300 leading-relaxed">
-              A verification dispatch was routed to your inbox. Click below to simulate instant confirmation of token authenticity.
+        {/* MODE: FORGOT PASSWORD */}
+        {currentMode === 'forgot-password' && (
+          <form onSubmit={handleForgotPassword} className="space-y-4">
+            <p className="text-xs text-slate-300 font-sans leading-relaxed">
+              Enter your verified organization email address. If an account exists, a single-use password recovery token expiring in 15 minutes will be issued.
             </p>
+
+            <div>
+              <label className="block text-xs uppercase tracking-wider text-slate-300 font-semibold mb-1">
+                Registered Email Address
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full bg-[#051322] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#C6922D]"
+              />
+            </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full py-2.5 px-4 rounded-lg bg-[#C6922D] hover:bg-[#d8a339] text-[#071A2F] font-bold text-xs uppercase tracking-wider transition-all disabled:opacity-50"
             >
-              <CheckCircle2 className="w-4 h-4" /> Confirm Email Verification
+              Dispatch Recovery Instructions
             </button>
+
+            <div className="text-center pt-2">
+              <button
+                type="button"
+                onClick={() => setCurrentMode('login')}
+                className="text-xs text-slate-400 hover:text-white"
+              >
+                ← Return to Login
+              </button>
+            </div>
           </form>
         )}
 
-        {/* Role Persona Switcher for Quick Validation */}
-        <div className="mt-8 pt-6 border-t border-slate-800">
-          <label className="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">
-            Switch Verified Persona for Testing
-          </label>
-          <div className="grid grid-cols-2 gap-1.5 text-xs">
-            <button
-              type="button"
-              onClick={() => {
-                onChangeUserRole('ACTIVE_CLIENT');
-                setEmail('client@angelesholding.ph');
-              }}
-              className={`p-1.5 rounded border text-left truncate transition-colors ${
-                currentUserRole === 'ACTIVE_CLIENT' || currentUserRole === 'VERIFIED_CLIENT'
-                  ? 'border-[#C6922D] bg-[#C6922D]/10 text-[#C6922D]'
-                  : 'border-slate-800 text-slate-400 hover:bg-slate-800'
-              }`}
-            >
-              Active Client
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                onChangeUserRole('SUPPLIER_ADMIN');
-                setEmail('sales@luzonsteelmills.ph');
-              }}
-              className={`p-1.5 rounded border text-left truncate transition-colors ${
-                currentUserRole === 'SUPPLIER_ADMIN'
-                  ? 'border-[#C6922D] bg-[#C6922D]/10 text-[#C6922D]'
-                  : 'border-slate-800 text-slate-400 hover:bg-slate-800'
-              }`}
-            >
-              Supplier Admin
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                onChangeUserRole('PARTNER_ADMIN');
-                setEmail('bidding@clearthmovers.com.ph');
-              }}
-              className={`p-1.5 rounded border text-left truncate transition-colors ${
-                currentUserRole === 'PARTNER_ADMIN'
-                  ? 'border-[#C6922D] bg-[#C6922D]/10 text-[#C6922D]'
-                  : 'border-slate-800 text-slate-400 hover:bg-slate-800'
-              }`}
-            >
-              Partner / Bidder
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                onChangeUserRole('PROJECT_MANAGER');
-                setEmail('pm@dhenzebuilder.com');
-              }}
-              className={`p-1.5 rounded border text-left truncate transition-colors ${
-                currentUserRole === 'PROJECT_MANAGER'
-                  ? 'border-[#C6922D] bg-[#C6922D]/10 text-[#C6922D]'
-                  : 'border-slate-800 text-slate-400 hover:bg-slate-800'
-              }`}
-            >
-              Project Manager
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                onChangeUserRole('COMPLIANCE_REVIEWER');
-                setEmail('compliance@dhenzebuilder.com');
-              }}
-              className={`p-1.5 rounded border text-left truncate transition-colors ${
-                currentUserRole === 'COMPLIANCE_REVIEWER'
-                  ? 'border-[#C6922D] bg-[#C6922D]/10 text-[#C6922D]'
-                  : 'border-slate-800 text-slate-400 hover:bg-slate-800'
-              }`}
-            >
-              Compliance Reviewer
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                onChangeUserRole('SYSTEM_ADMIN');
-                setEmail('admin@dhenzebuilder.com');
-              }}
-              className={`p-1.5 rounded border text-left truncate transition-colors ${
-                currentUserRole === 'SYSTEM_ADMIN'
-                  ? 'border-[#C6922D] bg-[#C6922D]/10 text-[#C6922D]'
-                  : 'border-slate-800 text-slate-400 hover:bg-slate-800'
-              }`}
-            >
-              System Admin
-            </button>
-          </div>
-        </div>
-
-        {/* Back to Public Site */}
-        <div className="text-center mt-6">
+        {/* Return to Public Website */}
+        <div className="mt-6 pt-4 border-t border-white/10 text-center">
           <button
             type="button"
-            onClick={() => onNavigate('/')}
-            className="text-xs text-slate-400 hover:text-white"
+            onClick={() => onNavigate('home')}
+            className="text-xs text-slate-400 hover:text-slate-200 inline-flex items-center gap-1.5"
           >
-            ← Back to Public Website
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Return to Public Corporate Website</span>
           </button>
         </div>
       </div>

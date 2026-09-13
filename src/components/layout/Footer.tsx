@@ -193,11 +193,11 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenAssistant }) =
               </li>
               <li>
                 <button
-                  onClick={() => onNavigate('portal')}
+                  onClick={() => onNavigate('login')}
                   className="hover:text-[#C6922D] text-slate-200 transition-colors text-left flex items-center gap-1"
                 >
                   <Lock className="w-3 h-3 text-[#C6922D]" />
-                  Client Portal Access
+                  Account Login
                 </button>
               </li>
               <li>

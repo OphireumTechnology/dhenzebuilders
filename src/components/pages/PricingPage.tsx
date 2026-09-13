@@ -293,7 +293,7 @@ export const PricingPage: React.FC<PricingPageProps> = ({
 
                     {/* Benchmark Note */}
                     <div className="mt-2 text-[10px] text-slate-400 font-mono">
-                      Pricing Multiplier: <span className="text-[#C6922D] font-bold">{plan.multiplier.toFixed(2)}x</span> on verified reference
+                      Pricing Multiplier: <span className="text-[#C6922D] font-bold">{(plan?.multiplier ?? 1).toFixed(2)}x</span> on verified reference
                     </div>
                   </div>
 

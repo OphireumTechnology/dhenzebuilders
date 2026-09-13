@@ -25,6 +25,8 @@ import { AuthPages } from './components/auth/AuthPages';
 import { ProjectDetailPage } from './components/pages/ProjectDetailPage';
 import { InsightDetailPage } from './components/pages/InsightDetailPage';
 import { EnterprisePortalLayout } from './components/portal/EnterprisePortalLayout';
+import { EmergencyPortalLockScreen } from './components/security/EmergencyPortalLockScreen';
+import { AdminAccessConsole } from './components/security/AdminAccessConsole';
 
 const ROUTE_METADATA: Record<string, { title: string; description: string }> = {
   home: {
@@ -113,6 +115,21 @@ export default function App() {
   const [selectedIndustryId, setSelectedIndustryId] = useState<string | undefined>();
   const [selectedProjectSlug, setSelectedProjectSlug] = useState<string>('angeles-reserve');
   const [selectedInsightSlug, setSelectedInsightSlug] = useState<string>('art-01');
+  const [portalsEnabled, setPortalsEnabled] = useState<boolean>(false);
+  const [isEmergencyAdmin, setIsEmergencyAdmin] = useState<boolean>(false);
+  const [authenticatedUser, setAuthenticatedUser] = useState<any | null>(null);
+
+  // Query server for portal lock state
+  useEffect(() => {
+    fetch('/api/security/portal-status')
+      .then((res) => res.json())
+      .then((data) => {
+        setPortalsEnabled(Boolean(data.portalsEnabled));
+      })
+      .catch(() => {
+        setPortalsEnabled(false);
+      });
+  }, []);
 
   // Synchronize route with URL hash for browser history & SPA bookmarking
   useEffect(() => {
@@ -212,6 +229,79 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Check if target is a private portal path
+  const isPortalPath =
+    currentView === 'portal' ||
+    currentView.startsWith('portal/') ||
+    currentView.startsWith('/portal/') ||
+    currentView.startsWith('operations/') ||
+    currentView.startsWith('/operations/');
+
+  // 1. Emergency Portal Lock Guard (Section 1)
+  if (isPortalPath && !portalsEnabled && !isEmergencyAdmin) {
+    return (
+      <EmergencyPortalLockScreen
+        onNavigate={handleNavigate}
+        onEmergencyUnlockSuccess={(adminUser) => {
+          setIsEmergencyAdmin(true);
+          setPortalsEnabled(true);
+          setAuthenticatedUser(adminUser);
+          setCurrentUserRole('SYSTEM_ADMIN');
+        }}
+      />
+    );
+  }
+
+  // 2. Authentication Gateway: Non-authenticated visitors attempting portal access (Section 3 & 4)
+  if (isPortalPath && currentUserRole === 'ANONYMOUS_VISITOR') {
+    return (
+      <div className="min-h-screen bg-[#071A2F]">
+        <AuthPages
+          mode="login"
+          onNavigate={handleNavigate}
+          currentUserRole={currentUserRole}
+          onChangeUserRole={setCurrentUserRole}
+          onLoginSuccess={(user) => {
+            setAuthenticatedUser(user);
+            if (user.role === 'System Administrator' || user.email === 'dhenzebuilders@gmail.com') {
+              setIsEmergencyAdmin(true);
+            }
+          }}
+        />
+      </div>
+    );
+  }
+
+  // 3. System Administrator IAM & Access Management Console (Section 5 & 17)
+  if (currentView === 'admin' || currentView === 'admin/access') {
+    return (
+      <div className="min-h-screen bg-[#050E1A] text-slate-100 p-4 sm:p-8 blueprint-grid">
+        <div className="max-w-7xl mx-auto space-y-4">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => handleNavigate('home')}
+              className="text-xs text-slate-400 hover:text-white flex items-center gap-1 font-semibold"
+            >
+              ← Return to Corporate Home
+            </button>
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-mono text-[#C6922D]">
+                Session: {authenticatedUser?.email || 'dhenzebuilders@gmail.com'}
+              </span>
+              <button
+                onClick={() => handleNavigate('operations/overview')}
+                className="text-xs px-2.5 py-1 rounded bg-[#C6922D]/20 text-[#C6922D] border border-[#C6922D]/40 font-mono"
+              >
+                Operations Dashboard →
+              </button>
+            </div>
+          </div>
+          <AdminAccessConsole currentUser={authenticatedUser} onNavigate={handleNavigate} />
+        </div>
+      </div>
+    );
+  }
+
   // Enterprise Multi-Tenant Portal Routes
   if (
     currentView.startsWith('portal/') ||
@@ -221,6 +311,17 @@ export default function App() {
   ) {
     return (
       <div className="min-h-screen bg-[#061325] text-slate-100 selection:bg-[#C6922D] selection:text-[#071A2F]">
+        {isEmergencyAdmin && (
+          <div className="bg-amber-950/80 border-b border-amber-800/80 px-4 py-1.5 text-xs text-amber-200 flex items-center justify-between font-mono">
+            <span>● Emergency Admin Bypass Mode Active • Audit logging all actions</span>
+            <button
+              onClick={() => handleNavigate('admin')}
+              className="underline hover:text-white font-bold"
+            >
+              Open Access Console
+            </button>
+          </div>
+        )}
         <EnterprisePortalLayout
           currentPath={`/${currentView.replace(/^\//, '')}`}
           onNavigate={handleNavigate}
@@ -242,6 +343,17 @@ export default function App() {
   if (currentView === 'portal') {
     return (
       <div className="min-h-screen bg-[#061325] text-slate-100 selection:bg-[#C6922D] selection:text-[#071A2F]">
+        {isEmergencyAdmin && (
+          <div className="bg-amber-950/80 border-b border-amber-800/80 px-4 py-1.5 text-xs text-amber-200 flex items-center justify-between font-mono">
+            <span>● Emergency Admin Bypass Mode Active • Audit logging all actions</span>
+            <button
+              onClick={() => handleNavigate('admin')}
+              className="underline hover:text-white font-bold"
+            >
+              Open Access Console
+            </button>
+          </div>
+        )}
         <PortalPage
           currentUserRole={currentUserRole}
           onChangeUserRole={setCurrentUserRole}

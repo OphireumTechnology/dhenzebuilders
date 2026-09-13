@@ -2,60 +2,115 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
 
-    // Helper functions
-    function isAuthenticated() {
-      return request.auth != null;
+    // ====================================================
+    // STORAGE ACCESS VALIDATION HELPERS
+    // ====================================================
+    function isSignedIn() {
+      return request.auth != null && request.auth.uid != null;
     }
 
-    function isAdmin() {
-      return isAuthenticated() && (
-        request.auth.token.role == 'SYSTEM_ADMIN' ||
-        request.auth.token.role == 'EXECUTIVE'
+    function isAccountActive() {
+      return isSignedIn() && request.auth.token.accountStatus == 'ACTIVE';
+    }
+
+    function isSystemAdmin() {
+      return isAccountActive() &&
+        (request.auth.token.role == 'System Administrator' || request.auth.token.role == 'SYSTEM_ADMIN');
+    }
+
+    function isInternalOperations() {
+      return isAccountActive() && (
+        isSystemAdmin() ||
+        request.auth.token.role == 'Project Manager' ||
+        request.auth.token.role == 'Compliance Reviewer' ||
+        request.auth.token.role == 'Executive Approver' ||
+        request.auth.token.role == 'Auditor'
       );
     }
 
-    function isProjectManager() {
-      return isAuthenticated() && (
-        request.auth.token.role == 'PROJECT_MANAGER' ||
-        isAdmin()
+    function belongsToOrganization(orgId) {
+      return isAccountActive() && (
+        request.auth.token.organizationId == orgId ||
+        isSystemAdmin()
       );
     }
 
-    // Public Media: Marketing assets, photos, published renders
+    // MIME type and file size validation
+    function isValidDocumentUpload() {
+      return request.resource.size <= 50 * 1024 * 1024 && // 50MB max
+        request.resource.contentType.matches('application/pdf|application/vnd.ms-excel|application/vnd.openxmlformats-officedocument.spreadsheetml.sheet|application/acad|application/octet-stream|application/zip');
+    }
+
+    function isValidImageUpload() {
+      return request.resource.size <= 15 * 1024 * 1024 && // 15MB max
+        request.resource.contentType.matches('image/jpeg|image/png|image/webp');
+    }
+
+    // ====================================================
+    // PUBLIC ASSETS (Strictly verified marketing assets)
+    // ====================================================
     match /public/{allPaths=**} {
       allow read: if true;
-      allow write: if isAdmin() || isProjectManager();
+      allow write: if isSystemAdmin();
     }
 
-    // Corporate Profile Downloads & Public Documents
     match /documents/public/{fileName} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isSystemAdmin();
     }
 
-    // Confidential Project Files: Organized by Organization and Project ID
+    // ====================================================
+    // MULTI-TENANT PRIVATE WORKSPACE PATHS
+    // ====================================================
+    // /tenants/{tenantId}/organizations/{organizationId}/clients/...
+    match /tenants/{tenantId}/organizations/{orgId}/clients/{allPaths=**} {
+      allow read: if belongsToOrganization(orgId) || isInternalOperations();
+      allow write: if (belongsToOrganization(orgId) || isInternalOperations()) &&
+                      (isValidDocumentUpload() || isValidImageUpload());
+    }
+
+    // /tenants/{tenantId}/organizations/{organizationId}/suppliers/...
+    match /tenants/{tenantId}/organizations/{orgId}/suppliers/{allPaths=**} {
+      allow read: if belongsToOrganization(orgId) || isInternalOperations();
+      allow write: if (belongsToOrganization(orgId) || isInternalOperations()) &&
+                      (isValidDocumentUpload() || isValidImageUpload());
+    }
+
+    // /tenants/{tenantId}/organizations/{organizationId}/partners/...
+    match /tenants/{tenantId}/organizations/{orgId}/partners/{allPaths=**} {
+      allow read: if belongsToOrganization(orgId) || isInternalOperations();
+      allow write: if (belongsToOrganization(orgId) || isInternalOperations()) &&
+                      (isValidDocumentUpload() || isValidImageUpload());
+    }
+
+    // /tenants/{tenantId}/projects/{projectId}/documents/...
+    match /tenants/{tenantId}/projects/{projectId}/documents/{allPaths=**} {
+      allow read: if isInternalOperations() ||
+                     (isAccountActive() && request.auth.token.assignedProjects != null &&
+                      (projectId in request.auth.token.assignedProjects || 'all' in request.auth.token.assignedProjects));
+      allow write: if isInternalOperations() && isValidDocumentUpload();
+    }
+
+    // /tenants/{tenantId}/projects/{projectId}/evidence/...
+    match /tenants/{tenantId}/projects/{projectId}/evidence/{allPaths=**} {
+      allow read: if isInternalOperations();
+      allow write: if isInternalOperations() && (isValidImageUpload() || isValidDocumentUpload());
+    }
+
+    // Legacy paths fallback with organization verification
     match /organizations/{orgId}/projects/{projectId}/{allPaths=**} {
-      // Must be authenticated and assigned to that organization, or admin
-      allow read: if isAuthenticated() && (
-        request.auth.token.organizationId == orgId ||
-        isAdmin() ||
-        isProjectManager()
-      );
-      // Validating file size <= 50MB and allowed extensions (pdf, dwg, rvt, zip, png, jpg)
-      allow write: if isAuthenticated() && (
-        request.auth.token.organizationId == orgId ||
-        isAdmin() ||
-        isProjectManager()
-      ) &&
-      request.resource.size < 50 * 1024 * 1024 &&
-      request.resource.contentType.matches('application/pdf|application/zip|image/.*|application/acad|application/octet-stream');
+      allow read: if belongsToOrganization(orgId) || isInternalOperations();
+      allow write: if (belongsToOrganization(orgId) || isInternalOperations()) && isValidDocumentUpload();
     }
 
-    // Supplier & Partner Accreditation Documents
     match /partners/{partnerId}/{allPaths=**} {
-      allow read: if isAuthenticated() && (request.auth.uid == partnerId || isAdmin());
-      allow write: if isAuthenticated() && (request.auth.uid == partnerId || isAdmin()) &&
-                   request.resource.size < 20 * 1024 * 1024;
+      allow read: if isSignedIn() && (request.auth.uid == partnerId || isSystemAdmin());
+      allow write: if isSignedIn() && (request.auth.uid == partnerId || isSystemAdmin()) && isValidDocumentUpload();
+    }
+
+    // Default deny for all other paths
+    match /{allPaths=**} {
+      allow read, write: if false;
     }
   }
 }

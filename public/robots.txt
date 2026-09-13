@@ -1,4 +1,14 @@
 User-agent: *
+Disallow: /portal/
+Disallow: /operations/
+Disallow: /admin/
+Disallow: /projects/private/
+Disallow: /api/
+Disallow: /pricing
+Disallow: /login
+Disallow: /*?*token=
+Disallow: /*?*invitation=
 Allow: /
 
 Sitemap: https://dhenzebuilder.com/sitemap.xml
+

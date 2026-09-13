@@ -235,7 +235,7 @@ export const PartnerPortalView: React.FC<PartnerPortalViewProps> = ({
                 </div>
                 <p className={`text-sm font-semibold ${headerText}`}>Earthworks & Subgrade Compaction Package</p>
                 <p className={`text-xs ${mutedText} mt-1`}>
-                  Proposal: ₱{(p.commercialAmountPHP / 1e6).toFixed(2)}M • Submitted: {p.submittedAt}
+                  Proposal: ₱{(((p?.commercialAmountPHP ?? 0)) / 1e6).toFixed(2)}M • Submitted: {p?.submittedAt ?? 'Pending'}
                 </p>
               </div>
             ))}

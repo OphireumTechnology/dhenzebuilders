@@ -6,6 +6,7 @@ import path from 'path';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI } from '@google/genai';
+import { securityRouter, portalLockMiddleware } from './server/securityRoutes.ts';
 import { INITIAL_KNOWLEDGE_BASE } from './src/data/knowledgeBase.ts';
 import {
   INITIAL_SUBSCRIPTION_PLANS,
@@ -206,6 +207,12 @@ function getGeminiClient(): GoogleGenAI | null {
   }
   return aiClient;
 }
+
+// ----------------------------------------------------
+// SECURITY GUARDS & ROUTING (Section 1, 4, 5, 8, 15, 17, 18, 21)
+// ----------------------------------------------------
+app.use(securityRouter);
+app.use(portalLockMiddleware);
 
 // ----------------------------------------------------
 // API ROUTES

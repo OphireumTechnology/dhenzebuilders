@@ -131,7 +131,9 @@ export const ClientPortalView: React.FC<ClientPortalViewProps> = ({
       let citations = ['ST-201 rev 3 (Structural Rebar)', 'PO-2026-0044 (Ready Mix 4,000 PSI)'];
 
       if (userText.toLowerCase().includes('budget') || userText.toLowerCase().includes('invoice') || userText.toLowerCase().includes('payment')) {
-        responseText = `Current financial position for ${selectedProject.title}: Baseline budget is ₱${(selectedProject.budgetBaselinePHP / 1e6).toFixed(1)}M. Committed cost is ₱${(selectedProject.committedCostPHP / 1e6).toFixed(1)}M. Approved Invoice INV-2026-0182 for ₱12.75M net payable is due on Sept 30.`;
+        const baseline = ((selectedProject?.budgetBaselinePHP ?? 0) / 1e6).toFixed(1);
+        const committed = ((selectedProject?.committedCostPHP ?? 0) / 1e6).toFixed(1);
+        responseText = `Current financial position for ${selectedProject?.title ?? 'Active Project'}: Baseline budget is ₱${baseline}M. Committed cost is ₱${committed}M. Approved Invoice INV-2026-0182 for ₱12.75M net payable is due on Sept 30.`;
         citations = ['INV-2026-0182', 'Milestone 2 Signoff'];
       }
 
@@ -236,11 +238,11 @@ export const ClientPortalView: React.FC<ClientPortalViewProps> = ({
               <span className={`text-xs font-medium uppercase tracking-wider ${mutedText}`}>Baseline Budget</span>
               <div className="flex items-baseline justify-between mt-2">
                 <span className={`text-2xl font-serif ${headerText} font-bold`}>
-                  ₱{(selectedProject.budgetBaselinePHP / 1e6).toFixed(1)}M
+                  ₱{(((selectedProject?.budgetBaselinePHP ?? 0)) / 1e6).toFixed(1)}M
                 </span>
                 <span className={`text-xs ${mutedText}`}>PHP Currency</span>
               </div>
-              <p className={`text-xs ${mutedText} mt-2`}>Committed: ₱{(selectedProject.committedCostPHP / 1e6).toFixed(1)}M</p>
+              <p className={`text-xs ${mutedText} mt-2`}>Committed: ₱{(((selectedProject?.committedCostPHP ?? 0)) / 1e6).toFixed(1)}M</p>
             </div>
 
             <div className={`p-5 rounded-xl border ${cardBg}`}>
@@ -592,7 +594,7 @@ export const ClientPortalView: React.FC<ClientPortalViewProps> = ({
                     <span className={`text-xs font-semibold ${headerText}`}>{inv.milestoneReference}</span>
                   </div>
                   <p className={`text-xs ${mutedText} mt-1`}>
-                    Gross: ₱{(inv.grossAmountPHP / 1e6).toFixed(2)}M • 10% Retention: ₱{(inv.retentionDeductionPHP / 1e6).toFixed(2)}M • Net Payable: ₱{(inv.netPayablePHP / 1e6).toFixed(2)}M
+                    Gross: ₱{(((inv?.grossAmountPHP ?? 0)) / 1e6).toFixed(2)}M • 10% Retention: ₱{(((inv?.retentionDeductionPHP ?? 0)) / 1e6).toFixed(2)}M • Net Payable: ₱{(((inv?.netPayablePHP ?? 0)) / 1e6).toFixed(2)}M
                   </p>
                   <p className={`text-[11px] ${mutedText}`}>Invoice Date: {inv.invoiceDate} • Due Date: {inv.dueDate}</p>
                 </div>

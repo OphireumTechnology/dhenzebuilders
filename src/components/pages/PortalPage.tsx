@@ -1340,7 +1340,7 @@ export const PortalPage: React.FC<PortalPageProps> = ({
                 <div className="p-4 bg-[#051322] border border-white/5 rounded-xl">
                   <div className="text-slate-400 text-xs">Total Gross Revenue</div>
                   <div className="text-2xl font-black text-white font-mono mt-1">
-                    ${profitability?.totalRevenueUSD.toLocaleString(undefined, { minimumFractionDigits: 2 }) || '4,750.00'}
+                    ${profitability?.totalRevenueUSD != null ? profitability.totalRevenueUSD.toLocaleString(undefined, { minimumFractionDigits: 2 }) : '4,750.00'}
                   </div>
                   <div className="text-[11px] text-emerald-400 mt-1">Subscriptions + Top-up add-ons</div>
                 </div>
@@ -1348,7 +1348,7 @@ export const PortalPage: React.FC<PortalPageProps> = ({
                 <div className="p-4 bg-[#051322] border border-white/5 rounded-xl">
                   <div className="text-slate-400 text-xs">LLM Inference & Reasoning Compute</div>
                   <div className="text-2xl font-black text-slate-300 font-mono mt-1">
-                    ${profitability?.tokenInferenceCostUSD.toFixed(2) || '142.50'}
+                    ${profitability?.tokenInferenceCostUSD != null ? profitability.tokenInferenceCostUSD.toFixed(2) : '142.50'}
                   </div>
                   <div className="text-[11px] text-slate-500 mt-1">Direct token & thinking pass costs</div>
                 </div>
@@ -1356,7 +1356,7 @@ export const PortalPage: React.FC<PortalPageProps> = ({
                 <div className="p-4 bg-[#051322] border border-white/5 rounded-xl">
                   <div className="text-slate-400 text-xs">Visualizer & Blueprint Renders</div>
                   <div className="text-2xl font-black text-slate-300 font-mono mt-1">
-                    ${profitability?.visualizerRenderCostUSD.toFixed(2) || '210.00'}
+                    ${profitability?.visualizerRenderCostUSD != null ? profitability.visualizerRenderCostUSD.toFixed(2) : '210.00'}
                   </div>
                   <div className="text-[11px] text-slate-500 mt-1">Diffusion & CAD render instances</div>
                 </div>
@@ -1364,7 +1364,7 @@ export const PortalPage: React.FC<PortalPageProps> = ({
                 <div className="p-4 bg-[#051322] border border-emerald-500/30 rounded-xl">
                   <div className="text-emerald-400 text-xs font-semibold">Net Gross Margin</div>
                   <div className="text-2xl font-black text-emerald-400 font-mono mt-1">
-                    {profitability?.grossMarginPercentage.toFixed(1) || '84.6'}%
+                    {profitability?.grossMarginPercentage != null ? profitability.grossMarginPercentage.toFixed(1) : '84.6'}%
                   </div>
                   <div className="text-[11px] text-emerald-300 mt-1">Target baseline: ≥ 75.0% enforced</div>
                 </div>
@@ -1448,9 +1448,9 @@ export const PortalPage: React.FC<PortalPageProps> = ({
                         <td className="py-3 px-3 font-bold text-white">{pkg.name}</td>
                         <td className="py-3 px-3 text-right font-mono font-bold text-emerald-400">${pkg.priceUSD}</td>
                         <td className="py-3 px-3 text-right font-mono text-slate-300">{pkg.credits.toLocaleString()} credits</td>
-                        <td className="py-3 px-3 text-right font-mono text-slate-300">${pkg.infrastructureAllocationUSD.toFixed(2)}</td>
-                        <td className="py-3 px-3 text-right font-mono text-slate-400">${pkg.paymentProcessingFeeUSD.toFixed(2)}</td>
-                        <td className="py-3 px-3 text-right font-mono text-slate-400">${pkg.supportAllocationUSD.toFixed(2)}</td>
+                        <td className="py-3 px-3 text-right font-mono text-slate-300">${(pkg.infrastructureAllocationUSD ?? 1.25).toFixed(2)}</td>
+                        <td className="py-3 px-3 text-right font-mono text-slate-400">${(pkg.paymentProcessingFeeUSD ?? 1.61).toFixed(2)}</td>
+                        <td className="py-3 px-3 text-right font-mono text-slate-400">${(pkg.supportAllocationUSD ?? 2.50).toFixed(2)}</td>
                         <td className="py-3 px-3 text-right font-mono font-bold text-emerald-400">{pkg.grossMarginFloorPercent}%</td>
                         <td className="py-3 px-3 text-center">
                           <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-950 text-emerald-300 border border-emerald-800">
