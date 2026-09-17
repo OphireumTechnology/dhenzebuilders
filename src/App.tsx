@@ -151,10 +151,15 @@ export default function App() {
 
   // Query server for portal lock state
   useEffect(() => {
-    fetch('/api/security/portal-status')
-      .then((res) => res.json())
+    fetch('/api/security/portal-status', { headers: { Accept: 'application/json' } })
+      .then((res) => {
+        const ct = res.headers.get('content-type') || '';
+        return ct.includes('application/json') ? res.json() : null;
+      })
       .then((data) => {
-        setPortalsEnabled(Boolean(data.portalsEnabled));
+        if (data) {
+          setPortalsEnabled(Boolean(data.portalsEnabled));
+        }
       })
       .catch(() => {
         setPortalsEnabled(false);

@@ -2367,6 +2367,19 @@ app.get('/api/infrastructure/audit', (req: Request, res: Response) => {
 });
 
 // ----------------------------------------------------
+// API 404 FALLTHROUGH GUARD
+// ----------------------------------------------------
+// Ensure unhandled /api requests always return JSON, preventing SPA index.html fallthrough
+app.all('/api/*', (req: Request, res: Response) => {
+  res.status(404).json({
+    error: 'API_ENDPOINT_NOT_FOUND',
+    message: `API endpoint ${req.method} ${req.path} is not recognized.`,
+    path: req.path,
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// ----------------------------------------------------
 // VITE MIDDLEWARE & STATIC SERVING
 // ----------------------------------------------------
 async function startServer() {

@@ -61,6 +61,39 @@ import {
   Menu,
 } from 'lucide-react';
 
+// Safe JSON parser that checks content-type and handles non-JSON / HTML / 503 error responses gracefully
+const parseJsonSafely = async <T = any>(res: Response | null): Promise<T | null> => {
+  if (!res) return null;
+  try {
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      return null;
+    }
+    return (await res.json()) as T;
+  } catch {
+    return null;
+  }
+};
+
+const getPortalAuthHeaders = () => {
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+  };
+  try {
+    const stored = sessionStorage.getItem('ldl_auth_user');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (parsed?.email) {
+        headers['x-emergency-admin-email'] = parsed.email;
+        headers['Authorization'] = `Bearer sess_${parsed.uid || 'auth'}`;
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return headers;
+};
+
 interface PortalPageProps {
   currentUserRole: UserRole;
   onChangeUserRole: (role: UserRole) => void;
@@ -125,39 +158,43 @@ export const PortalPage: React.FC<PortalPageProps> = ({
   // Load inquiries, audit logs, knowledge sources, billing, and reconciliation data
   const fetchData = async () => {
     setLoading(true);
+    const headers = getPortalAuthHeaders();
     try {
       const [inqRes, logsRes, knowRes, subRes, ledgRes, pvRes, profRes, reconRes, btRes] = await Promise.all([
-        fetch('/api/inquiries'),
-        fetch('/api/audit-logs'),
-        fetch(`/api/knowledge/sources?role=${currentUserRole}`),
-        fetch('/api/billing/subscription'),
-        fetch('/api/billing/ledger'),
-        fetch('/api/billing/price-versions'),
-        fetch('/api/billing/profitability'),
-        fetch('/api/billing/pricing-reconciliation'),
-        fetch('/api/billing/bank-transfers'),
+        fetch('/api/inquiries', { headers }).catch(() => null),
+        fetch('/api/audit-logs', { headers }).catch(() => null),
+        fetch(`/api/knowledge/sources?role=${encodeURIComponent(currentUserRole)}`, { headers }).catch(() => null),
+        fetch('/api/billing/subscription', { headers }).catch(() => null),
+        fetch('/api/billing/ledger', { headers }).catch(() => null),
+        fetch('/api/billing/price-versions', { headers }).catch(() => null),
+        fetch('/api/billing/profitability', { headers }).catch(() => null),
+        fetch('/api/billing/pricing-reconciliation', { headers }).catch(() => null),
+        fetch('/api/billing/bank-transfers', { headers }).catch(() => null),
       ]);
-      const inqData = await inqRes.json();
-      const logsData = await logsRes.json();
-      const knowData = await knowRes.json();
-      const subData = await subRes.json();
-      const ledgData = await ledgRes.json();
-      const pvData = await pvRes.json();
-      const profData = await profRes.json();
-      const reconData = await reconRes.json();
-      const btData = await btRes.json();
 
-      if (inqData.inquiries) setInquiries(inqData.inquiries);
-      if (logsData.logs) setAuditLogs(logsData.logs);
-      if (knowData.sources) setKnowledgeSources(knowData.sources);
-      if (subData.subscription) setSubscription(subData.subscription);
-      if (ledgData.ledger) setLedger(ledgData.ledger);
-      if (pvData.versions) setPriceVersions(pvData.versions);
-      if (profData.metrics) setProfitability(profData.metrics);
-      if (reconData.reconciliationRecords) setReconciliationRecords(reconData.reconciliationRecords);
-      if (btData.transfers) setBankTransfers(btData.transfers);
+      const [inqData, logsData, knowData, subData, ledgData, pvData, profData, reconData, btData] = await Promise.all([
+        inqRes ? parseJsonSafely(inqRes) : null,
+        logsRes ? parseJsonSafely(logsRes) : null,
+        knowRes ? parseJsonSafely(knowRes) : null,
+        subRes ? parseJsonSafely(subRes) : null,
+        ledgRes ? parseJsonSafely(ledgRes) : null,
+        pvRes ? parseJsonSafely(pvRes) : null,
+        profRes ? parseJsonSafely(profRes) : null,
+        reconRes ? parseJsonSafely(reconRes) : null,
+        btRes ? parseJsonSafely(btRes) : null,
+      ]);
+
+      if (inqData?.inquiries) setInquiries(inqData.inquiries);
+      if (logsData?.logs) setAuditLogs(logsData.logs);
+      if (knowData?.sources) setKnowledgeSources(knowData.sources);
+      if (subData?.subscription) setSubscription(subData.subscription);
+      if (ledgData?.ledger) setLedger(ledgData.ledger);
+      if (pvData?.versions) setPriceVersions(pvData.versions);
+      if (profData?.metrics) setProfitability(profData.metrics);
+      if (reconData?.reconciliationRecords) setReconciliationRecords(reconData.reconciliationRecords);
+      if (btData?.transfers) setBankTransfers(btData.transfers);
     } catch (err) {
-      console.error('Failed to load portal data:', err);
+      console.warn('Portal data fetch completed with fallback defaults:', err);
     } finally {
       setLoading(false);
     }
@@ -171,19 +208,19 @@ export const PortalPage: React.FC<PortalPageProps> = ({
     try {
       const res = await fetch(`/api/billing/pricing-reconciliation/${planId}/approve`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { ...getPortalAuthHeaders(), 'Content-Type': 'application/json' },
         body: JSON.stringify({
           approver: approverName,
           approverRole: currentUserRole,
         }),
       });
-      const data = await res.json();
-      if (data.success) {
+      const data = await parseJsonSafely(res);
+      if (data?.success) {
         setActionMessage(`Reconciliation approved: ${planId.toUpperCase()} selling price finalized at USD $${data.record.finalApprovedSellingPriceUSD}.`);
         fetchData();
         setTimeout(() => setActionMessage(null), 5000);
       } else {
-        alert(data.error || 'Approval rejected by governance policy.');
+        alert(data?.error || 'Approval rejected by governance policy.');
       }
     } catch (e) {
       console.error(e);
@@ -194,19 +231,19 @@ export const PortalPage: React.FC<PortalPageProps> = ({
     try {
       const res = await fetch(`/api/billing/bank-transfers/${transferId}/approve`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { ...getPortalAuthHeaders(), 'Content-Type': 'application/json' },
         body: JSON.stringify({
           approver: approverName,
           approverRole: currentUserRole,
         }),
       });
-      const data = await res.json();
-      if (data.success) {
+      const data = await parseJsonSafely(res);
+      if (data?.success) {
         setActionMessage(`Bank transfer ${transferId} approved by Checker. Subscription activated.`);
         fetchData();
         setTimeout(() => setActionMessage(null), 5000);
       } else {
-        alert(data.error || 'Approval rejected.');
+        alert(data?.error || 'Approval rejected.');
       }
     } catch (e) {
       console.error(e);
@@ -216,11 +253,11 @@ export const PortalPage: React.FC<PortalPageProps> = ({
   const handleRunQaSuite = async () => {
     setRunningTestKey('qa');
     try {
-      const res = await fetch(`/api/qa/run-tests?role=${currentUserRole}`, {
-        headers: { 'x-user-role': currentUserRole },
+      const res = await fetch(`/api/qa/run-tests?role=${encodeURIComponent(currentUserRole)}`, {
+        headers: { ...getPortalAuthHeaders(), 'x-user-role': currentUserRole },
       });
-      const data = await res.json();
-      setQaResults(data);
+      const data = await parseJsonSafely(res);
+      if (data) setQaResults(data);
     } catch (e) {
       console.error('QA run failed:', e);
     } finally {
@@ -231,9 +268,12 @@ export const PortalPage: React.FC<PortalPageProps> = ({
   const handleRunBoundaryTests = async () => {
     setRunningTestKey('boundary');
     try {
-      const res = await fetch('/api/qa/test-boundaries', { method: 'POST' });
-      const data = await res.json();
-      setBoundaryResults(data);
+      const res = await fetch('/api/qa/test-boundaries', {
+        method: 'POST',
+        headers: getPortalAuthHeaders(),
+      });
+      const data = await parseJsonSafely(res);
+      if (data) setBoundaryResults(data);
     } catch (e) {
       console.error('Boundary test failed:', e);
     } finally {
@@ -244,9 +284,11 @@ export const PortalPage: React.FC<PortalPageProps> = ({
   const handleRunFirebaseRbac = async () => {
     setRunningTestKey('rbac');
     try {
-      const res = await fetch('/api/qa/test-firebase-rbac');
-      const data = await res.json();
-      setFirebaseRbacResults(data);
+      const res = await fetch('/api/qa/test-firebase-rbac', {
+        headers: getPortalAuthHeaders(),
+      });
+      const data = await parseJsonSafely(res);
+      if (data) setFirebaseRbacResults(data);
     } catch (e) {
       console.error('RBAC test failed:', e);
     } finally {
@@ -257,10 +299,15 @@ export const PortalPage: React.FC<PortalPageProps> = ({
   const handleRunConcurrentStressTest = async () => {
     setRunningTestKey('stress');
     try {
-      const res = await fetch('/api/billing/test-concurrent-reservations', { method: 'POST' });
-      const data = await res.json();
-      setConcurrentStressResults(data);
-      fetchData();
+      const res = await fetch('/api/billing/test-concurrent-reservations', {
+        method: 'POST',
+        headers: getPortalAuthHeaders(),
+      });
+      const data = await parseJsonSafely(res);
+      if (data) {
+        setConcurrentStressResults(data);
+        fetchData();
+      }
     } catch (e) {
       console.error('Stress test failed:', e);
     } finally {
@@ -272,11 +319,11 @@ export const PortalPage: React.FC<PortalPageProps> = ({
     try {
       const res = await fetch('/api/billing/topup', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { ...getPortalAuthHeaders(), 'Content-Type': 'application/json' },
         body: JSON.stringify({ packageId }),
       });
-      const data = await res.json();
-      if (data.success) {
+      const data = await parseJsonSafely(res);
+      if (data?.success) {
         setActionMessage(`Successfully purchased ${data.package.credits} credits! Wallet updated.`);
         fetchData();
         setTopUpModalOpen(false);
@@ -291,19 +338,19 @@ export const PortalPage: React.FC<PortalPageProps> = ({
     try {
       const res = await fetch(`/api/billing/price-versions/${versionId}/approve`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { ...getPortalAuthHeaders(), 'Content-Type': 'application/json' },
         body: JSON.stringify({
           approver: approverName,
           approverRole: 'EXECUTIVE',
         }),
       });
-      const data = await res.json();
-      if (data.success) {
+      const data = await parseJsonSafely(res);
+      if (data?.success) {
         setActionMessage(`Price version ${versionId} approved and activated with 10x benchmark applied.`);
         fetchData();
         setTimeout(() => setActionMessage(null), 5000);
       } else {
-        alert(data.error || 'Approval failed');
+        alert(data?.error || 'Approval failed');
       }
     } catch (e) {
       console.error(e);
@@ -315,7 +362,7 @@ export const PortalPage: React.FC<PortalPageProps> = ({
     try {
       const res = await fetch('/api/billing/price-versions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { ...getPortalAuthHeaders(), 'Content-Type': 'application/json' },
         body: JSON.stringify({
           planId: newVersionPlanId,
           monthlyAmountUSD: newVersionPriceUSD,
@@ -325,8 +372,8 @@ export const PortalPage: React.FC<PortalPageProps> = ({
           notes: newVersionNotes,
         }),
       });
-      const data = await res.json();
-      if (data.success) {
+      const data = await parseJsonSafely(res);
+      if (data?.success) {
         setActionMessage(`Submitted draft price version for ${newVersionPlanId}. Awaiting executive checker approval.`);
         setNewVersionModalOpen(false);
         setNewVersionNotes('');
@@ -343,14 +390,14 @@ export const PortalPage: React.FC<PortalPageProps> = ({
     try {
       const res = await fetch('/api/billing/emergency-shutoff', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { ...getPortalAuthHeaders(), 'Content-Type': 'application/json' },
         body: JSON.stringify({
           active: !profitability.emergencyShutoffActive,
           actorRole: currentUserRole,
         }),
       });
-      const data = await res.json();
-      if (data.success) {
+      const data = await parseJsonSafely(res);
+      if (data?.success) {
         setActionMessage(`Emergency generation kill-switch updated.`);
         fetchData();
         setTimeout(() => setActionMessage(null), 5000);
@@ -365,7 +412,7 @@ export const PortalPage: React.FC<PortalPageProps> = ({
     try {
       const res = await fetch('/api/knowledge/status-toggle', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { ...getPortalAuthHeaders(), 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, status: nextStatus, actorRole: currentUserRole }),
       });
       if (res.ok) {

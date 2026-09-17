@@ -45,9 +45,14 @@ export const CompanyProfilePage: React.FC<CompanyProfilePageProps> = ({
 
   // Fetch real-time publication metadata from backend
   useEffect(() => {
-    fetch('/api/corporate-resources/company-profile')
-      .then((res) => res.json())
-      .then((data) => setServerStatus(data))
+    fetch('/api/corporate-resources/company-profile', { headers: { Accept: 'application/json' } })
+      .then((res) => {
+        const ct = res.headers.get('content-type') || '';
+        return ct.includes('application/json') ? res.json() : null;
+      })
+      .then((data) => {
+        if (data) setServerStatus(data);
+      })
       .catch(() => setServerStatus({ isPublished: true, metadata: OFFICIAL_PROFILE_METADATA }));
   }, []);
 

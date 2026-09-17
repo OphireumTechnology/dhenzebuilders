@@ -82,11 +82,18 @@ export const CompanyProfileAdminConsole: React.FC<CompanyProfileAdminConsoleProp
   const fetchAdminData = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/company-profile/status');
-      const data = await res.json();
-      setActiveVersion(data.activeVersion);
-      setVersions(data.versions || []);
-      setAuditLogs(data.auditLogs || []);
+      const res = await fetch('/api/admin/company-profile/status', {
+        headers: { Accept: 'application/json' },
+      });
+      const ct = res.headers.get('content-type') || '';
+      if (res.ok && ct.includes('application/json')) {
+        const data = await res.json();
+        if (data) {
+          setActiveVersion(data.activeVersion);
+          setVersions(data.versions || []);
+          setAuditLogs(data.auditLogs || []);
+        }
+      }
     } catch (err) {
       console.error('Failed to fetch admin profile status:', err);
     } finally {
@@ -98,6 +105,16 @@ export const CompanyProfileAdminConsole: React.FC<CompanyProfileAdminConsoleProp
     fetchAdminData();
   }, []);
 
+  const safeJson = async (res: Response) => {
+    const ct = res.headers.get('content-type') || '';
+    if (!ct.includes('application/json')) return null;
+    try {
+      return await res.json();
+    } catch {
+      return null;
+    }
+  };
+
   const handleUploadNewDraft = async () => {
     if (currentActorRole !== 'System Administrator') {
       alert('Only System Administrators can upload new draft editions.');
@@ -108,15 +125,15 @@ export const CompanyProfileAdminConsole: React.FC<CompanyProfileAdminConsoleProp
     try {
       const res = await fetch('/api/admin/company-profile/upload', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({
           edition: newEditionName,
           changeLog: changeLogNotes,
           uploadedBy: 'admin@dhenzebuilder.com (System Administrator)',
         }),
       });
-      const data = await res.json();
-      if (data.success) {
+      const data = await safeJson(res);
+      if (data?.success) {
         setStatusMessage(`Successfully staged ${newEditionName}. Automated validations passed.`);
         setUploadModalOpen(false);
         fetchAdminData();
@@ -138,15 +155,15 @@ export const CompanyProfileAdminConsole: React.FC<CompanyProfileAdminConsoleProp
     try {
       const res = await fetch('/api/admin/company-profile/compliance-review', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({
           version,
           reviewerEmail: 'legal@dhenzebuilder.com (Compliance Reviewer)',
           notes: 'Statutory disclosures, RA 9266 statements, and PRC licensing verified.',
         }),
       });
-      const data = await res.json();
-      if (data.success) {
+      const data = await safeJson(res);
+      if (data?.success) {
         setStatusMessage(`Compliance sign-off registered for version ${version}.`);
         fetchAdminData();
       }
@@ -167,15 +184,15 @@ export const CompanyProfileAdminConsole: React.FC<CompanyProfileAdminConsoleProp
     try {
       const res = await fetch('/api/admin/company-profile/executive-approve', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({
           version,
           approverEmail: 'ceo@dhenzebuilder.com (Leodenis Deveza Languisan, CEO)',
           notes: 'Executive approval granted for public distribution.',
         }),
       });
-      const data = await res.json();
-      if (data.success) {
+      const data = await safeJson(res);
+      if (data?.success) {
         setStatusMessage(`Executive approval granted for version ${version}. Ready for publication.`);
         fetchAdminData();
       }
@@ -191,14 +208,14 @@ export const CompanyProfileAdminConsole: React.FC<CompanyProfileAdminConsoleProp
     try {
       const res = await fetch('/api/admin/company-profile/publish', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({
           version,
           actorEmail: 'admin@dhenzebuilder.com',
         }),
       });
-      const data = await res.json();
-      if (data.success) {
+      const data = await safeJson(res);
+      if (data?.success) {
         setStatusMessage(`Version ${version} is now LIVE on the public website.`);
         fetchAdminData();
       }
@@ -217,14 +234,14 @@ export const CompanyProfileAdminConsole: React.FC<CompanyProfileAdminConsoleProp
     try {
       const res = await fetch('/api/admin/company-profile/revoke', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({
           reason,
           actorEmail: 'executive@dhenzebuilder.com',
         }),
       });
-      const data = await res.json();
-      if (data.success) {
+      const data = await safeJson(res);
+      if (data?.success) {
         setStatusMessage('Public distribution has been revoked. Access blocked.');
         fetchAdminData();
       }
