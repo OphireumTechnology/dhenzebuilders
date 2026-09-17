@@ -474,3 +474,6 @@ export interface RequirementRule {
   description: string;
   statutoryReference: string;
 }
+
+export type OnboardingRequirementRule = RequirementRule;
+

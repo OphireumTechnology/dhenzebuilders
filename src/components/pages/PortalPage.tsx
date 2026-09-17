@@ -15,6 +15,7 @@ import {
   SUBSCRIPTION_TERMS_STATEMENT,
   TOP_UP_ECONOMIC_AUDIT,
   CREDIT_LIFECYCLE_POLICY,
+  INITIAL_USER_SUBSCRIPTION,
 } from '../../data/subscriptionData';
 import {
   ShieldCheck,
@@ -121,7 +122,7 @@ export const PortalPage: React.FC<PortalPageProps> = ({
   const [inquiries, setInquiries] = useState<any[]>([]);
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
   const [knowledgeSources, setKnowledgeSources] = useState<KnowledgeChunk[]>([]);
-  const [subscription, setSubscription] = useState<UserSubscription | null>(null);
+  const [subscription, setSubscription] = useState<UserSubscription | null>(INITIAL_USER_SUBSCRIPTION);
   const [ledger, setLedger] = useState<CreditLedgerItem[]>([]);
   const [priceVersions, setPriceVersions] = useState<PriceVersion[]>([]);
   const [reconciliationRecords, setReconciliationRecords] = useState<PricingReconciliationRecord[]>([]);
@@ -955,13 +956,15 @@ export const PortalPage: React.FC<PortalPageProps> = ({
 
               {/* Wallet Matrix Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-6">
-                <div className="p-4 bg-[#051322] border border-[#C6922D]/40 rounded-2xl">
+                <div className="p-4 bg-[#051322] border border-[#C6922D]/30 rounded-2xl">
                   <div className="flex items-center justify-between text-xs text-slate-400">
                     <span>Available Balance</span>
                     <Coins className="w-4 h-4 text-[#C6922D]" />
                   </div>
                   <div className="text-3xl font-black text-white font-mono mt-1">
-                    {subscription?.wallet.totalCreditsRemaining.toLocaleString() || '2,650'}
+                    {subscription?.wallet?.totalCreditsRemaining != null
+                      ? subscription.wallet.totalCreditsRemaining.toLocaleString()
+                      : '2,650'}
                   </div>
                   <div className="text-[11px] text-[#C6922D] mt-1 font-semibold">
                     Net Ready for Autonomous Executions
@@ -974,7 +977,9 @@ export const PortalPage: React.FC<PortalPageProps> = ({
                     <Clock className="w-4 h-4 text-sky-400" />
                   </div>
                   <div className="text-2xl font-black text-white font-mono mt-1">
-                    {subscription?.wallet.subscriptionCreditsRemaining.toLocaleString() || '2,150'}
+                    {subscription?.wallet?.subscriptionCreditsRemaining != null
+                      ? subscription.wallet.subscriptionCreditsRemaining.toLocaleString()
+                      : '2,150'}
                   </div>
                   <div className="text-[11px] text-slate-400 mt-1">
                     Of 2,500 monthly recurring allocation
@@ -987,7 +992,9 @@ export const PortalPage: React.FC<PortalPageProps> = ({
                     <Zap className="w-4 h-4 text-emerald-400" />
                   </div>
                   <div className="text-2xl font-black text-emerald-300 font-mono mt-1">
-                    {subscription?.wallet.topUpCreditsRemaining.toLocaleString() || '500'}
+                    {subscription?.wallet?.topUpCreditsRemaining != null
+                      ? subscription.wallet.topUpCreditsRemaining.toLocaleString()
+                      : '500'}
                   </div>
                   <div className="text-[11px] text-slate-400 mt-1">Never expire • Used after plan pool</div>
                 </div>
@@ -998,7 +1005,9 @@ export const PortalPage: React.FC<PortalPageProps> = ({
                     <Lock className="w-4 h-4 text-amber-400" />
                   </div>
                   <div className="text-2xl font-black text-amber-300 font-mono mt-1">
-                    {subscription?.wallet.reservedCredits || '0'}
+                    {subscription?.wallet?.reservedCredits != null
+                      ? subscription.wallet.reservedCredits.toLocaleString()
+                      : '0'}
                   </div>
                   <div className="text-[11px] text-slate-400 mt-1">2-phase transactional lock buffer</div>
                 </div>

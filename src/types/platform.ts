@@ -650,3 +650,20 @@ export interface PartnerRecord extends PlatformOrganization {
   safetyRating?: number;
 }
 
+export interface AuditLogRecord {
+  id: string;
+  timestamp: string;
+  actor: string;
+  actorName?: string;
+  actorRole: string;
+  action: string;
+  resource?: string;
+  resourceType?: string;
+  resourceId?: string;
+  status?: 'SUCCESS' | 'FAILURE' | 'WARNING' | string;
+  details?: string;
+  ipAddress?: string;
+  sha256Hash?: string;
+}
+
+
