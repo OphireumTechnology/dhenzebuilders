@@ -28,6 +28,8 @@ import {
   SEED_ORGANIZATIONS,
   SEED_AUDIT_LOGS,
 } from '../../data/platformSeedData';
+import { VerificationCenterView } from '../onboarding/VerificationCenterView';
+import { UnifiedOnboardingDashboard } from '../onboarding/UnifiedOnboardingDashboard';
 
 interface OperationsPortalViewProps {
   currentSubRoute: string;
@@ -111,6 +113,8 @@ export const OperationsPortalView: React.FC<OperationsPortalViewProps> = ({
           </div>
           <h1 className={`text-2xl sm:text-3xl font-serif ${headerText} mt-1`}>
             {route === 'overview' && 'Operations Command & KPI Overview'}
+            {route === 'verification-center' && 'Government Verification Center (Simulation Phase)'}
+            {route === 'onboarding' && 'Unified Onboarding & Compliance Directory'}
             {route === 'organizations' && 'Multi-Tenant Organizations Directory'}
             {route === 'clients' && 'Client Accounts & Property Portfolios'}
             {route === 'suppliers' && 'Supplier Verification & Spend Analysis'}
@@ -346,6 +350,20 @@ export const OperationsPortalView: React.FC<OperationsPortalViewProps> = ({
             </button>
           </div>
         </div>
+      )}
+
+      {/* Verification Center Section */}
+      {route === 'verification-center' && (
+        <VerificationCenterView portalTheme={portalTheme} />
+      )}
+
+      {/* Onboarding Master Section */}
+      {route === 'onboarding' && (
+        <UnifiedOnboardingDashboard
+          portalTheme={portalTheme}
+          currentUserRole={currentUserRole}
+          onNavigate={onNavigate}
+        />
       )}
     </div>
   );

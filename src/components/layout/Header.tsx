@@ -13,6 +13,10 @@ import {
   Mail,
   Compass,
   FileCheck,
+  LayoutDashboard,
+  ShieldAlert,
+  Building2,
+  Users,
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -32,9 +36,9 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
+  const [dashboardsOpen, setDashboardsOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
-  const roleRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -46,14 +50,14 @@ export const Header: React.FC<HeaderProps> = ({
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (roleRef.current && !roleRef.current.contains(e.target as Node)) {
-        setRoleDropdownOpen(false);
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDashboardsOpen(false);
       }
     };
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setMobileMenuOpen(false);
-        setRoleDropdownOpen(false);
+        setDashboardsOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -66,7 +70,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   const handleNavClick = (view: string) => {
     setMobileMenuOpen(false);
-    setRoleDropdownOpen(false);
+    setDashboardsOpen(false);
     onNavigate(view);
   };
 
@@ -98,7 +102,7 @@ export const Header: React.FC<HeaderProps> = ({
       }`}
     >
       <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-2 xl:gap-3 2xl:gap-6">
           {/* Logo */}
           <div className="shrink-0 flex items-center">
             <button
@@ -113,7 +117,7 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Desktop Primary Navigation */}
           <nav
             id="desktop-primary-nav"
-            className="hidden lg:flex items-center justify-center gap-1 xl:gap-2 flex-1 min-w-0 px-2"
+            className="hidden xl:flex items-center justify-center gap-0.5 2xl:gap-1.5 shrink-0 px-1"
             aria-label="Primary Navigation"
           >
             {navItems.map((item) => {
@@ -122,25 +126,155 @@ export const Header: React.FC<HeaderProps> = ({
                 <button
                   key={item.label}
                   onClick={() => handleNavClick(item.view)}
-                  className={`px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-colors rounded-md whitespace-nowrap focus:outline-none focus-visible:ring-1 focus-visible:ring-[#C6922D] ${
+                  className={`px-2.5 py-1.5 2xl:px-3 2xl:py-2 text-[11px] 2xl:text-xs font-semibold uppercase tracking-wider transition-colors rounded-md whitespace-nowrap focus:outline-none focus-visible:ring-1 focus-visible:ring-[#C6922D] ${
                     active
                       ? 'text-[#C6922D] bg-white/5 font-bold'
                       : 'text-slate-200 hover:text-[#C6922D] hover:bg-white/5'
                   }`}
                 >
-                  {item.label}
+                  {item.label === 'Selected Work' ? (
+                    <>
+                      <span className="hidden 2xl:inline">Selected </span>Work
+                    </>
+                  ) : (
+                    item.label
+                  )}
                 </button>
               );
             })}
           </nav>
 
           {/* Desktop Actions Cluster */}
-          <div className="hidden sm:flex items-center gap-2.5 shrink-0">
+          <div className="hidden sm:flex items-center gap-2 2xl:gap-2.5 shrink-0">
+            {/* Dashboards & Portals Dropdown */}
+            <div className="relative" ref={dropdownRef}>
+              <button
+                id="header-dashboards-btn"
+                onClick={() => setDashboardsOpen(!dashboardsOpen)}
+                className={`px-2.5 py-1.5 2xl:px-3.5 2xl:py-2 text-[11px] 2xl:text-xs font-semibold tracking-wider rounded-md transition-all inline-flex items-center gap-1.5 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C6922D] ${
+                  dashboardsOpen ||
+                  currentView.includes('portal') ||
+                  currentView.includes('operations') ||
+                  currentView === 'verification-center' ||
+                  currentView === 'onboarding'
+                    ? 'text-[#C6922D] bg-[#C6922D]/15 border border-[#C6922D]'
+                    : 'text-slate-200 hover:text-[#C6922D] border border-white/10 hover:border-[#C6922D]/40 hover:bg-white/5'
+                }`}
+                aria-expanded={dashboardsOpen}
+                aria-haspopup="true"
+              >
+                <LayoutDashboard className="w-3.5 h-3.5 text-[#C6922D]" />
+                <span>Dashboards</span>
+                <ChevronDown
+                  className={`w-3 h-3 transition-transform ${
+                    dashboardsOpen ? 'rotate-180 text-[#C6922D]' : 'text-slate-400'
+                  }`}
+                />
+              </button>
+
+              {/* Dropdown Menu */}
+              {dashboardsOpen && (
+                <div
+                  id="header-dashboards-dropdown"
+                  className="absolute right-0 mt-2 w-72 bg-[#07182C] border border-[#C6922D]/30 rounded-xl shadow-2xl p-2 z-50 backdrop-blur-xl animate-in fade-in"
+                >
+                  <div className="px-3 py-2 border-b border-white/10">
+                    <p className="text-[10px] font-mono uppercase tracking-widest text-[#C6922D]">
+                      Access Directory
+                    </p>
+                    <p className="text-xs font-serif text-white font-medium">
+                      Portals & Verification Engines
+                    </p>
+                  </div>
+
+                  <div className="py-1 space-y-0.5 text-xs">
+                    <button
+                      onClick={() => handleNavClick('verification-center')}
+                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#C6922D]/10 hover:text-white text-slate-200 flex items-start gap-2.5 transition-colors group"
+                    >
+                      <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                      <div>
+                        <div className="font-semibold flex items-center gap-1.5">
+                          Verification Center
+                          <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-amber-400/20 text-amber-300">
+                            DEMO
+                          </span>
+                        </div>
+                        <div className="text-[11px] text-slate-400 font-sans">
+                          Simulated PRC, PCAB, SEC, BIR check engine
+                        </div>
+                      </div>
+                    </button>
+
+                    <button
+                      onClick={() => handleNavClick('onboarding')}
+                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#C6922D]/10 hover:text-white text-slate-200 flex items-start gap-2.5 transition-colors group"
+                    >
+                      <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                      <div>
+                        <div className="font-semibold text-slate-200 group-hover:text-white">
+                          Onboarding Master Portal
+                        </div>
+                        <div className="text-[11px] text-slate-400 font-sans">
+                          Contractor, supplier, professional & client intake
+                        </div>
+                      </div>
+                    </button>
+
+                    <button
+                      onClick={() => handleNavClick('operations/overview')}
+                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#C6922D]/10 hover:text-white text-slate-200 flex items-start gap-2.5 transition-colors group"
+                    >
+                      <Building2 className="w-4 h-4 text-[#C6922D] shrink-0 mt-0.5" />
+                      <div>
+                        <div className="font-semibold text-slate-200 group-hover:text-white">
+                          Operations Command
+                        </div>
+                        <div className="text-[11px] text-slate-400 font-sans">
+                          Multi-tenant management, audit & finance
+                        </div>
+                      </div>
+                    </button>
+
+                    <button
+                      onClick={() => handleNavClick('portal')}
+                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#C6922D]/10 hover:text-white text-slate-200 flex items-start gap-2.5 transition-colors group"
+                    >
+                      <Users className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
+                      <div>
+                        <div className="font-semibold text-slate-200 group-hover:text-white">
+                          Client & Partner Portal
+                        </div>
+                        <div className="text-[11px] text-slate-400 font-sans">
+                          Project milestones, billing & live documents
+                        </div>
+                      </div>
+                    </button>
+
+                    <button
+                      onClick={() => handleNavClick('company-profile-admin')}
+                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#C6922D]/10 hover:text-white text-slate-200 flex items-start gap-2.5 transition-colors group border-t border-white/5 pt-2 mt-1"
+                    >
+                      <FileCheck className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
+                      <div>
+                        <div className="font-semibold text-slate-200 group-hover:text-white">
+                          Profile Admin Console
+                        </div>
+                        <div className="text-[11px] text-slate-400 font-sans">
+                          Dual-custody verification & publication
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Outlined Login Button (Strict public website boundary) */}
             <button
               id="header-login-btn"
               onClick={() => handleNavClick('login')}
-              className="px-3.5 py-2 text-xs font-semibold tracking-wider text-slate-200 hover:text-white border border-[#C6922D]/40 hover:border-[#C6922D] hover:bg-[#C6922D]/10 rounded-md transition-all inline-flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C6922D]"
+              className="hidden md:inline-flex px-2.5 py-1.5 2xl:px-3.5 2xl:py-2 text-[11px] 2xl:text-xs font-semibold tracking-wider text-slate-200 hover:text-white border border-[#C6922D]/40 hover:border-[#C6922D] hover:bg-[#C6922D]/10 rounded-md transition-all items-center gap-1.5 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C6922D]"
             >
               <Lock className="w-3.5 h-3.5 text-[#C6922D]" />
               <span>Login</span>
@@ -150,18 +284,19 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="header-discuss-project-btn"
               onClick={() => handleNavClick('start-project')}
-              className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#071A2F] bg-[#C6922D] hover:bg-[#d8a339] rounded-md transition-all shadow-md hover:shadow-lg inline-flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C6922D]"
+              className="px-3 py-1.5 2xl:px-4 2xl:py-2 text-[11px] 2xl:text-xs font-bold uppercase tracking-wider text-[#071A2F] bg-[#C6922D] hover:bg-[#d8a339] rounded-md transition-all shadow-md hover:shadow-lg inline-flex items-center gap-1.5 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C6922D]"
             >
-              <span>Discuss a Project</span>
+              <span className="hidden lg:inline">Discuss a Project</span>
+              <span className="lg:hidden">Discuss</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
           {/* Mobile & Tablet Hamburger Toggle */}
-          <div className="flex items-center gap-2 lg:hidden">
+          <div className="flex items-center gap-2 xl:hidden">
             <button
               onClick={() => handleNavClick('login')}
-              className="sm:hidden px-2.5 py-1.5 text-[11px] font-semibold text-slate-200 border border-[#C6922D]/40 rounded inline-flex items-center gap-1"
+              className="md:hidden px-2.5 py-1.5 text-[11px] font-semibold text-slate-200 border border-[#C6922D]/40 rounded inline-flex items-center gap-1"
             >
               <Lock className="w-3 h-3 text-[#C6922D]" />
               <span>Login</span>
@@ -184,7 +319,7 @@ export const Header: React.FC<HeaderProps> = ({
       {mobileMenuOpen && (
         <div
           id="mobile-navigation-drawer"
-          className="lg:hidden fixed inset-x-0 top-[76px] bottom-0 bg-[#061325]/98 border-t border-[#C6922D]/25 backdrop-blur-2xl z-50 overflow-y-auto px-6 py-8 flex flex-col justify-between animate-in fade-in slide-in-from-top-4 duration-200"
+          className="xl:hidden fixed inset-x-0 top-[76px] bottom-0 bg-[#061325]/98 border-t border-[#C6922D]/25 backdrop-blur-2xl z-50 overflow-y-auto px-6 py-8 flex flex-col justify-between animate-in fade-in slide-in-from-top-4 duration-200"
         >
           <div className="space-y-6">
             <div className="text-[11px] uppercase tracking-widest text-[#C6922D] font-bold pb-2 border-b border-white/10">
@@ -211,6 +346,59 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
 
             <div className="pt-4 border-t border-white/10 space-y-3">
+              {/* Dashboards & Portals Quick Access for Mobile */}
+              <div className="bg-[#051323] border border-[#C6922D]/30 rounded-xl p-3 space-y-2">
+                <div className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-wider text-[#C6922D] font-semibold">
+                  <LayoutDashboard className="w-3.5 h-3.5" />
+                  <span>Portals & Dashboards</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <button
+                    onClick={() => handleNavClick('verification-center')}
+                    className="p-2.5 rounded-lg bg-white/5 hover:bg-[#C6922D]/20 text-left border border-white/10 transition-colors"
+                  >
+                    <div className="font-semibold text-amber-400 flex items-center gap-1 text-[11px]">
+                      <ShieldAlert className="w-3 h-3" />
+                      Verification
+                    </div>
+                    <div className="text-[10px] text-slate-400">Gov Credential Demo</div>
+                  </button>
+
+                  <button
+                    onClick={() => handleNavClick('onboarding')}
+                    className="p-2.5 rounded-lg bg-white/5 hover:bg-[#C6922D]/20 text-left border border-white/10 transition-colors"
+                  >
+                    <div className="font-semibold text-emerald-400 flex items-center gap-1 text-[11px]">
+                      <ShieldCheck className="w-3 h-3" />
+                      Onboarding
+                    </div>
+                    <div className="text-[10px] text-slate-400">Master Compliance</div>
+                  </button>
+
+                  <button
+                    onClick={() => handleNavClick('operations/overview')}
+                    className="p-2.5 rounded-lg bg-white/5 hover:bg-[#C6922D]/20 text-left border border-white/10 transition-colors"
+                  >
+                    <div className="font-semibold text-[#C6922D] flex items-center gap-1 text-[11px]">
+                      <Building2 className="w-3 h-3" />
+                      Operations
+                    </div>
+                    <div className="text-[10px] text-slate-400">Command & Audit</div>
+                  </button>
+
+                  <button
+                    onClick={() => handleNavClick('portal')}
+                    className="p-2.5 rounded-lg bg-white/5 hover:bg-[#C6922D]/20 text-left border border-white/10 transition-colors"
+                  >
+                    <div className="font-semibold text-sky-400 flex items-center gap-1 text-[11px]">
+                      <Users className="w-3 h-3" />
+                      Client Portal
+                    </div>
+                    <div className="text-[10px] text-slate-400">Projects & Finance</div>
+                  </button>
+                </div>
+              </div>
+
               <button
                 onClick={() => handleNavClick('login')}
                 className="w-full py-3 px-4 rounded-lg font-semibold text-xs tracking-wider text-slate-100 border border-[#C6922D]/40 bg-white/5 hover:bg-[#C6922D]/15 flex items-center justify-center gap-2"

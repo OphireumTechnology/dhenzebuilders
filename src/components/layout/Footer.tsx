@@ -270,6 +270,24 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenAssistant }) =
                   Client & Partner Login
                 </button>
               </li>
+              <li>
+                <button
+                  onClick={() => onNavigate('verification-center')}
+                  className="hover:text-amber-300 text-amber-400/90 transition-colors text-left flex items-center gap-1.5 font-mono text-[11px]"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                  Verification Center (Demo)
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigate('onboarding')}
+                  className="hover:text-[#C6922D] text-slate-400 transition-colors text-left flex items-center gap-1.5 font-mono text-[11px]"
+                >
+                  <FileText className="w-3.5 h-3.5 text-[#C6922D]" />
+                  Onboarding Master Portal
+                </button>
+              </li>
             </ul>
           </div>
         </div>

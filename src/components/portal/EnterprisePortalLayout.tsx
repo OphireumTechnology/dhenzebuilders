@@ -112,6 +112,8 @@ export const EnterprisePortalLayout: React.FC<EnterprisePortalLayoutProps> = ({
 
   const operationsNav = [
     { label: 'Overview', route: '/operations/overview', icon: Building2 },
+    { label: 'Verification Center (Demo)', route: '/operations/verification-center', icon: ShieldAlert },
+    { label: 'Onboarding Master', route: '/operations/onboarding', icon: ShieldCheck },
     { label: 'Organizations & Tenants', route: '/operations/organizations', icon: Users },
     { label: 'Maker-Checker Finance', route: '/operations/finance', icon: DollarSign },
     { label: 'Cryptographic Audit', route: '/operations/audit', icon: ShieldCheck },

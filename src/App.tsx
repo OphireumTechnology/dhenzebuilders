@@ -31,6 +31,8 @@ import { AdminAccessConsole } from './components/security/AdminAccessConsole';
 import { CeoCornerPage } from './components/pages/CeoCornerPage';
 import { CompanyProfilePage } from './components/pages/CompanyProfilePage';
 import { CompanyProfileAdminConsole } from './components/admin/CompanyProfileAdminConsole';
+import { UnifiedOnboardingDashboard } from './components/onboarding/UnifiedOnboardingDashboard';
+import { VerificationCenterView } from './components/onboarding/VerificationCenterView';
 
 const ROUTE_METADATA: Record<string, { title: string; description: string }> = {
   home: {
@@ -120,6 +122,18 @@ const ROUTE_METADATA: Record<string, { title: string; description: string }> = {
   'company-profile-admin': {
     title: 'Corporate Profile Publication Console | LDL Dhenze Admin',
     description: 'Dual-custody verification, automated safety checks, and publication lifecycle management for official corporate profile.',
+  },
+  'verification-center': {
+    title: 'Government License & Credential Verification Center | LDL Dhenze',
+    description: 'Simulated government licensing verification engine across PRC, PCAB, SEC, DTI, LGU, and BIR.',
+  },
+  onboarding: {
+    title: 'Unified Onboarding & Compliance Dashboard | LDL Dhenze',
+    description: 'Comprehensive contractor, supplier, professional, and client onboarding portal with credential verification.',
+  },
+  'onboarding-dashboard': {
+    title: 'Unified Onboarding & Compliance Dashboard | LDL Dhenze',
+    description: 'Comprehensive contractor, supplier, professional, and client onboarding portal with credential verification.',
   },
 };
 
@@ -347,6 +361,30 @@ export default function App() {
           </div>
           <AdminAccessConsole currentUser={authenticatedUser} onNavigate={handleNavigate} />
         </div>
+      </div>
+    );
+  }
+
+  // Unified Onboarding & Government Verification Dashboard
+  if (
+    currentView === 'onboarding' ||
+    currentView === 'onboarding-dashboard' ||
+    currentView === 'verification-center'
+  ) {
+    return (
+      <div className="min-h-screen bg-[#071A2F] text-slate-100 selection:bg-[#C6922D] selection:text-[#071A2F]">
+        <UnifiedOnboardingDashboard
+          initialSection={currentView === 'verification-center' ? 'verification-center' : 'overview'}
+          currentUserRole={currentUserRole}
+          onNavigate={handleNavigate}
+        />
+        <BuilderAssistantModal
+          isOpen={assistantOpen}
+          onClose={() => setAssistantOpen(false)}
+          currentUserRole={currentUserRole}
+          onChangeUserRole={setCurrentUserRole}
+          onNavigate={handleNavigate}
+        />
       </div>
     );
   }
