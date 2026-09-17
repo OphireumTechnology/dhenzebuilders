@@ -144,6 +144,10 @@ export const CapabilitiesPage: React.FC<CapabilitiesPageProps> = ({
                             src={exp.image}
                             alt={exp.title}
                             className="w-full h-full object-cover"
+                            referrerPolicy="no-referrer"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).src = '/assets/images/bim-engineering.jpg';
+                            }}
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-[#071A2F]/90 via-transparent to-transparent" />
                           <div className="absolute bottom-3 left-3 text-[11px] font-mono text-[#e5b95d] bg-[#071A2F]/80 px-2 py-1 rounded backdrop-blur-sm">

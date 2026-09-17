@@ -53,6 +53,10 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({ projectSlu
               src={project.heroImage}
               alt={project.name}
               className="w-full h-72 sm:h-96 object-cover"
+              referrerPolicy="no-referrer"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = '/assets/images/solar-storage.jpg';
+              }}
             />
             <div className="absolute bottom-4 left-4 bg-slate-950/80 backdrop-blur-md px-3 py-1.5 rounded text-xs text-slate-300 border border-slate-700">
               {project.stage === 'Completed' ? 'Verified Physical Build Record' : 'Architectural Concept & Feasibility Study'}

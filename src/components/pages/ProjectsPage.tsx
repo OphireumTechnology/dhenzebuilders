@@ -95,6 +95,10 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({ onNavigate }) => {
                     alt={`${prj.name} - ${prj.stage} by LDL Dhenze`}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                     loading="lazy"
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = '/assets/images/solar-storage.jpg';
+                    }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#09223d] via-transparent to-black/30" />
                   <div className="absolute top-3 left-3">
@@ -205,6 +209,10 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({ onNavigate }) => {
                   src={activeProjectModal.heroImage}
                   alt={activeProjectModal.name}
                   className="w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = '/assets/images/solar-storage.jpg';
+                  }}
                 />
               </div>
 

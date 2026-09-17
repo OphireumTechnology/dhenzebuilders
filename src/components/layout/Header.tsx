@@ -25,6 +25,8 @@ interface HeaderProps {
   onOpenAssistant: () => void;
   currentUserRole: UserRole;
   onChangeUserRole: (role: UserRole) => void;
+  authenticatedUser?: any;
+  onSignOut?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -33,6 +35,8 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenAssistant,
   currentUserRole,
   onChangeUserRole,
+  authenticatedUser,
+  onSignOut,
 }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -178,13 +182,26 @@ export const Header: React.FC<HeaderProps> = ({
                   id="header-dashboards-dropdown"
                   className="absolute right-0 mt-2 w-72 bg-[#07182C] border border-[#C6922D]/30 rounded-xl shadow-2xl p-2 z-50 backdrop-blur-xl animate-in fade-in"
                 >
-                  <div className="px-3 py-2 border-b border-white/10">
-                    <p className="text-[10px] font-mono uppercase tracking-widest text-[#C6922D]">
-                      Access Directory
-                    </p>
-                    <p className="text-xs font-serif text-white font-medium">
-                      Portals & Verification Engines
-                    </p>
+                  <div className="px-3 py-2 border-b border-white/10 flex items-center justify-between">
+                    <div>
+                      <p className="text-[10px] font-mono uppercase tracking-widest text-[#C6922D]">
+                        Access Directory
+                      </p>
+                      <p className="text-xs font-serif text-white font-medium">
+                        Portals & Verification Engines
+                      </p>
+                    </div>
+                    {authenticatedUser ? (
+                      <span className="text-[9px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-1.5 py-0.5 rounded flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                        UNLOCKED
+                      </span>
+                    ) : (
+                      <span className="text-[9px] font-mono text-amber-400 bg-amber-400/10 border border-amber-400/30 px-1.5 py-0.5 rounded flex items-center gap-1">
+                        <Lock className="w-2.5 h-2.5" />
+                        PRIVATE
+                      </span>
+                    )}
                   </div>
 
                   <div className="py-1 space-y-0.5 text-xs">
@@ -193,12 +210,18 @@ export const Header: React.FC<HeaderProps> = ({
                       className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#C6922D]/10 hover:text-white text-slate-200 flex items-start gap-2.5 transition-colors group"
                     >
                       <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                      <div>
-                        <div className="font-semibold flex items-center gap-1.5">
-                          Verification Center
-                          <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-amber-400/20 text-amber-300">
-                            DEMO
-                          </span>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold flex items-center justify-between gap-1">
+                          <span className="truncate">Verification Center</span>
+                          {!authenticatedUser ? (
+                            <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-amber-400/15 text-amber-300 shrink-0 flex items-center gap-0.5">
+                              <Lock className="w-2.5 h-2.5" /> Auth Req
+                            </span>
+                          ) : (
+                            <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-amber-400/20 text-amber-300 shrink-0">
+                              DEMO
+                            </span>
+                          )}
                         </div>
                         <div className="text-[11px] text-slate-400 font-sans">
                           Simulated PRC, PCAB, SEC, BIR check engine
@@ -211,9 +234,14 @@ export const Header: React.FC<HeaderProps> = ({
                       className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#C6922D]/10 hover:text-white text-slate-200 flex items-start gap-2.5 transition-colors group"
                     >
                       <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                      <div>
-                        <div className="font-semibold text-slate-200 group-hover:text-white">
-                          Onboarding Master Portal
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-slate-200 group-hover:text-white flex items-center justify-between gap-1">
+                          <span className="truncate">Onboarding Master Portal</span>
+                          {!authenticatedUser && (
+                            <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-amber-400/15 text-amber-300 shrink-0 flex items-center gap-0.5">
+                              <Lock className="w-2.5 h-2.5" /> Auth Req
+                            </span>
+                          )}
                         </div>
                         <div className="text-[11px] text-slate-400 font-sans">
                           Contractor, supplier, professional & client intake
@@ -226,9 +254,14 @@ export const Header: React.FC<HeaderProps> = ({
                       className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#C6922D]/10 hover:text-white text-slate-200 flex items-start gap-2.5 transition-colors group"
                     >
                       <Building2 className="w-4 h-4 text-[#C6922D] shrink-0 mt-0.5" />
-                      <div>
-                        <div className="font-semibold text-slate-200 group-hover:text-white">
-                          Operations Command
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-slate-200 group-hover:text-white flex items-center justify-between gap-1">
+                          <span className="truncate">Operations Command</span>
+                          {!authenticatedUser && (
+                            <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-amber-400/15 text-amber-300 shrink-0 flex items-center gap-0.5">
+                              <Lock className="w-2.5 h-2.5" /> Auth Req
+                            </span>
+                          )}
                         </div>
                         <div className="text-[11px] text-slate-400 font-sans">
                           Multi-tenant management, audit & finance
@@ -241,9 +274,14 @@ export const Header: React.FC<HeaderProps> = ({
                       className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#C6922D]/10 hover:text-white text-slate-200 flex items-start gap-2.5 transition-colors group"
                     >
                       <Users className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
-                      <div>
-                        <div className="font-semibold text-slate-200 group-hover:text-white">
-                          Client & Partner Portal
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-slate-200 group-hover:text-white flex items-center justify-between gap-1">
+                          <span className="truncate">Client & Partner Portal</span>
+                          {!authenticatedUser && (
+                            <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-amber-400/15 text-amber-300 shrink-0 flex items-center gap-0.5">
+                              <Lock className="w-2.5 h-2.5" /> Auth Req
+                            </span>
+                          )}
                         </div>
                         <div className="text-[11px] text-slate-400 font-sans">
                           Project milestones, billing & live documents
@@ -256,9 +294,14 @@ export const Header: React.FC<HeaderProps> = ({
                       className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#C6922D]/10 hover:text-white text-slate-200 flex items-start gap-2.5 transition-colors group border-t border-white/5 pt-2 mt-1"
                     >
                       <FileCheck className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
-                      <div>
-                        <div className="font-semibold text-slate-200 group-hover:text-white">
-                          Profile Admin Console
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-slate-200 group-hover:text-white flex items-center justify-between gap-1">
+                          <span className="truncate">Profile Admin Console</span>
+                          {!authenticatedUser && (
+                            <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-amber-400/15 text-amber-300 shrink-0 flex items-center gap-0.5">
+                              <Lock className="w-2.5 h-2.5" /> Auth Req
+                            </span>
+                          )}
                         </div>
                         <div className="text-[11px] text-slate-400 font-sans">
                           Dual-custody verification & publication
@@ -270,15 +313,36 @@ export const Header: React.FC<HeaderProps> = ({
               )}
             </div>
 
-            {/* Outlined Login Button (Strict public website boundary) */}
-            <button
-              id="header-login-btn"
-              onClick={() => handleNavClick('login')}
-              className="hidden md:inline-flex px-2.5 py-1.5 2xl:px-3.5 2xl:py-2 text-[11px] 2xl:text-xs font-semibold tracking-wider text-slate-200 hover:text-white border border-[#C6922D]/40 hover:border-[#C6922D] hover:bg-[#C6922D]/10 rounded-md transition-all items-center gap-1.5 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C6922D]"
-            >
-              <Lock className="w-3.5 h-3.5 text-[#C6922D]" />
-              <span>Login</span>
-            </button>
+            {/* Portal Authentication / Session Status */}
+            {authenticatedUser ? (
+              <div className="hidden md:flex items-center gap-1.5">
+                <button
+                  onClick={() => handleNavClick('operations/overview')}
+                  className="px-2.5 py-1.5 text-[11px] font-mono text-emerald-300 border border-emerald-500/40 bg-emerald-950/40 hover:bg-emerald-900/50 rounded-md transition-all flex items-center gap-1.5 whitespace-nowrap"
+                  title="Authorized Session"
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>{authenticatedUser.loginId || 'Authorized User'}</span>
+                </button>
+                <button
+                  onClick={onSignOut}
+                  className="px-2 py-1.5 text-[11px] text-slate-300 hover:text-white border border-white/10 hover:border-amber-400/40 hover:bg-white/10 rounded-md transition-all flex items-center gap-1"
+                  title="Lock Portals & Sign Out"
+                >
+                  <Lock className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="text-[10px] font-mono">Lock</span>
+                </button>
+              </div>
+            ) : (
+              <button
+                id="header-login-btn"
+                onClick={() => handleNavClick('login')}
+                className="hidden md:inline-flex px-2.5 py-1.5 2xl:px-3.5 2xl:py-2 text-[11px] 2xl:text-xs font-semibold tracking-wider text-slate-200 hover:text-white border border-[#C6922D]/40 hover:border-[#C6922D] hover:bg-[#C6922D]/10 rounded-md transition-all items-center gap-1.5 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C6922D]"
+              >
+                <Lock className="w-3.5 h-3.5 text-[#C6922D]" />
+                <span>Login</span>
+              </button>
+            )}
 
             {/* Primary CTA: Discuss a Project */}
             <button
@@ -348,18 +412,32 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="pt-4 border-t border-white/10 space-y-3">
               {/* Dashboards & Portals Quick Access for Mobile */}
               <div className="bg-[#051323] border border-[#C6922D]/30 rounded-xl p-3 space-y-2">
-                <div className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-wider text-[#C6922D] font-semibold">
-                  <LayoutDashboard className="w-3.5 h-3.5" />
-                  <span>Portals & Dashboards</span>
+                <div className="flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-[#C6922D] font-semibold">
+                  <div className="flex items-center gap-2">
+                    <LayoutDashboard className="w-3.5 h-3.5" />
+                    <span>Portals & Dashboards</span>
+                  </div>
+                  {authenticatedUser ? (
+                    <span className="text-[9px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                      UNLOCKED
+                    </span>
+                  ) : (
+                    <span className="text-[9px] text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded border border-amber-400/20">
+                      PRIVATE
+                    </span>
+                  )}
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <button
                     onClick={() => handleNavClick('verification-center')}
                     className="p-2.5 rounded-lg bg-white/5 hover:bg-[#C6922D]/20 text-left border border-white/10 transition-colors"
                   >
-                    <div className="font-semibold text-amber-400 flex items-center gap-1 text-[11px]">
-                      <ShieldAlert className="w-3 h-3" />
-                      Verification
+                    <div className="font-semibold text-amber-400 flex items-center justify-between text-[11px]">
+                      <span className="flex items-center gap-1">
+                        <ShieldAlert className="w-3 h-3" />
+                        Verification
+                      </span>
+                      {!authenticatedUser && <Lock className="w-2.5 h-2.5 text-amber-400/80" />}
                     </div>
                     <div className="text-[10px] text-slate-400">Gov Credential Demo</div>
                   </button>
@@ -368,9 +446,12 @@ export const Header: React.FC<HeaderProps> = ({
                     onClick={() => handleNavClick('onboarding')}
                     className="p-2.5 rounded-lg bg-white/5 hover:bg-[#C6922D]/20 text-left border border-white/10 transition-colors"
                   >
-                    <div className="font-semibold text-emerald-400 flex items-center gap-1 text-[11px]">
-                      <ShieldCheck className="w-3 h-3" />
-                      Onboarding
+                    <div className="font-semibold text-emerald-400 flex items-center justify-between text-[11px]">
+                      <span className="flex items-center gap-1">
+                        <ShieldCheck className="w-3 h-3" />
+                        Onboarding
+                      </span>
+                      {!authenticatedUser && <Lock className="w-2.5 h-2.5 text-amber-400/80" />}
                     </div>
                     <div className="text-[10px] text-slate-400">Master Compliance</div>
                   </button>
@@ -379,9 +460,12 @@ export const Header: React.FC<HeaderProps> = ({
                     onClick={() => handleNavClick('operations/overview')}
                     className="p-2.5 rounded-lg bg-white/5 hover:bg-[#C6922D]/20 text-left border border-white/10 transition-colors"
                   >
-                    <div className="font-semibold text-[#C6922D] flex items-center gap-1 text-[11px]">
-                      <Building2 className="w-3 h-3" />
-                      Operations
+                    <div className="font-semibold text-[#C6922D] flex items-center justify-between text-[11px]">
+                      <span className="flex items-center gap-1">
+                        <Building2 className="w-3 h-3" />
+                        Operations
+                      </span>
+                      {!authenticatedUser && <Lock className="w-2.5 h-2.5 text-amber-400/80" />}
                     </div>
                     <div className="text-[10px] text-slate-400">Command & Audit</div>
                   </button>
@@ -390,22 +474,47 @@ export const Header: React.FC<HeaderProps> = ({
                     onClick={() => handleNavClick('portal')}
                     className="p-2.5 rounded-lg bg-white/5 hover:bg-[#C6922D]/20 text-left border border-white/10 transition-colors"
                   >
-                    <div className="font-semibold text-sky-400 flex items-center gap-1 text-[11px]">
-                      <Users className="w-3 h-3" />
-                      Client Portal
+                    <div className="font-semibold text-sky-400 flex items-center justify-between text-[11px]">
+                      <span className="flex items-center gap-1">
+                        <Users className="w-3 h-3" />
+                        Client Portal
+                      </span>
+                      {!authenticatedUser && <Lock className="w-2.5 h-2.5 text-amber-400/80" />}
                     </div>
                     <div className="text-[10px] text-slate-400">Projects & Finance</div>
                   </button>
                 </div>
               </div>
 
-              <button
-                onClick={() => handleNavClick('login')}
-                className="w-full py-3 px-4 rounded-lg font-semibold text-xs tracking-wider text-slate-100 border border-[#C6922D]/40 bg-white/5 hover:bg-[#C6922D]/15 flex items-center justify-center gap-2"
-              >
-                <Lock className="w-4 h-4 text-[#C6922D]" />
-                <span>Account Login</span>
-              </button>
+              {authenticatedUser ? (
+                <div className="space-y-2">
+                  <div className="py-2.5 px-3 rounded-lg font-mono text-xs text-emerald-300 border border-emerald-500/30 bg-emerald-950/40 flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      <span>Active: {authenticatedUser.loginId || 'Authorized User'}</span>
+                    </span>
+                    <span className="text-[10px] uppercase font-sans text-emerald-400">Authorized</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      onSignOut?.();
+                    }}
+                    className="w-full py-2.5 px-4 rounded-lg font-semibold text-xs tracking-wider text-amber-200 border border-amber-500/40 bg-amber-950/30 hover:bg-amber-900/40 flex items-center justify-center gap-2"
+                  >
+                    <Lock className="w-4 h-4 text-amber-400" />
+                    <span>Lock Portals & Sign Out</span>
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => handleNavClick('login')}
+                  className="w-full py-3 px-4 rounded-lg font-semibold text-xs tracking-wider text-slate-100 border border-[#C6922D]/40 bg-white/5 hover:bg-[#C6922D]/15 flex items-center justify-center gap-2"
+                >
+                  <Lock className="w-4 h-4 text-[#C6922D]" />
+                  <span>Portal Login</span>
+                </button>
+              )}
 
               <button
                 onClick={() => handleNavClick('start-project')}

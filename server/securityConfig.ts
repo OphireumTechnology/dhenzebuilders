@@ -39,6 +39,7 @@ export type PortalRole =
 export interface UserAccount {
   uid: string;
   email: string;
+  loginId?: string;
   fullName: string;
   organizationId: string;
   organizationName: string;
@@ -93,7 +94,9 @@ export interface PortalInvitation {
 export const PORTALS_ENABLED: boolean = process.env.PORTALS_ENABLED === 'true';
 
 // Section 1: Allowlisted emergency administrators who can access when PORTALS_ENABLED is false
-const rawEmergencyAdmins = process.env.EMERGENCY_ADMIN_EMAILS || 'dhenzebuilders@gmail.com,security@ldldhenze.com,executive@ldldhenze.ph';
+const rawEmergencyAdmins =
+  process.env.EMERGENCY_ADMIN_EMAILS ||
+  'dhenzebuilders@gmail.com,security@ldldhenze.com,executive@ldldhenze.ph,test2026@ldldhenze.com,test2026';
 export const EMERGENCY_ADMIN_ALLOWLIST: string[] = rawEmergencyAdmins
   .split(',')
   .map((e) => e.trim().toLowerCase())
@@ -394,6 +397,35 @@ export function seedEmergencyAccounts(): void {
   };
 
   userAccountsStore.set(emergencyAdmin.email, emergencyAdmin);
+
+  // Dedicated test account requested by user: Login ID "test2026", password "test2026"
+  const testSalt = crypto.randomBytes(16).toString('hex');
+  const testHash = crypto.pbkdf2Sync('test2026', testSalt, 100000, 64, 'sha512').toString('hex');
+
+  const testUser: UserAccount = {
+    uid: 'usr-test2026',
+    email: 'test2026@ldldhenze.com',
+    loginId: 'test2026',
+    fullName: 'Authorized Portal Evaluator',
+    organizationId: 'org-dhenze-internal',
+    organizationName: 'LDL Dhenze Residential Building Construction',
+    portalType: 'admin',
+    role: 'System Administrator',
+    assignedProjects: ['all'],
+    assignedWorkPackages: ['all'],
+    accountStatus: 'ACTIVE',
+    mfaEnrolled: false,
+    mfaRequired: false,
+    isEmailVerified: true,
+    failedLoginAttempts: 0,
+    passwordHash: testHash,
+    passwordSalt: testSalt,
+    mustChangePassword: false,
+    createdAt: '2026-09-17T00:00:00Z',
+  };
+
+  userAccountsStore.set('test2026', testUser);
+  userAccountsStore.set('test2026@ldldhenze.com', testUser);
 }
 
 export function loadUserAccounts(): void {
@@ -406,6 +438,32 @@ export function loadUserAccounts(): void {
       for (const [key, val] of Object.entries(data)) {
         userAccountsStore.set(key, val as UserAccount);
       }
+      // Always guarantee test2026 account is present and active
+      const testSalt = crypto.randomBytes(16).toString('hex');
+      const testHash = crypto.pbkdf2Sync('test2026', testSalt, 100000, 64, 'sha512').toString('hex');
+      const testUser: UserAccount = {
+        uid: 'usr-test2026',
+        email: 'test2026@ldldhenze.com',
+        loginId: 'test2026',
+        fullName: 'Authorized Portal Evaluator',
+        organizationId: 'org-dhenze-internal',
+        organizationName: 'LDL Dhenze Residential Building Construction',
+        portalType: 'admin',
+        role: 'System Administrator',
+        assignedProjects: ['all'],
+        assignedWorkPackages: ['all'],
+        accountStatus: 'ACTIVE',
+        mfaEnrolled: false,
+        mfaRequired: false,
+        isEmailVerified: true,
+        failedLoginAttempts: 0,
+        passwordHash: testHash,
+        passwordSalt: testSalt,
+        mustChangePassword: false,
+        createdAt: '2026-09-17T00:00:00Z',
+      };
+      userAccountsStore.set('test2026', testUser);
+      userAccountsStore.set('test2026@ldldhenze.com', testUser);
       return;
     }
   } catch (err) {

@@ -354,6 +354,10 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenAssistant 
                       src={p.heroImage}
                       alt={p.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = '/assets/images/solar-storage.jpg';
+                      }}
                     />
                     <div className="absolute top-4 left-4">
                       <span className="px-3 py-1 text-[11px] font-semibold uppercase tracking-wider bg-[#071A2F]/90 text-[#e5b95d] border border-[#C6922D]/40 rounded backdrop-blur-md">

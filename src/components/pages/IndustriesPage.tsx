@@ -123,6 +123,10 @@ export const IndustriesPage: React.FC<IndustriesPageProps> = ({
                 src={activeSector.image}
                 alt={activeSector.title}
                 className="w-full h-full object-cover"
+                referrerPolicy="no-referrer"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = '/assets/images/civil-roads.jpg';
+                }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#081F38] via-transparent to-transparent lg:hidden" />
             </div>
@@ -156,6 +160,10 @@ export const IndustriesPage: React.FC<IndustriesPageProps> = ({
                       src={sec.image}
                       alt={sec.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = '/assets/images/civil-roads.jpg';
+                      }}
                     />
                   </div>
                   <h4 className="font-serif-display text-lg text-white font-normal mb-1 group-hover:text-[#e5b95d] transition-colors">

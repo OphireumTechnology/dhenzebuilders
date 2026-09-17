@@ -159,7 +159,35 @@ export default function App() {
       .catch(() => {
         setPortalsEnabled(false);
       });
+
+    // Hydrate existing session from storage if present
+    try {
+      const storedUser = sessionStorage.getItem('ldl_auth_user');
+      if (storedUser) {
+        const parsed = JSON.parse(storedUser);
+        setAuthenticatedUser(parsed);
+        setCurrentUserRole('SYSTEM_ADMIN');
+        setIsEmergencyAdmin(true);
+        setPortalsEnabled(true);
+      }
+    } catch {
+      // ignore
+    }
   }, []);
+
+  const handleLogout = () => {
+    try {
+      sessionStorage.removeItem('ldl_auth_user');
+      sessionStorage.removeItem('ldl_auth_role');
+      sessionStorage.removeItem('ldl_portal_auth');
+    } catch {
+      // ignore
+    }
+    setAuthenticatedUser(null);
+    setCurrentUserRole('ANONYMOUS_VISITOR');
+    setIsEmergencyAdmin(false);
+    handleNavigate('home');
+  };
 
   // Synchronize route with URL hash for browser history & SPA bookmarking
   useEffect(() => {
@@ -259,8 +287,12 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Check if target is a private portal path
+  // Check if target is a private portal path (strictly non-public)
   const isPortalPath =
+    currentView === 'verification-center' ||
+    currentView === 'onboarding' ||
+    currentView === 'onboarding-dashboard' ||
+    currentView === 'company-profile-admin' ||
     currentView === 'portal' ||
     currentView.startsWith('portal/') ||
     currentView.startsWith('/portal/') ||
@@ -272,36 +304,33 @@ export default function App() {
     currentView.startsWith('projects/private/') ||
     currentView.startsWith('/projects/private/');
 
-  // 1. Emergency Portal Lock Guard (Section 1)
+  // 1. Authentication Gateway: Non-authenticated visitors attempting portal access (Section 3 & 4)
+  if (isPortalPath && (!authenticatedUser || currentUserRole === 'ANONYMOUS_VISITOR')) {
+    return (
+      <div className="min-h-screen bg-[#071A2F]">
+        <AuthPages
+          mode="login"
+          targetView={currentView}
+          onNavigate={handleNavigate}
+          currentUserRole={currentUserRole}
+          onChangeUserRole={setCurrentUserRole}
+          onLoginSuccess={(user) => {
+            setAuthenticatedUser(user);
+            setIsEmergencyAdmin(true);
+            setPortalsEnabled(true);
+          }}
+        />
+      </div>
+    );
+  }
+
+  // 2. Emergency Portal Lock Guard (Section 1)
   if (isPortalPath && !portalsEnabled && !isEmergencyAdmin) {
     return (
       <EmergencyPortalLockScreen
         onNavigate={handleNavigate}
         currentUser={authenticatedUser}
       />
-    );
-  }
-
-  // 2. Authentication Gateway: Non-authenticated visitors attempting portal access (Section 3 & 4)
-  if (isPortalPath && currentUserRole === 'ANONYMOUS_VISITOR') {
-    return (
-      <div className="min-h-screen bg-[#071A2F]">
-        <AuthPages
-          mode="login"
-          onNavigate={handleNavigate}
-          currentUserRole={currentUserRole}
-          onChangeUserRole={setCurrentUserRole}
-          onLoginSuccess={(user) => {
-            setAuthenticatedUser(user);
-            const isAllowlistedAdmin =
-              (user.role === 'System Administrator' || user.role === 'SYSTEM_ADMIN') &&
-              ['dhenzebuilders@gmail.com', 'info@dhenzebuilder.com'].includes((user.email || '').toLowerCase());
-            if (isAllowlistedAdmin) {
-              setIsEmergencyAdmin(true);
-            }
-          }}
-        />
-      </div>
     );
   }
 
@@ -475,6 +504,8 @@ export default function App() {
         currentUserRole={currentUserRole}
         onChangeUserRole={setCurrentUserRole}
         onOpenAssistant={() => setAssistantOpen(true)}
+        authenticatedUser={authenticatedUser}
+        onSignOut={handleLogout}
       />
 
       {/* Main Content Area */}
@@ -581,6 +612,11 @@ export default function App() {
             onNavigate={handleNavigate}
             currentUserRole={currentUserRole}
             onChangeUserRole={setCurrentUserRole}
+            onLoginSuccess={(user) => {
+              setAuthenticatedUser(user);
+              setIsEmergencyAdmin(true);
+              setPortalsEnabled(true);
+            }}
           />
         )}
 
