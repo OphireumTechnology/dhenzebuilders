@@ -175,12 +175,12 @@ export const CeoCornerPage: React.FC<CeoCornerPageProps> = ({
                 </p>
 
                 <blockquote className="border-l-4 border-[#C6922D] pl-4 py-1 text-white font-serif italic text-lg">
-                  “{CORPORATE_INFO.executive.founderMessage.paragraphs[0]}”
+                  “{CORPORATE_INFO.executive.founderMessage.quote || CORPORATE_INFO.executive.founderMessage.paragraphs[0]}”
                 </blockquote>
 
-                <p>{CORPORATE_INFO.executive.founderMessage.paragraphs[1]}</p>
-                <p>{CORPORATE_INFO.executive.founderMessage.paragraphs[2]}</p>
-                <p>{CORPORATE_INFO.executive.founderMessage.paragraphs[3]}</p>
+                {CORPORATE_INFO.executive.founderMessage.paragraphs.map((para, idx) => (
+                  <p key={idx}>{para}</p>
+                ))}
 
                 {/* Gratitude */}
                 <div className="pt-3 border-t border-white/10 text-xs sm:text-sm text-slate-400 space-y-1">

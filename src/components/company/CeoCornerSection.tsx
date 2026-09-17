@@ -8,11 +8,11 @@ import {
   Building,
   Scale,
   Landmark,
-  Users,
-  Globe,
+  GraduationCap,
+  Download,
+  CheckCircle2,
+  Sparkles,
   Award,
-  ChevronRight,
-  ExternalLink,
 } from 'lucide-react';
 import { CORPORATE_INFO } from '../../data/corporateInfo';
 import { FoundersPledgeModal } from './FoundersPledgeModal';
@@ -24,72 +24,146 @@ interface CeoCornerSectionProps {
 export const CeoCornerSection: React.FC<CeoCornerSectionProps> = ({ onNavigate }) => {
   const [modalOpen, setModalOpen] = useState(false);
 
+  const founderMessage = CORPORATE_INFO.executive.founderMessage;
+  const pillars = CORPORATE_INFO.pledgePillars;
+
   return (
     <section
       id="ceo-corner-section"
-      className="relative py-24 bg-[#051322] border-t border-b border-[#C6922D]/20 text-slate-100 overflow-hidden"
+      className="relative py-20 lg:py-24 bg-[#051322] border-t border-b border-[#C6922D]/20 text-slate-100 overflow-hidden"
     >
-      {/* Background blueprint grid styling */}
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:24px_24px]" />
+      {/* Background technical grid pattern */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:28px_28px]" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Section Eyebrow & Header */}
-        <div className="max-w-3xl mb-14">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#C6922D]/10 border border-[#C6922D]/30 text-[#C6922D] text-xs font-bold uppercase tracking-widest font-['Montserrat'] mb-4">
-            <ShieldCheck className="w-4 h-4" />
+        {/* Section Header */}
+        <div className="max-w-3xl mb-12">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#C6922D]/10 border border-[#C6922D]/30 text-[#C6922D] text-xs font-bold uppercase tracking-widest font-['Montserrat'] mb-3">
+            <ShieldCheck className="w-4 h-4 text-[#C6922D]" />
             <span>Executive Leadership &amp; Corporate Stewardship</span>
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white font-['Montserrat'] tracking-tight">
             The CEO Corner
           </h2>
-          <p className="text-base sm:text-lg text-slate-300 mt-3 font-serif italic">
+          <p className="text-base sm:text-lg text-slate-300 mt-2 font-serif italic">
             “Disciplined Development. Institutional Integrity. Enduring Value.”
           </p>
         </div>
 
-        {/* Main Content Asymmetric Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
-          {/* Column A: Left 5 Cols - Official Founder's Pledge Poster Viewer Card */}
-          <div className="lg:col-span-5 space-y-4">
-            <div className="bg-[#071A2F] border-2 border-[#C6922D]/30 rounded-2xl p-4 sm:p-5 shadow-2xl relative group">
-              {/* Top Card Badge */}
-              <div className="flex items-center justify-between pb-3 mb-3 border-b border-white/10 text-xs">
-                <span className="font-mono text-[#C6922D] font-bold uppercase tracking-wider text-[11px]">
-                  Official Document Artifact
-                </span>
-                <span className="px-2 py-0.5 rounded bg-white/5 border border-white/10 text-[10px] text-slate-300">
-                  DTI 4812272
-                </span>
-              </div>
+        {/* Balanced Two-Column Architectural Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-stretch">
+          {/* =========================================================================
+              COLUMN A: Executive Dossier & Official Artifact (5 Columns)
+          ========================================================================= */}
+          <div className="lg:col-span-5 flex flex-col justify-between gap-6">
+            {/* 1. Executive Identity & Institutional Pedigree */}
+            <div className="bg-[#071A2F] border border-[#C6922D]/30 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#C6922D]/5 rounded-bl-full pointer-events-none" />
 
-              {/* Poster Container with object-fit: contain */}
-              <div
-                className="relative bg-[#020B14] rounded-xl overflow-hidden border border-white/10 cursor-pointer aspect-[3/4] flex items-center justify-center p-2 group/img"
-                onClick={() => setModalOpen(true)}
-                title="Click to inspect full document"
-              >
-                <img
-                  src="/assets/images/founders-pledge.svg"
-                  alt="Founder's Message & Solemn Pledge by Leodenis Deveza Languisan"
-                  className="w-full h-full object-contain rounded transition-transform duration-300 group-hover/img:scale-[1.01]"
-                />
-
-                {/* Hover overlay hint */}
-                <div className="absolute inset-0 bg-[#071A2F]/60 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-4 text-center backdrop-blur-xs">
-                  <div className="w-11 h-11 rounded-full bg-[#C6922D] text-[#071A2F] flex items-center justify-center shadow-lg">
-                    <Maximize2 className="w-5 h-5" />
+              {/* Profile Header */}
+              <div className="flex items-start gap-4 pb-5 border-b border-white/10">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#C6922D] to-[#8F6317] p-0.5 shadow-lg shrink-0">
+                  <div className="w-full h-full bg-[#071A2F] rounded-[10px] flex items-center justify-center">
+                    <span className="font-serif font-black text-lg text-[#C6922D] tracking-wider">
+                      LDL
+                    </span>
                   </div>
-                  <span className="text-xs font-bold text-white uppercase tracking-wider">
-                    Inspect Full Resolution Pledge
-                  </span>
-                  <span className="text-[11px] text-slate-300">
-                    Includes zoom, pan &amp; accessible transcript
-                  </span>
+                </div>
+
+                <div className="min-w-0">
+                  <div className="inline-flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-widest text-[#C6922D]">
+                    <ShieldCheck className="w-3 h-3" />
+                    <span>Executive Profile</span>
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-black text-white font-['Montserrat'] tracking-tight truncate mt-0.5">
+                    {CORPORATE_INFO.executive.publicDisplayName}
+                  </h3>
+                  <p className="text-xs font-semibold text-[#E5B95D] mt-0.5 truncate">
+                    {CORPORATE_INFO.executive.professionalTitle}
+                  </p>
                 </div>
               </div>
 
-              {/* Action Bar below image */}
-              <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between gap-3">
+              {/* Verified Credentials Duo */}
+              <div className="mt-5 space-y-3">
+                <div className="bg-[#040E1B] border border-white/5 rounded-xl p-3.5 flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-[#C6922D]/10 flex items-center justify-center shrink-0 mt-0.5 text-[#C6922D]">
+                    <Landmark className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-[10px] uppercase font-bold text-[#C6922D] tracking-wider">
+                      Banking Rigor &amp; Controls
+                    </div>
+                    <div className="text-xs font-semibold text-slate-200 mt-0.5">
+                      JPMorgan Chase Operations Background
+                    </div>
+                    <div className="text-[11px] text-slate-400 mt-0.5 leading-snug">
+                      Mortgage servicing, underwriting audit &amp; enterprise risk controls
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-[#040E1B] border border-white/5 rounded-xl p-3.5 flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0 mt-0.5 text-slate-300">
+                    <GraduationCap className="w-4 h-4 text-[#C6922D]" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                      Academic Background
+                    </div>
+                    <div className="text-xs font-semibold text-slate-200 mt-0.5">
+                      B.Com (Banking &amp; Finance) • BSIT
+                    </div>
+                    <div className="text-[11px] text-slate-400 mt-0.5 leading-snug">
+                      STI College &amp; Data Center College, Baguio
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 2. Official Document Artifact Preview (Interactive) */}
+            <div className="bg-[#071A2F] border border-white/10 rounded-2xl p-5 shadow-xl relative group flex-1 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between pb-3 mb-3 border-b border-white/10 text-xs">
+                  <span className="font-mono text-[#C6922D] font-bold uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                    <Award className="w-3.5 h-3.5" />
+                    <span>Official Document Artifact</span>
+                  </span>
+                  <span className="px-2 py-0.5 rounded bg-white/5 border border-white/10 text-[10px] font-mono text-slate-300">
+                    DTI 4812272
+                  </span>
+                </div>
+
+                {/* Poster Preview Frame */}
+                <div
+                  className="relative bg-[#020B14] rounded-xl overflow-hidden border border-white/10 cursor-pointer aspect-[3/4] max-h-[320px] mx-auto flex items-center justify-center p-2 group/img"
+                  onClick={() => setModalOpen(true)}
+                  title="Click to inspect full high-resolution document"
+                >
+                  <img
+                    src="/assets/images/founders-pledge.svg"
+                    alt="Founder's Message & Solemn Pledge by Leodenis Deveza Languisan"
+                    className="w-full h-full object-contain rounded transition-transform duration-300 group-hover/img:scale-[1.02]"
+                  />
+
+                  {/* Hover overlay hint */}
+                  <div className="absolute inset-0 bg-[#071A2F]/70 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-4 text-center backdrop-blur-xs">
+                    <div className="w-10 h-10 rounded-full bg-[#C6922D] text-[#071A2F] flex items-center justify-center shadow-lg">
+                      <Maximize2 className="w-5 h-5" />
+                    </div>
+                    <span className="text-xs font-bold text-white uppercase tracking-wider">
+                      Inspect Full Resolution Pledge
+                    </span>
+                    <span className="text-[11px] text-slate-300">
+                      Zoom, pan &amp; accessible transcript
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Bar below artifact */}
+              <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between gap-3 text-xs">
                 <button
                   onClick={() => setModalOpen(true)}
                   className="text-xs text-[#C6922D] hover:text-[#e5b95d] font-semibold flex items-center gap-1.5 transition-colors"
@@ -99,7 +173,7 @@ export const CeoCornerSection: React.FC<CeoCornerSectionProps> = ({ onNavigate }
                 </button>
                 <button
                   onClick={() => onNavigate('company-profile')}
-                  className="text-xs text-slate-300 hover:text-white font-medium flex items-center gap-1 transition-colors"
+                  className="text-xs text-slate-300 hover:text-white font-medium flex items-center gap-1.5 transition-colors"
                 >
                   <FileText className="w-3.5 h-3.5 text-[#C6922D]" />
                   <span>Corporate Profile</span>
@@ -107,154 +181,166 @@ export const CeoCornerSection: React.FC<CeoCornerSectionProps> = ({ onNavigate }
               </div>
             </div>
 
-            {/* Registered Head Office Detail Box */}
-            <div className="bg-[#071A2F]/60 border border-white/10 rounded-xl p-4 text-xs text-slate-300 space-y-1.5">
-              <div className="font-semibold text-slate-200 flex items-center gap-2">
-                <Building className="w-3.5 h-3.5 text-[#C6922D]" />
-                <span>Executive Office Location:</span>
+            {/* 3. Executive Office Location & Contact */}
+            <div className="bg-[#071A2F]/70 border border-white/10 rounded-xl p-4 text-xs text-slate-300 flex items-start gap-3">
+              <Building className="w-4 h-4 text-[#C6922D] shrink-0 mt-0.5" />
+              <div className="min-w-0 leading-relaxed">
+                <div className="font-semibold text-slate-200">
+                  Executive Office Location:
+                </div>
+                <div className="text-slate-400 text-[11px] mt-0.5">
+                  {CORPORATE_INFO.headquarters.fullFormatted}
+                </div>
               </div>
-              <p className="text-slate-400 pl-5 leading-relaxed">
-                {CORPORATE_INFO.headquarters.fullFormatted}
-              </p>
             </div>
           </div>
 
-          {/* Column B: Right 7 Cols - Executive Intro & Leadership Message */}
-          <div className="lg:col-span-7 space-y-8">
-            {/* Executive Bio Header */}
-            <div className="border-b border-white/10 pb-6">
-              <div className="flex flex-wrap items-center gap-3 mb-2">
-                <span className="text-xs font-mono font-bold text-[#C6922D] uppercase tracking-wider">
-                  Executive Profile
-                </span>
-                <span className="text-xs text-slate-400">•</span>
-                <span className="text-xs text-slate-400">Two Decades Multidisciplinary Leadership</span>
-              </div>
-              <h3 className="text-2xl sm:text-3xl font-black text-white font-['Montserrat'] tracking-tight">
-                {CORPORATE_INFO.executive.publicDisplayName}
-              </h3>
-              <p className="text-sm sm:text-base font-semibold text-[#C6922D] mt-1 font-['Montserrat']">
-                {CORPORATE_INFO.executive.professionalTitle}
-              </p>
-
-              {/* Education & Banking Discipline Credentials */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 pt-4 border-t border-white/5 text-xs text-slate-300">
-                <div className="bg-[#071A2F] p-3 rounded-lg border border-white/5">
-                  <div className="text-[10px] uppercase font-bold text-slate-400">Academic Background</div>
-                  <div className="font-semibold text-slate-200 mt-0.5">
-                    B.Com (Banking &amp; Finance) • BSIT
-                  </div>
-                  <div className="text-[11px] text-slate-400 mt-0.5">
-                    STI College &amp; Data Center College, Baguio
-                  </div>
-                </div>
-                <div className="bg-[#071A2F] p-3 rounded-lg border border-white/5">
-                  <div className="text-[10px] uppercase font-bold text-[#C6922D]">Banking Rigor &amp; Controls</div>
-                  <div className="font-semibold text-slate-200 mt-0.5">
-                    JPMorgan Chase Operations Background
-                  </div>
-                  <div className="text-[11px] text-slate-400 mt-0.5">
-                    Mortgage servicing, underwriting audit &amp; risk controls
-                  </div>
-                </div>
-              </div>
+          {/* =========================================================================
+              COLUMN B: Official Executive Address & Solemn Covenant (7 Columns)
+          ========================================================================= */}
+          <div className="lg:col-span-7 bg-[#071A2F]/90 border border-[#C6922D]/30 rounded-2xl p-6 sm:p-8 lg:p-9 shadow-2xl relative overflow-hidden backdrop-blur-sm flex flex-col justify-between">
+            {/* Watermark Crest */}
+            <div className="absolute -bottom-10 -right-10 w-64 h-64 opacity-[0.025] pointer-events-none">
+              <ShieldCheck className="w-full h-full text-[#C6922D]" />
             </div>
 
-            {/* Approved Leadership Message (Word-for-Word Copy) */}
-            <div className="space-y-4 text-sm sm:text-base text-slate-300 leading-relaxed font-sans">
-              <p className="font-serif italic text-lg text-white">
-                {CORPORATE_INFO.executive.founderMessage.salutation}
-              </p>
+            <div>
+              {/* Communiqué Top Header */}
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-4 mb-6 border-b border-white/10 text-xs">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#C6922D] animate-pulse" />
+                  <span className="font-mono text-[#C6922D] font-bold uppercase tracking-widest text-[11px]">
+                    Official Executive Address
+                  </span>
+                </div>
+                <span className="text-slate-400 font-mono text-[11px]">
+                  Republic of the Philippines • RA 9266 &amp; RA 544
+                </span>
+              </div>
 
-              <blockquote className="border-l-2 border-[#C6922D] pl-4 my-3 text-white font-serif italic text-base sm:text-lg">
-                “{CORPORATE_INFO.executive.founderMessage.paragraphs[0]}”
-              </blockquote>
+              {/* Salutation */}
+              <div className="mb-4">
+                <h3 className="text-xl sm:text-2xl font-bold text-white font-serif tracking-tight">
+                  {founderMessage.salutation}
+                </h3>
+              </div>
 
-              <p>{CORPORATE_INFO.executive.founderMessage.paragraphs[1]}</p>
-              <p>{CORPORATE_INFO.executive.founderMessage.paragraphs[2]}</p>
-              <p>{CORPORATE_INFO.executive.founderMessage.paragraphs[3]}</p>
+              {/* Guiding Principle / Pullquote */}
+              <div className="my-5 p-4 sm:p-5 rounded-xl bg-gradient-to-r from-[#C6922D]/10 via-[#071A2F] to-[#071A2F] border-l-4 border-[#C6922D]">
+                <blockquote className="text-white font-serif italic text-base sm:text-lg leading-relaxed">
+                  “{founderMessage.quote || founderMessage.paragraphs[0]}”
+                </blockquote>
+              </div>
+
+              {/* Core Narrative Paragraphs */}
+              <div className="space-y-4 text-sm sm:text-base text-slate-300 leading-relaxed font-sans">
+                {founderMessage.paragraphs.map((p, index) => (
+                  <p key={index} className="text-slate-300 text-justify sm:text-left">
+                    {p}
+                  </p>
+                ))}
+              </div>
+
+              {/* Four Pillars of Stewardship */}
+              <div className="my-6 pt-6 border-t border-white/10">
+                <div className="text-[10px] font-mono uppercase tracking-widest text-[#C6922D] font-bold mb-3">
+                  Four Pillars of Institutional Stewardship
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {pillars.map((pillar) => (
+                    <div
+                      key={pillar.id}
+                      className="bg-[#051322] border border-white/10 rounded-xl p-3.5 hover:border-[#C6922D]/40 transition-colors"
+                    >
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#C6922D] shrink-0" />
+                        <span className="text-xs font-bold text-white uppercase tracking-wider font-['Montserrat']">
+                          {pillar.title}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 mt-1 pl-5.5 leading-snug">
+                        {pillar.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
               {/* Gratitude Statement */}
-              <div className="pt-2 text-xs sm:text-sm text-slate-400 space-y-1">
-                <div>{CORPORATE_INFO.executive.founderMessage.gratitude.team}</div>
-                <div>{CORPORATE_INFO.executive.founderMessage.gratitude.partners}</div>
-                <div>{CORPORATE_INFO.executive.founderMessage.gratitude.clients}</div>
+              <div className="bg-[#051322]/80 border border-white/5 rounded-xl p-4 text-xs text-slate-400 space-y-1.5">
+                <div className="flex items-center gap-2 text-slate-300 font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#C6922D]" />
+                  <span>{founderMessage.gratitude.team}</span>
+                </div>
+                <div className="flex items-center gap-2 text-slate-300 font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#C6922D]" />
+                  <span>{founderMessage.gratitude.partners}</span>
+                </div>
+                <div className="flex items-center gap-2 text-slate-300 font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#C6922D]" />
+                  <span>{founderMessage.gratitude.clients}</span>
+                </div>
               </div>
 
-              <div className="pt-2 text-sm sm:text-base font-serif italic text-[#C6922D] font-bold">
-                {CORPORATE_INFO.executive.founderMessage.closingCall}
+              {/* Closing Call */}
+              <div className="mt-4 text-sm sm:text-base font-serif italic text-[#C6922D] font-bold">
+                {founderMessage.closingCall}
               </div>
-            </div>
 
-            {/* Four Pledge Pillars Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-4">
-              {CORPORATE_INFO.pledgePillars.map((pillar) => (
-                <div
-                  key={pillar.id}
-                  className="bg-[#071A2F] border border-white/10 rounded-lg p-3 hover:border-[#C6922D]/40 transition-colors"
-                >
-                  <div className="text-[11px] font-bold text-[#C6922D] uppercase tracking-wider font-['Montserrat']">
-                    {pillar.title}
+              {/* Solemn Pledge & Official Sign-off */}
+              <div className="mt-6 pt-5 border-t border-white/10 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="text-[10px] font-mono uppercase tracking-widest text-slate-400 font-bold">
+                    Solemn Corporate Pledge
                   </div>
-                  <div className="text-[11px] text-slate-400 mt-1 leading-snug">
-                    {pillar.description}
+                  <p className="text-xs text-slate-300 italic font-serif max-w-lg leading-relaxed">
+                    “{founderMessage.solemnPledge}”
+                  </p>
+                  <div className="pt-2">
+                    <div className="font-bold text-white text-sm font-['Montserrat'] tracking-wide">
+                      {CORPORATE_INFO.executive.legalName}
+                    </div>
+                    <div className="text-xs text-[#C6922D] font-medium">
+                      Founder, President &amp; Chief Executive Officer
+                    </div>
                   </div>
                 </div>
-              ))}
-            </div>
 
-            {/* Solemn Pledge Banner */}
-            <div className="bg-[#071A2F] border border-[#C6922D]/40 rounded-xl p-5 relative overflow-hidden">
-              <div className="text-[10px] font-mono uppercase tracking-widest text-[#C6922D] font-bold mb-1">
-                Solemn Corporate Pledge
-              </div>
-              <p className="text-xs sm:text-sm text-white italic font-serif leading-relaxed">
-                “We pledge to uphold the highest standards of professionalism, safety, and environmental stewardship, to empower communities, and to create value that endures beyond our time.”
-              </p>
-              <div className="mt-3 flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-white/5">
-                <span className="font-semibold text-slate-200">
-                  {CORPORATE_INFO.executive.legalName}
-                </span>
-                <span className="text-[#C6922D] font-mono text-[11px]">Founder &amp; President</span>
+                <div className="sm:text-right shrink-0 text-[11px] font-mono text-slate-400 border-t sm:border-t-0 pt-2 sm:pt-0 border-white/5">
+                  <div className="text-slate-300 font-bold">LDL Dhenze Residential Building Construction</div>
+                  <div>DTI Certificate No. 4812272</div>
+                  <div className="text-[10px] text-[#C6922D]">Angeles City, Pampanga</div>
+                </div>
               </div>
             </div>
 
-            {/* Required Action Cluster */}
-            <div className="pt-4 border-t border-white/10">
-              <div className="flex flex-wrap items-center gap-3">
-                {/* Primary CTA: Request a Private Consultation */}
-                <button
-                  onClick={() => onNavigate('book-consultation')}
-                  className="px-5 py-3 rounded-lg bg-[#C6922D] hover:bg-[#d8a339] text-[#071A2F] font-bold text-xs uppercase tracking-wider transition-colors shadow-lg flex items-center gap-2"
-                >
-                  <span>Request a Private Consultation</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+            {/* Action Buttons Cluster */}
+            <div className="mt-8 pt-6 border-t border-white/10 flex flex-wrap items-center gap-3">
+              <button
+                onClick={() => onNavigate('book-consultation')}
+                className="px-5 py-3 rounded-xl bg-[#C6922D] hover:bg-[#d8a339] text-[#071A2F] font-bold text-xs uppercase tracking-wider transition-colors shadow-lg flex items-center gap-2 cursor-pointer"
+              >
+                <span>Request Private Consultation</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
 
-                {/* Secondary CTA: Read the Founder's Message */}
-                <button
-                  onClick={() => onNavigate('ceo-corner')}
-                  className="px-5 py-3 rounded-lg bg-white/5 hover:bg-white/10 text-slate-200 font-semibold text-xs tracking-wider border border-white/15 transition-colors flex items-center gap-2"
-                >
-                  <FileText className="w-4 h-4 text-[#C6922D]" />
-                  <span>Read Founder’s Message</span>
-                </button>
+              <button
+                onClick={() => onNavigate('company-profile')}
+                className="px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-slate-200 font-semibold text-xs tracking-wider border border-white/15 transition-colors flex items-center gap-2 cursor-pointer"
+              >
+                <FileText className="w-4 h-4 text-[#C6922D]" />
+                <span>View Corporate Profile</span>
+              </button>
 
-                {/* Telephone CTA: Call Executive Office */}
-                <a
-                  href={CORPORATE_INFO.contacts.telephoneLink}
-                  className="px-5 py-3 rounded-lg bg-[#071A2F] hover:bg-[#0a2747] text-slate-200 font-semibold text-xs tracking-wider border border-[#C6922D]/30 transition-colors flex items-center gap-2"
-                >
-                  <Phone className="w-4 h-4 text-[#C6922D]" />
-                  <span>Call Executive Office: {CORPORATE_INFO.contacts.telephoneDisplay}</span>
-                </a>
-              </div>
+              <a
+                href={CORPORATE_INFO.contacts.telephoneLink}
+                className="px-5 py-3 rounded-xl bg-[#040E1B] hover:bg-[#071a2f] text-slate-300 hover:text-white font-medium text-xs tracking-wider border border-[#C6922D]/30 transition-colors flex items-center gap-2"
+              >
+                <Phone className="w-3.5 h-3.5 text-[#C6922D]" />
+                <span>{CORPORATE_INFO.contacts.telephoneDisplay}</span>
+              </a>
             </div>
-
-            {/* Statutory Compliance Note */}
-            <p className="text-[11px] text-slate-500 italic leading-relaxed pt-2">
-              {CORPORATE_INFO.executive.founderMessage.complianceNote}
-            </p>
           </div>
         </div>
       </div>
@@ -268,3 +354,4 @@ export const CeoCornerSection: React.FC<CeoCornerSectionProps> = ({ onNavigate }
     </section>
   );
 };
+
