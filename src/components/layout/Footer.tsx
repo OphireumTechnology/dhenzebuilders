@@ -12,6 +12,7 @@ import {
   Compass,
   FileText,
   UserCheck,
+  Building2,
 } from 'lucide-react';
 
 interface FooterProps {
@@ -286,6 +287,15 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenAssistant }) =
                 >
                   <FileText className="w-3.5 h-3.5 text-[#C6922D]" />
                   Onboarding Master Portal
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigate('project-publishing-admin')}
+                  className="hover:text-[#C6922D] text-slate-400 transition-colors text-left flex items-center gap-1.5 font-mono text-[11px]"
+                >
+                  <Building2 className="w-3.5 h-3.5 text-[#C6922D]" />
+                  Project Library Publishing
                 </button>
               </li>
             </ul>

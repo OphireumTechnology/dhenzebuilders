@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 import { GoogleGenAI } from '@google/genai';
 import { securityRouter, portalLockMiddleware } from './server/securityRoutes.ts';
 import { companyProfileRouter } from './server/companyProfileRoutes.ts';
+import { publicProjectRouter } from './server/publicProjectRoutes.ts';
 import { INITIAL_KNOWLEDGE_BASE } from './src/data/knowledgeBase.ts';
 import {
   INITIAL_SUBSCRIPTION_PLANS,
@@ -214,6 +215,7 @@ function getGeminiClient(): GoogleGenAI | null {
 // ----------------------------------------------------
 app.use(securityRouter);
 app.use(companyProfileRouter);
+app.use(publicProjectRouter);
 app.use(portalLockMiddleware);
 
 // ----------------------------------------------------

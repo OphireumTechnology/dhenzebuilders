@@ -83,7 +83,7 @@ export const Header: React.FC<HeaderProps> = ({
     { label: 'Company', view: 'about' },
     { label: 'Expertise', view: 'capabilities' },
     { label: 'Sectors', view: 'industries' },
-    { label: 'Selected Work', view: 'projects' },
+    { label: 'Project Library', view: 'projects' },
     { label: 'Insights', view: 'insights' },
     { label: 'Contact', view: 'contact' },
   ];
@@ -92,6 +92,7 @@ export const Header: React.FC<HeaderProps> = ({
     if (view === 'about' && (currentView === 'about' || currentView === 'sustainability' || currentView === 'technology' || currentView === 'partners')) return true;
     if (view === 'capabilities' && (currentView === 'capabilities' || currentView.startsWith('capability-') || currentView.startsWith('capabilities:'))) return true;
     if (view === 'industries' && (currentView === 'industries' || currentView.startsWith('industry-') || currentView.startsWith('industries:'))) return true;
+    if (view === 'projects' && (currentView === 'projects' || currentView === 'project-detail' || currentView.startsWith('projects/') || currentView.startsWith('project-'))) return true;
     return currentView === view;
   };
 

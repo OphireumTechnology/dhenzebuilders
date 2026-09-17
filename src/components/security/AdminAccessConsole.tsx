@@ -19,7 +19,9 @@ import {
   Layers,
   Copy,
   ExternalLink,
+  Building2,
 } from 'lucide-react';
+import { PublicProjectAdminConsole } from '../admin/PublicProjectAdminConsole';
 
 interface AdminAccessConsoleProps {
   currentUser?: any;
@@ -27,7 +29,7 @@ interface AdminAccessConsoleProps {
 }
 
 export const AdminAccessConsole: React.FC<AdminAccessConsoleProps> = ({ currentUser, onNavigate }) => {
-  const [activeTab, setActiveTab] = useState<'create-access' | 'temp-access' | 'invitations' | 'qa-tests' | 'audit-trail'>('create-access');
+  const [activeTab, setActiveTab] = useState<'create-access' | 'temp-access' | 'invitations' | 'qa-tests' | 'audit-trail' | 'public-content'>('create-access');
 
   // Form State for Invitation
   const [inviteForm, setInviteForm] = useState({
@@ -273,6 +275,15 @@ export const AdminAccessConsole: React.FC<AdminAccessConsoleProps> = ({ currentU
             }`}
           >
             Security Audit Trail
+          </button>
+          <button
+            onClick={() => setActiveTab('public-content')}
+            className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 ${
+              activeTab === 'public-content' ? 'bg-[#C6922D] text-[#071A2F] font-bold shadow' : 'text-slate-300 hover:text-white'
+            }`}
+          >
+            <Building2 className="w-3.5 h-3.5" />
+            <span>Public Content & Library</span>
           </button>
         </div>
       </div>
@@ -778,6 +789,13 @@ export const AdminAccessConsole: React.FC<AdminAccessConsoleProps> = ({ currentU
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+
+      {/* TAB 6: PUBLIC CONTENT & PROJECT LIBRARY PUBLISHING */}
+      {activeTab === 'public-content' && (
+        <div className="mt-6">
+          <PublicProjectAdminConsole currentUser={currentUser} onNavigate={onNavigate} />
         </div>
       )}
     </div>

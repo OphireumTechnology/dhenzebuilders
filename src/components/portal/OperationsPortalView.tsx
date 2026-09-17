@@ -30,6 +30,7 @@ import {
 } from '../../data/platformSeedData';
 import { VerificationCenterView } from '../onboarding/VerificationCenterView';
 import { UnifiedOnboardingDashboard } from '../onboarding/UnifiedOnboardingDashboard';
+import { PublicProjectAdminConsole } from '../admin/PublicProjectAdminConsole';
 
 interface OperationsPortalViewProps {
   currentSubRoute: string;
@@ -113,6 +114,7 @@ export const OperationsPortalView: React.FC<OperationsPortalViewProps> = ({
           </div>
           <h1 className={`text-2xl sm:text-3xl font-serif ${headerText} mt-1`}>
             {route === 'overview' && 'Operations Command & KPI Overview'}
+            {route === 'public-projects' && 'Project Library Publishing & Public Content Manager'}
             {route === 'verification-center' && 'Government Verification Center (Simulation Phase)'}
             {route === 'onboarding' && 'Unified Onboarding & Compliance Directory'}
             {route === 'organizations' && 'Multi-Tenant Organizations Directory'}
@@ -355,6 +357,14 @@ export const OperationsPortalView: React.FC<OperationsPortalViewProps> = ({
       {/* Verification Center Section */}
       {route === 'verification-center' && (
         <VerificationCenterView portalTheme={portalTheme} />
+      )}
+
+      {/* Project Library Publishing & Public Content Manager */}
+      {route === 'public-projects' && (
+        <PublicProjectAdminConsole
+          onNavigate={onNavigate}
+          currentUser={{ role: currentUserRole, email: 'admin@ldldhenze.com' }}
+        />
       )}
 
       {/* Onboarding Master Section */}

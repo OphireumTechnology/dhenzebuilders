@@ -31,6 +31,7 @@ import { AdminAccessConsole } from './components/security/AdminAccessConsole';
 import { CeoCornerPage } from './components/pages/CeoCornerPage';
 import { CompanyProfilePage } from './components/pages/CompanyProfilePage';
 import { CompanyProfileAdminConsole } from './components/admin/CompanyProfileAdminConsole';
+import { PublicProjectAdminConsole } from './components/admin/PublicProjectAdminConsole';
 import { UnifiedOnboardingDashboard } from './components/onboarding/UnifiedOnboardingDashboard';
 import { VerificationCenterView } from './components/onboarding/VerificationCenterView';
 
@@ -122,6 +123,10 @@ const ROUTE_METADATA: Record<string, { title: string; description: string }> = {
   'company-profile-admin': {
     title: 'Corporate Profile Publication Console | LDL Dhenze Admin',
     description: 'Dual-custody verification, automated safety checks, and publication lifecycle management for official corporate profile.',
+  },
+  'project-publishing-admin': {
+    title: 'Project Library Publishing & Public Content Manager | LDL Dhenze Admin',
+    description: 'Upload, organize, preview, and publish project presentations, architectural plans, and approved public download files.',
   },
   'verification-center': {
     title: 'Government License & Credential Verification Center | LDL Dhenze',
@@ -298,6 +303,7 @@ export default function App() {
     currentView === 'onboarding' ||
     currentView === 'onboarding-dashboard' ||
     currentView === 'company-profile-admin' ||
+    currentView === 'project-publishing-admin' ||
     currentView === 'portal' ||
     currentView.startsWith('portal/') ||
     currentView.startsWith('/portal/') ||
@@ -663,6 +669,12 @@ export default function App() {
 
         {currentView === 'company-profile-admin' && (
           <CompanyProfileAdminConsole onNavigate={handleNavigate} />
+        )}
+
+        {currentView === 'project-publishing-admin' && (
+          <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <PublicProjectAdminConsole onNavigate={handleNavigate} currentUser={authenticatedUser} />
+          </div>
         )}
       </main>
 
