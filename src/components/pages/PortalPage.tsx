@@ -184,7 +184,23 @@ export const PortalPage: React.FC<PortalPageProps> = ({
         btRes ? parseJsonSafely(btRes) : null,
       ]);
 
-      if (inqData?.inquiries) setInquiries(inqData.inquiries);
+      const localInquiries = (() => {
+        try {
+          const raw = localStorage.getItem('ldl_inquiries_store');
+          return raw ? JSON.parse(raw) : [];
+        } catch {
+          return [];
+        }
+      })();
+
+      const serverInqs = Array.isArray(inqData?.inquiries) ? inqData.inquiries : [];
+      const combinedInquiries = [...serverInqs];
+      for (const loc of localInquiries) {
+        if (!combinedInquiries.some((x) => x.inquiryNumber === loc.inquiryNumber)) {
+          combinedInquiries.unshift(loc);
+        }
+      }
+      setInquiries(combinedInquiries);
       if (logsData?.logs) setAuditLogs(logsData.logs);
       if (knowData?.sources) setKnowledgeSources(knowData.sources);
       if (subData?.subscription) setSubscription(subData.subscription);
