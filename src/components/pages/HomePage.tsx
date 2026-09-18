@@ -1,10 +1,8 @@
 import React from 'react';
 import {
-  STRATEGIC_EXPERTISE_LIST,
   STRATEGIC_SECTORS_LIST,
   PORTFOLIO_PROJECTS,
   FOUNDER_INFO,
-  COMPANY_CREDENTIALS,
 } from '../../data/companyData';
 import { CORPORATE_INFO } from '../../data/corporateInfo';
 import { CeoCornerSection } from '../company/CeoCornerSection';
