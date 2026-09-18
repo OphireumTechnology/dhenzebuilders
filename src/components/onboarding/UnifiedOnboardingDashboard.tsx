@@ -31,6 +31,7 @@ import {
   HelpCircle,
 } from 'lucide-react';
 import { UserRole } from '../../types';
+import { CompanyLogo } from '../common/CompanyLogo';
 import { VerificationCenterView, VerificationSubsection } from './VerificationCenterView';
 import { DocumentUploadCenter } from './DocumentUploadCenter';
 import { SiteMediaGallery } from './SiteMediaGallery';
@@ -153,25 +154,29 @@ export const UnifiedOnboardingDashboard: React.FC<UnifiedOnboardingDashboardProp
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="p-1.5 rounded-lg border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800 transition-colors lg:hidden"
+            aria-label="Toggle navigation menu"
           >
             {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
 
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-serif font-bold text-white text-base tracking-wide">
-                LDL DHENZE
-              </span>
-              <span className="text-xs text-slate-400">&bull;</span>
-              <span className="text-xs font-semibold text-[#C6922D] uppercase tracking-wider">
-                Enterprise Onboarding & Verification Center
-              </span>
-            </div>
-            {/* Breadcrumb */}
-            <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-mono mt-0.5">
-              <span>Portal</span>
-              <ChevronRight className="w-3 h-3 text-slate-600" />
-              <span className="text-slate-300">{getBreadcrumbTitle()}</span>
+          <div className="flex items-center gap-3">
+            <CompanyLogo variant="emblem" size="xs" onClick={() => onNavigate?.('/')} className="cursor-pointer" />
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-serif font-bold text-white text-base tracking-wide">
+                  LDL DHENZE
+                </span>
+                <span className="text-xs text-slate-400">&bull;</span>
+                <span className="text-xs font-semibold text-[#C6922D] uppercase tracking-wider">
+                  Enterprise Onboarding & Verification Center
+                </span>
+              </div>
+              {/* Breadcrumb */}
+              <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-mono mt-0.5">
+                <span>Portal</span>
+                <ChevronRight className="w-3 h-3 text-slate-600" />
+                <span className="text-slate-300">{getBreadcrumbTitle()}</span>
+              </div>
             </div>
           </div>
         </div>

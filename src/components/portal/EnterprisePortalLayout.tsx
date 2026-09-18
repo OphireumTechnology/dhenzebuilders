@@ -24,6 +24,7 @@ import {
   HelpCircle,
 } from 'lucide-react';
 import { UserRole } from '../../types';
+import { CompanyLogo } from '../common/CompanyLogo';
 import { ClientPortalView } from './ClientPortalView';
 import { SupplierPortalView } from './SupplierPortalView';
 import { PartnerPortalView } from './PartnerPortalView';
@@ -137,21 +138,20 @@ export const EnterprisePortalLayout: React.FC<EnterprisePortalLayoutProps> = ({
   return (
     <div className={`min-h-screen flex flex-col md:flex-row ${pageBg}`}>
       {/* Mobile Top Bar */}
-      <div className="md:hidden flex items-center justify-between p-4 border-b border-slate-800 bg-[#071A2F]">
-        <div className="flex items-center gap-2">
+      <div className="md:hidden flex items-center justify-between p-3 border-b border-slate-800 bg-[#071A2F]">
+        <div className="flex items-center gap-3">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="p-1.5 rounded-lg bg-slate-800 text-white"
+            aria-label="Toggle sidebar"
           >
             {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
-          <span className="text-xs font-serif font-bold text-white uppercase tracking-wider">
-            LDL Dhenze Workspace
-          </span>
+          <CompanyLogo variant="compact" size="xs" theme="dark" onClick={() => onNavigate('/')} />
         </div>
         <button
           onClick={() => onNavigate('/')}
-          className="text-xs text-[#C6922D] font-semibold"
+          className="text-xs text-[#C6922D] font-semibold px-2 py-1 rounded bg-slate-800/60 hover:bg-slate-800"
         >
           Exit
         </button>
@@ -163,18 +163,24 @@ export const EnterprisePortalLayout: React.FC<EnterprisePortalLayoutProps> = ({
           sidebarOpen ? 'block' : 'hidden'
         } md:block w-full md:w-64 border-r flex flex-col shrink-0 ${sidebarBg} transition-colors z-20`}
       >
-        {/* Brand & Portal Header */}
-        <div className="p-5 border-b border-slate-800/80">
-          <div className="flex items-center gap-2 text-xs font-serif tracking-widest text-[#C6922D] uppercase font-bold">
-            <Lock className="w-4 h-4" />
-            <span>Private Workspace</span>
-          </div>
-          <p className="text-[11px] text-slate-400 mt-1">
-            Domain:{' '}
-            <span className="font-semibold text-white uppercase">
+        {/* Brand & Portal Header with Official Master Logo */}
+        <div className="p-4 border-b border-slate-800/80">
+          <button
+            onClick={() => onNavigate('/')}
+            className="w-full text-left transition-opacity hover:opacity-90 focus:outline-none mb-3"
+            title="Back to Public Site"
+          >
+            <CompanyLogo variant="compact" size="sm" theme={isLight ? 'light' : 'dark'} showTagline={false} />
+          </button>
+          <div className="flex items-center justify-between text-[11px] pt-2 border-t border-slate-800/60">
+            <div className="flex items-center gap-1.5 text-[#C6922D] font-semibold uppercase tracking-wider text-[10px]">
+              <Lock className="w-3 h-3" />
+              <span>Workspace</span>
+            </div>
+            <span className="font-semibold text-slate-300 uppercase text-[10px] bg-slate-800/80 px-2 py-0.5 rounded">
               {portalDomain}
             </span>
-          </p>
+          </div>
         </div>
 
         {/* Domain Switcher Tabs */}

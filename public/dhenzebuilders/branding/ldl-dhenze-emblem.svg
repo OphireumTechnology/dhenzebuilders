@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500" fill="none">
+  <defs>
+    <linearGradient id="embGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E2B755"/>
+      <stop offset="35%" stop-color="#CBA135"/>
+      <stop offset="70%" stop-color="#B88B22"/>
+      <stop offset="100%" stop-color="#9E7314"/>
+    </linearGradient>
+    <clipPath id="embClip">
+      <circle cx="250" cy="250" r="216" />
+    </clipPath>
+  </defs>
+
+  <!-- Outer Navy Ring -->
+  <circle cx="250" cy="250" r="238" stroke="#081E38" stroke-width="3.5" fill="none" />
+  <!-- Main Gold Ring -->
+  <circle cx="250" cy="250" r="227" stroke="url(#embGold)" stroke-width="15" fill="none" />
+  <!-- Inner Navy Ring & Clean White Field -->
+  <circle cx="250" cy="250" r="218" stroke="#081E38" stroke-width="2.5" fill="#FFFFFF" />
+
+  <!-- Foundation Swooshes (Clipped) -->
+  <g clip-path="url(#embClip)">
+    <path d="M 60 380 Q 250 340 440 380 L 440 480 L 60 480 Z" fill="#081E38" />
+    <path d="M 80 385 C 160 360 340 360 420 388 C 400 404 320 378 240 378 C 160 378 100 398 80 385 Z" fill="url(#embGold)" />
+    <path d="M 100 402 C 180 380 320 380 400 404 C 370 420 320 396 240 396 C 160 396 120 416 100 402 Z" fill="#081E38" />
+    <path d="M 115 414 C 185 394 305 394 375 414 C 360 422 310 402 240 402 C 170 402 130 418 115 414 Z" fill="#FFFFFF" />
+  </g>
+
+  <!-- Architectural Emblem Monogram -->
+  <g transform="translate(0, -10)">
+    <!-- Tower Outline -->
+    <path d="M 244 80 L 284 104 L 284 250 L 244 250 Z" fill="none" stroke="#081E38" stroke-width="7" stroke-linejoin="round" />
+    <!-- Tower Gold Louvers -->
+    <path d="M 290 110 L 304 118 L 304 250 L 290 250 Z" fill="url(#embGold)" />
+    <path d="M 310 130 L 324 138 L 324 250 L 310 250 Z" fill="url(#embGold)" />
+
+    <!-- Roofline -->
+    <path d="M 226 122 L 144 191 L 156 203 L 226 144 Z" fill="url(#embGold)" />
+    <path d="M 222 125 L 273 169 L 265 178 L 222 141 Z" fill="#081E38" />
+
+    <!-- 4-Pane Window in Gold -->
+    <rect x="212" y="160" width="10" height="10" fill="url(#embGold)" rx="0.8" />
+    <rect x="225" y="160" width="10" height="10" fill="url(#embGold)" rx="0.8" />
+    <rect x="212" y="173" width="10" height="10" fill="url(#embGold)" rx="0.8" />
+    <rect x="225" y="173" width="10" height="10" fill="url(#embGold)" rx="0.8" />
+
+    <!-- Interlocking Letters LDL -->
+    <path d="M 165 190 H 184 V 256 H 206 V 276 H 165 Z" fill="#081E38" />
+    <path d="M 208 192 H 236 C 258 192 271 208 271 235 C 271 262 258 276 236 276 H 208 Z M 223 208 V 260 H 235 C 248 260 256 250 256 235 C 256 218 248 208 235 208 Z" fill="url(#embGold)" />
+    <path d="M 273 168 H 288 V 256 H 333 V 276 H 273 Z" fill="#081E38" />
+  </g>
+
+  <!-- LDL DHENZE Mini Bottom Arc Text / Wordmark -->
+  <text x="180" y="326" font-family="'Montserrat', system-ui, sans-serif" font-size="40" font-weight="900" fill="url(#embGold)" text-anchor="middle">
+    LDL
+  </text>
+  <text x="310" y="326" font-family="'Montserrat', system-ui, sans-serif" font-size="40" font-weight="900" fill="#081E38" text-anchor="middle">
+    DHENZE
+  </text>
+  <text x="250" y="348" font-family="'Montserrat', system-ui, sans-serif" font-size="12" font-weight="800" fill="#081E38" letter-spacing="0.18em" text-anchor="middle">
+    RESIDENTIAL CONSTRUCTION
+  </text>
+</svg>

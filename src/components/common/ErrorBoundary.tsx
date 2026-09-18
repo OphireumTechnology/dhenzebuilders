@@ -1,5 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { CompanyLogo } from './CompanyLogo';
 
 interface Props {
   children: ReactNode;
@@ -34,8 +35,11 @@ export class ErrorBoundary extends React.Component<Props, State> {
       return (
         <div className="min-h-screen bg-[#071A2F] text-slate-100 flex items-center justify-center p-6">
           <div className="max-w-md w-full bg-[#0a233f] border border-[#C6922D]/30 rounded-2xl p-6 text-center shadow-2xl space-y-4">
-            <div className="w-12 h-12 rounded-full bg-amber-500/10 text-[#C6922D] flex items-center justify-center mx-auto">
-              <AlertTriangle className="w-6 h-6" />
+            <div className="flex justify-center mb-2">
+              <CompanyLogo variant="emblem" size="md" />
+            </div>
+            <div className="w-10 h-10 rounded-full bg-amber-500/10 text-[#C6922D] flex items-center justify-center mx-auto">
+              <AlertTriangle className="w-5 h-5" />
             </div>
             <h2 className="text-lg font-bold text-white font-['Montserrat']">Application State Notice</h2>
             <p className="text-xs text-slate-400 leading-relaxed">

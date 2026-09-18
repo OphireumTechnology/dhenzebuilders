@@ -14,6 +14,7 @@ import {
   Info,
 } from 'lucide-react';
 import { UserRole } from '../../types';
+import { CompanyLogo } from '../common/CompanyLogo';
 
 interface AuthPagesProps {
   mode: 'login' | 'forgot-password' | 'verify-email' | 'accept-invitation';
@@ -285,15 +286,12 @@ export const AuthPages: React.FC<AuthPagesProps> = ({
   return (
     <div className="min-h-screen bg-[#071A2F] text-slate-100 flex items-center justify-center py-16 px-4 sm:px-6 lg:px-8 blueprint-grid">
       <div className="max-w-md w-full bg-[#08182B]/95 border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl backdrop-blur-md">
-        {/* Brand Header */}
+        {/* Official Brand Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#C6922D]/10 border border-[#C6922D]/30 text-[#C6922D] mb-4">
-            <Lock className="w-6 h-6" />
+          <div className="flex justify-center mb-4">
+            <CompanyLogo variant="full" size="lg" theme="dark" onClick={() => onNavigate('home')} className="cursor-pointer" />
           </div>
-          <h2 className="text-2xl font-serif text-white tracking-tight">
-            LDL DHENZE
-          </h2>
-          <p className="text-xs font-mono text-[#C6922D] uppercase tracking-wider mt-1">
+          <p className="text-xs font-mono text-[#C6922D] uppercase tracking-wider mt-2 font-bold">
             Private Multi-Tenant Gateway
           </p>
           <p className="text-xs text-slate-400 mt-1">
