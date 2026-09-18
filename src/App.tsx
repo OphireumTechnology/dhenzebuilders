@@ -470,17 +470,6 @@ export default function App() {
   if (currentView === 'portal') {
     return (
       <div className="min-h-screen bg-[#061325] text-slate-100 selection:bg-[#C6922D] selection:text-[#071A2F]">
-        {isEmergencyAdmin && (
-          <div className="bg-amber-950/80 border-b border-amber-800/80 px-4 py-1.5 text-xs text-amber-200 flex items-center justify-between font-mono">
-            <span>● Emergency Admin Bypass Mode Active • Audit logging all actions</span>
-            <button
-              onClick={() => handleNavigate('admin')}
-              className="underline hover:text-white font-bold"
-            >
-              Open Access Console
-            </button>
-          </div>
-        )}
         <PortalPage
           currentUserRole={currentUserRole}
           onChangeUserRole={setCurrentUserRole}

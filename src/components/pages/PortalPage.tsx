@@ -60,7 +60,20 @@ import {
   ChevronLeft,
   ChevronRight,
   Menu,
+  Hammer,
+  UserCheck,
+  FolderPlus,
 } from 'lucide-react';
+import {
+  ClientProfile,
+  ClientProjectItem,
+  ClientNeedsNarrativeReport,
+} from '../../types/clientPortal';
+import { ClientInfoForm } from '../portal/ClientInfoForm';
+import { ClientNeedsInterviewer } from '../portal/ClientNeedsInterviewer';
+import { ProjectCreationModal } from '../portal/ProjectCreationModal';
+import { ProjectWorkspaceView } from '../portal/ProjectWorkspaceView';
+import { IntelligentDocumentCenter } from '../portal/IntelligentDocumentCenter';
 
 // Safe JSON parser that checks content-type and handles non-JSON / HTML / 503 error responses gracefully
 const parseJsonSafely = async <T = any>(res: Response | null): Promise<T | null> => {
@@ -95,6 +108,87 @@ const getPortalAuthHeaders = () => {
   return headers;
 };
 
+const INITIAL_CLIENT_PROFILE: ClientProfile = {
+  id: 'ORG-CL-001',
+  organizationName: 'Angeles Villa Holdings Group Inc.',
+  tradeName: 'Villa Holdings PH',
+  clientType: 'CORPORATE_ENTERPRISE',
+  authorizedRepresentative: {
+    fullName: 'Don Eduardo Miranda',
+    designation: 'Managing Director & Principal Client Representative',
+    email: 'e.miranda@angelesvillas.ph',
+    phone: '+63 917 888 2341',
+    idType: 'PASSPORT',
+    idNumber: 'P8921447B',
+  },
+  taxIdentificationNumber: '248-910-432-000',
+  secOrDtiRegistrationNumber: 'CS2019-84729',
+  officialAddress: {
+    street: 'Unit 402, Clark Cyberpark Tower 1, Clark Freeport Zone',
+    barangay: 'Anunas',
+    city: 'Angeles City',
+    province: 'Pampanga',
+    postalCode: '2009',
+  },
+  preferredProcurementMethod: 'EPC_DESIGN_BUILD',
+  authorizationDocumentType: 'BOARD_RESOLUTION',
+  verificationStatus: 'VERIFIED',
+  updatedAt: '2026-09-18',
+};
+
+const INITIAL_PROJECTS: ClientProjectItem[] = [
+  {
+    id: 'PROJECT-2026-000001',
+    title: 'Angeles City Residential Villa Cluster',
+    clientOrganizationId: 'org-client-clark',
+    clientOrganizationName: 'Angeles Villa Holdings Group Inc.',
+    projectType: 'Residential Estate',
+    status: 'PLANNING',
+    location: 'Fil-Am Friendship Enclave, Anunas, Angeles City, Pampanga',
+    province: 'Pampanga',
+    lotAreaSqM: 1250,
+    buildingAreaSqM: 680,
+    numberOfFloors: 2,
+    targetBudgetPHP: 32000000,
+    committedBudgetPHP: 30450000,
+    paidAmountPHP: 0,
+    currentPhase: 'Engineering & Contractor Procurement',
+    overallProgressPercent: 15,
+    projectManagerName: 'Engr. J. Dela Cruz',
+    targetStartDate: '2026-11-01',
+    targetHandoverDate: '2027-10-31',
+    fundingSource: 'Self-Funded Cash Equity',
+    procurementMethod: 'EPC Design-Build Turnkey',
+    isPrivate: true,
+    readinessPercent: 88,
+  },
+  {
+    id: 'PROJECT-2026-000002',
+    title: 'Clark Highlands Commercial Retail Annex',
+    clientOrganizationId: 'org-client-clark',
+    clientOrganizationName: 'Angeles Villa Holdings Group Inc.',
+    projectType: 'Commercial Building',
+    status: 'PLANNING',
+    location: 'Clark Global City, Mabalacat, Pampanga',
+    province: 'Pampanga',
+    lotAreaSqM: 2800,
+    buildingAreaSqM: 1450,
+    numberOfFloors: 3,
+    targetBudgetPHP: 65000000,
+    committedBudgetPHP: 0,
+    paidAmountPHP: 0,
+    currentPhase: 'Feasibility & Schematics',
+    overallProgressPercent: 5,
+    projectManagerName: 'Arch. M. Santos',
+    targetStartDate: '2027-02-01',
+    targetHandoverDate: '2028-04-30',
+    fundingSource: 'Corporate Capital Allocation',
+    procurementMethod: 'General Contractor (Traditional)',
+    isPrivate: true,
+    readinessPercent: 42,
+  },
+];
+
 interface PortalPageProps {
   currentUserRole: UserRole;
   onChangeUserRole: (role: UserRole) => void;
@@ -111,6 +205,43 @@ export const PortalPage: React.FC<PortalPageProps> = ({
     return (localStorage.getItem('portal_theme') as 'dark' | 'light') || 'dark';
   });
   const [activeSection, setActiveSection] = useState<string>('overview');
+
+  // Client Dashboard Data Management
+  const [clientProfile, setClientProfile] = useState<ClientProfile>(INITIAL_CLIENT_PROFILE);
+  const [projects, setProjects] = useState<ClientProjectItem[]>(INITIAL_PROJECTS);
+  const [activeProjectId, setActiveProjectId] = useState<string>('PROJECT-2026-000001');
+  const [createProjectModalOpen, setCreateProjectModalOpen] = useState<boolean>(false);
+  const [clientNeedsReport, setClientNeedsReport] = useState<ClientNeedsNarrativeReport | null>(null);
+
+  const activeProject = projects.find((p) => p.id === activeProjectId) || projects[0];
+
+  const handleUpdateProject = (updated: ClientProjectItem) => {
+    setProjects(projects.map((p) => (p.id === updated.id ? updated : p)));
+    setActionMessage(`Project "${updated.title}" workspace changes saved.`);
+    setTimeout(() => setActionMessage(null), 4000);
+  };
+
+  const handleCreateProject = (newProject: ClientProjectItem) => {
+    setProjects([newProject, ...projects]);
+    setActiveProjectId(newProject.id);
+    setCreateProjectModalOpen(false);
+    setActionMessage(`New project "${newProject.title}" initialized! Now active in your workspace.`);
+    setTimeout(() => setActionMessage(null), 5000);
+  };
+
+  const handleApplyNarrativeToActiveProject = (report: ClientNeedsNarrativeReport) => {
+    setClientNeedsReport(report);
+    if (activeProject) {
+      const updated: ClientProjectItem = {
+        ...activeProject,
+        readinessPercent: Math.min(100, (activeProject.readinessPercent || 70) + 15),
+        currentPhase: 'Procurement & Contractor Bidding',
+      };
+      setProjects(projects.map((p) => (p.id === activeProject.id ? updated : p)));
+      setActionMessage(`Client Needs Narrative report generated and applied to "${activeProject.title}"! Project readiness updated.`);
+      setTimeout(() => setActionMessage(null), 5000);
+    }
+  };
 
   const toggleTheme = () => {
     const next = portalTheme === 'dark' ? 'light' : 'dark';
@@ -441,24 +572,23 @@ export const PortalPage: React.FC<PortalPageProps> = ({
   };
 
   const portalNavItems = [
-    { id: 'overview', label: 'Overview', icon: LayoutDashboard, tab: 'client' as const },
-    { id: 'projects', label: 'My Projects', icon: FolderKanban, tab: 'client' as const },
-    { id: 'milestones', label: 'Project Milestones', icon: Milestone, tab: 'client' as const },
-    { id: 'documents', label: 'Documents', icon: FileText, tab: 'client' as const },
-    { id: 'drawings', label: 'Drawings and Plans', icon: Compass, tab: 'client' as const },
-    { id: 'approvals', label: 'Approvals', icon: CheckSquare, tab: 'client' as const },
-    { id: 'consultations', label: 'Consultations', icon: Calendar, tab: 'client' as const },
-    { id: 'messages', label: 'Messages', icon: MessageSquare, tab: 'client' as const },
-    { id: 'assistant', label: 'Builder Assistant', icon: Sparkles, tab: 'client' as const },
-    { id: 'proposals', label: 'Proposals and Offerings', icon: CreditCard, tab: 'billing' as const },
-    { id: 'invoices', label: 'Invoices and Payments', icon: Receipt, tab: 'billing' as const },
-    { id: 'notifications', label: 'Notifications', icon: Bell, tab: 'admin' as const },
-    { id: 'account', label: 'Account and Security', icon: ShieldCheck, tab: 'admin' as const },
+    { id: 'overview', label: 'Client Dashboard', icon: LayoutDashboard },
+    { id: 'client_info', label: 'Client Profile & Info', icon: UserCheck },
+    { id: 'interviewer', label: 'Needs Discovery & Report', icon: Sparkles },
+    { id: 'projects', label: 'My Projects', icon: FolderKanban },
+    { id: 'workspace', label: 'Project Workspace', icon: Layers },
+    { id: 'drawings', label: 'Drawings and Plans', icon: Compass },
+    { id: 'contractors', label: 'Looking for Contractors', icon: Hammer },
+    { id: 'documents', label: 'Documents & CDE Archive', icon: FileText },
+    { id: 'milestones', label: 'Project Milestones', icon: Milestone },
+    { id: 'invoices', label: 'Billing & Invoices', icon: Receipt },
+    { id: 'messages', label: 'Communications & RFIs', icon: MessageSquare },
+    { id: 'proposals', label: 'Proposals & Wallet', icon: CreditCard },
+    { id: 'admin', label: 'Governance & Audits', icon: ShieldCheck },
   ];
 
   const handleSelectNav = (item: typeof portalNavItems[0]) => {
     setActiveSection(item.id);
-    setActiveTab(item.tab);
   };
 
   return (
@@ -696,217 +826,635 @@ export const PortalPage: React.FC<PortalPageProps> = ({
             </div>
           )}
 
-          {/* Tab Navigation Controls (Quick filter bar) */}
-          <div className="flex border-b border-white/10 mb-6 space-x-2 sm:space-x-4 overflow-x-auto">
-            <button
-              onClick={() => {
-                setActiveTab('client');
-                setActiveSection('overview');
-              }}
-              className={`pb-3 text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors border-b-2 whitespace-nowrap ${
-                activeTab === 'client'
-                  ? 'border-[#C6922D] text-[#C6922D]'
-                  : 'border-transparent text-slate-400 hover:text-white'
-              }`}
-            >
-              Client Progress Room
-            </button>
-            <button
-              onClick={() => {
-                setActiveTab('billing');
-                setActiveSection('proposals');
-              }}
-              className={`pb-3 text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors border-b-2 whitespace-nowrap flex items-center gap-1.5 ${
-                activeTab === 'billing'
-                  ? 'border-[#C6922D] text-[#C6922D]'
-                  : 'border-transparent text-slate-400 hover:text-white'
-              }`}
-            >
-              <Coins className="w-3.5 h-3.5 text-[#C6922D]" />
-              <span>Proposals, Wallet & Economic Audits</span>
-            </button>
-            <button
-              onClick={() => {
-                setActiveTab('partner');
-                setActiveSection('messages');
-              }}
-              className={`pb-3 text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors border-b-2 whitespace-nowrap ${
-                activeTab === 'partner'
-                  ? 'border-[#C6922D] text-[#C6922D]'
-                  : 'border-transparent text-slate-400 hover:text-white'
-              }`}
-            >
-              Supplier & Partner Hub
-            </button>
-            <button
-              onClick={() => {
-                setActiveTab('admin');
-                setActiveSection('account');
-              }}
-              className={`pb-3 text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors border-b-2 whitespace-nowrap ${
-                activeTab === 'admin'
-                  ? 'border-[#C6922D] text-[#C6922D]'
-                  : 'border-transparent text-slate-400 hover:text-white'
-              }`}
-            >
-              Governance & QA Suite
-            </button>
-          </div>
-
-        {/* ---------------------------------------------------- */}
-        {/* 1. CLIENT PROGRESS ROOM TAB */}
-        {/* ---------------------------------------------------- */}
-        {activeTab === 'client' && (
-          <div className="space-y-8">
-            {/* Restricted Access Check if Anonymous */}
-            {currentUserRole === 'ANONYMOUS_VISITOR' && (
-              <div className="bg-amber-950/40 border border-amber-500/40 rounded-2xl p-5 text-xs text-amber-200 flex items-start gap-3">
-                <Lock className="w-5 h-5 shrink-0 text-amber-400 mt-0.5" />
-                <div>
-                  <strong className="text-white">Public Visitor Notice: </strong>
-                  You are currently previewing with the public visitor role. Switch the Active Role selector above to <strong>Verified Client</strong> to simulate authorized private project telemetry.
+          {/* Top Project Selector & Quick Context Bar */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 sm:p-5 rounded-2xl bg-[#09223d] border border-white/10 shadow-lg">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#C6922D]/20 border border-[#C6922D]/40 flex items-center justify-center text-[#C6922D] shrink-0">
+                <FolderKanban className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="text-[10px] text-slate-400 uppercase font-mono tracking-wider">
+                  Active Client Project
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <select
+                    value={activeProjectId}
+                    onChange={(e) => setActiveProjectId(e.target.value)}
+                    className="bg-[#051322] text-sm font-bold text-white focus:outline-none cursor-pointer border border-white/20 rounded-lg px-2.5 py-1"
+                  >
+                    {projects.map((p) => (
+                      <option key={p.id} value={p.id} className="bg-[#071A2F] text-white">
+                        {p.title} ({p.status})
+                      </option>
+                    ))}
+                  </select>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 font-bold">
+                    {activeProject?.readinessPercent || 0}% Ready
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-mono hidden sm:inline">
+                    Ref: {activeProject?.id}
+                  </span>
                 </div>
               </div>
-            )}
+            </div>
 
-            {/* Active Project Dashboard Header */}
-            <div className="bg-[#09223d] border border-[#C6922D]/30 rounded-3xl p-6 sm:p-8 shadow-xl">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => setCreateProjectModalOpen(true)}
+                className="px-3.5 py-2 rounded-xl bg-[#C6922D] hover:bg-[#d8a339] text-[#071A2F] font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-md transition-all"
+              >
+                <FolderPlus className="w-4 h-4" />
+                <span>New Project</span>
+              </button>
+              <button
+                onClick={() => setActiveSection('interviewer')}
+                className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 transition-colors"
+              >
+                <Sparkles className="w-4 h-4 text-[#C6922D]" />
+                <span>Needs Questionnaire</span>
+              </button>
+            </div>
+          </div>
+
+          {/* ---------------------------------------------------- */}
+          {/* SECTION 1: CLIENT DASHBOARD OVERVIEW */}
+          {/* ---------------------------------------------------- */}
+          {activeSection === 'overview' && (
+            <div className="space-y-6">
+              {/* Row 1: Client Profile & Active Project Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                {/* Client Profile Summary Card (5 cols) */}
+                <div className="lg:col-span-5 bg-[#09223d] border border-white/10 rounded-3xl p-6 shadow-xl flex flex-col justify-between space-y-4">
+                  <div>
+                    <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                      <div className="flex items-center gap-2">
+                        <UserCheck className="w-4 h-4 text-[#C6922D]" />
+                        <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+                          Client Information
+                        </h3>
+                      </div>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-800">
+                        {clientProfile.verificationStatus}
+                      </span>
+                    </div>
+
+                    <div className="mt-3 space-y-2 text-xs">
+                      <div>
+                        <div className="text-[10px] text-slate-400 uppercase">Registered Client Entity</div>
+                        <div className="text-white font-bold text-sm truncate">
+                          {clientProfile.organizationName}
+                        </div>
+                        <div className="text-[11px] text-[#C6922D]">{clientProfile.tradeName}</div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 pt-1 border-t border-white/5 text-[11px]">
+                        <div>
+                          <span className="text-slate-400 block">TIN:</span>
+                          <span className="text-slate-200 font-mono font-semibold">
+                            {clientProfile.taxIdentificationNumber}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-slate-400 block">Registration:</span>
+                          <span className="text-slate-200 font-mono">
+                            {clientProfile.secOrDtiRegistrationNumber || 'Registered'}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="pt-1 border-t border-white/5 text-[11px]">
+                        <span className="text-slate-400 block">Authorized Signatory:</span>
+                        <div className="text-white font-semibold">{clientProfile.authorizedRepresentative.fullName}</div>
+                        <div className="text-[10px] text-slate-400">{clientProfile.authorizedRepresentative.designation}</div>
+                        <div className="text-[10px] text-slate-400 font-mono mt-0.5">
+                          {clientProfile.authorizedRepresentative.phone} • {clientProfile.authorizedRepresentative.email}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-3 border-t border-white/10 flex justify-between items-center text-xs">
+                    <span className="text-[11px] text-slate-400">Authority: Board Resolution (₱50M)</span>
+                    <button
+                      onClick={() => setActiveSection('client_info')}
+                      className="text-[#C6922D] font-bold hover:underline"
+                    >
+                      Edit Client Details →
+                    </button>
+                  </div>
+                </div>
+
+                {/* Active Project Highlight Card (7 cols) */}
+                <div className="lg:col-span-7 bg-[#09223d] border border-[#C6922D]/30 rounded-3xl p-6 sm:p-7 shadow-xl flex flex-col justify-between space-y-4">
+                  <div>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-white/10">
+                      <div>
+                        <span className="font-mono text-[10px] text-[#C6922D] uppercase font-bold tracking-wider">
+                          Project Ref: {activeProject.id} • {activeProject.projectType}
+                        </span>
+                        <h2 className="text-xl sm:text-2xl font-bold text-white mt-0.5">
+                          {activeProject.title}
+                        </h2>
+                        <p className="text-xs text-slate-300 mt-0.5 truncate">
+                          {activeProject.location}
+                        </p>
+                      </div>
+                      <div className="text-left sm:text-right shrink-0">
+                        <div className="text-[10px] text-slate-400 uppercase font-bold">Target Budget</div>
+                        <div className="text-lg font-mono font-black text-emerald-400">
+                          ₱{(activeProject.targetBudgetPHP).toLocaleString()}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Progress Bar & Key Stats */}
+                    <div className="pt-4 space-y-3">
+                      <div>
+                        <div className="flex justify-between text-xs text-slate-300 mb-1.5">
+                          <span>Current Phase: <strong>{activeProject.currentPhase}</strong></span>
+                          <span>Target Handover: <strong>{activeProject.targetHandoverDate}</strong></span>
+                        </div>
+                        <div className="w-full bg-[#051322] h-2.5 rounded-full overflow-hidden border border-white/10">
+                          <div
+                            className="bg-[#C6922D] h-full rounded-full transition-all duration-500"
+                            style={{ width: `${activeProject.overallProgressPercent}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-2 text-center text-xs pt-1">
+                        <div className="p-2 bg-[#051322] rounded-xl border border-white/5">
+                          <div className="text-[10px] text-slate-400">Lot Area</div>
+                          <div className="text-white font-bold font-mono">{activeProject.lotAreaSqM} sqm</div>
+                        </div>
+                        <div className="p-2 bg-[#051322] rounded-xl border border-white/5">
+                          <div className="text-[10px] text-slate-400">Floor Area</div>
+                          <div className="text-white font-bold font-mono">{activeProject.buildingAreaSqM} sqm</div>
+                        </div>
+                        <div className="p-2 bg-[#051322] rounded-xl border border-white/5">
+                          <div className="text-[10px] text-slate-400">Readiness</div>
+                          <div className="text-emerald-400 font-bold font-mono">{activeProject.readinessPercent}%</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-3 border-t border-white/10 flex flex-wrap gap-2 justify-end">
+                    <button
+                      onClick={() => setActiveSection('drawings')}
+                      className="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 transition-colors"
+                    >
+                      <Compass className="w-3.5 h-3.5 text-[#C6922D]" />
+                      <span>Drawings & Plans</span>
+                    </button>
+                    <button
+                      onClick={() => setActiveSection('contractors')}
+                      className="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 transition-colors"
+                    >
+                      <Hammer className="w-3.5 h-3.5 text-[#C6922D]" />
+                      <span>Looking for Contractors</span>
+                    </button>
+                    <button
+                      onClick={() => setActiveSection('workspace')}
+                      className="px-4 py-1.5 rounded-xl bg-[#C6922D] hover:bg-[#d8a339] text-[#071A2F] font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-md transition-all"
+                    >
+                      <Layers className="w-3.5 h-3.5" />
+                      <span>Open Workspace</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Row 2: Needs Interviewer Discovery & Contractor Bidding Status */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Needs Interviewer Card */}
+                <div className="bg-[#09223d] border border-white/10 rounded-3xl p-6 shadow-xl space-y-4">
+                  <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-[#C6922D]" />
+                      <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+                        Client Needs Discovery & Narrative Report
+                      </h3>
+                    </div>
+                    <span
+                      className={`px-2 py-0.5 rounded text-[10px] font-bold font-mono ${
+                        clientNeedsReport
+                          ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
+                          : 'bg-amber-950 text-amber-300 border border-amber-800'
+                      }`}
+                    >
+                      {clientNeedsReport ? 'NARRATIVE READY' : 'QUESTIONNAIRE PENDING'}
+                    </span>
+                  </div>
+
+                  {clientNeedsReport ? (
+                    <div className="space-y-3 text-xs">
+                      <div className="p-3.5 bg-[#051322] rounded-2xl border border-emerald-500/30">
+                        <div className="font-bold text-emerald-300 mb-1">{clientNeedsReport.projectTitle}</div>
+                        <p className="text-slate-300 text-[11px] leading-relaxed line-clamp-3">
+                          {clientNeedsReport.executiveSummary}
+                        </p>
+                        <div className="mt-2.5 pt-2 border-t border-white/5 flex items-center justify-between text-[11px] text-slate-400">
+                          <span>Target Budget: <strong className="text-white">₱{clientNeedsReport.financialBenchmarking?.targetBudgetPHP?.toLocaleString() || '32,000,000'}</strong></span>
+                          <span>Readiness: <strong className="text-emerald-400 font-mono">{clientNeedsReport.projectReadinessAssessment?.overallReadinessPercent || 85}%</strong></span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-1">
+                        <span className="text-[11px] text-slate-400">Generated {clientNeedsReport.generatedAt}</span>
+                        <button
+                          onClick={() => setActiveSection('interviewer')}
+                          className="px-4 py-2 rounded-xl bg-[#C6922D] text-[#071A2F] font-bold text-xs uppercase tracking-wider hover:bg-[#d8a339] transition-all"
+                        >
+                          View Full Narrative Report →
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-3 text-xs">
+                      <p className="text-slate-300 text-xs leading-relaxed">
+                        Complete our structured 7-step Interviewer Questionnaire to pinpoint your exact architectural,
+                        structural, mechanical, and budget requirements. Our system will generate a comprehensive
+                        narrative report detailing your complete project specifications.
+                      </p>
+
+                      <div className="p-3 bg-[#051322] rounded-xl border border-white/5 text-[11px] text-slate-300 space-y-1">
+                        <div>• Step 1: Project Identity & Vision</div>
+                        <div>• Step 2: Site Location & Title Verification</div>
+                        <div>• Step 3: Spatial Program & Architectural Aesthetic</div>
+                        <div>• Step 4: Budget Range & Procurement Strategy</div>
+                      </div>
+
+                      <div className="pt-2 flex justify-end">
+                        <button
+                          onClick={() => setActiveSection('interviewer')}
+                          className="px-4 py-2.5 rounded-xl bg-[#C6922D] hover:bg-[#d8a339] text-[#071A2F] font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-md transition-all"
+                        >
+                          <Sparkles className="w-4 h-4" />
+                          <span>Start Needs Questionnaire</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Looking for Contractors Card */}
+                <div className="bg-[#09223d] border border-white/10 rounded-3xl p-6 shadow-xl space-y-4">
+                  <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                    <div className="flex items-center gap-2">
+                      <Hammer className="w-4 h-4 text-[#C6922D]" />
+                      <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+                        Looking for Contractors (Bidding Room)
+                      </h3>
+                    </div>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-blue-950 text-blue-300 border border-blue-800">
+                      3 BIDS SUBMITTED
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    Compare verified PCAB-licensed general contractors currently competing for your project. Review
+                    itemized cost breakdowns against your budget ceiling, construction durations, and mobilization guarantees.
+                  </p>
+
+                  <div className="space-y-2 text-xs">
+                    <div className="p-3 bg-[#051322] rounded-xl border border-emerald-500/30 flex items-center justify-between">
+                      <div>
+                        <div className="font-bold text-white">PrimeBuild Luzon Corp.</div>
+                        <div className="text-[11px] text-slate-400">PCAB Category AAA • 330 Calendar Days</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-mono font-bold text-emerald-400">₱29,850,000</div>
+                        <span className="text-[10px] text-emerald-300 bg-emerald-950 px-1.5 py-0.5 rounded">Lowest Tender</span>
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-[#051322] rounded-xl border border-white/5 flex items-center justify-between">
+                      <div>
+                        <div className="font-bold text-white">Metro Clark Builders & Heavy Civil</div>
+                        <div className="text-[11px] text-slate-400">PCAB Category AA • 300 Calendar Days</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-mono font-bold text-slate-200">₱31,200,000</div>
+                        <span className="text-[10px] text-slate-400">Within Budget</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 flex justify-end">
+                    <button
+                      onClick={() => setActiveSection('contractors')}
+                      className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition-colors"
+                    >
+                      <Hammer className="w-4 h-4 text-[#C6922D]" />
+                      <span>Review Bid Comparison Matrix →</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Row 3: Scheduled Milestones & Action Items */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Milestones Card */}
+                <div className="bg-[#09223d] border border-white/10 rounded-3xl p-6 shadow-xl space-y-4">
+                  <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-[#C6922D]" />
+                      <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+                        Scheduled Milestones
+                      </h3>
+                    </div>
+                    <button
+                      onClick={() => setActiveSection('milestones')}
+                      className="text-[#C6922D] text-xs font-bold hover:underline"
+                    >
+                      View All →
+                    </button>
+                  </div>
+
+                  <div className="space-y-2.5 text-xs">
+                    <div className="p-3 bg-[#051322] rounded-xl border border-white/5 flex items-center justify-between">
+                      <div>
+                        <div className="font-semibold text-white">M1: Geotechnical Survey & Foundation Concrete Cast</div>
+                        <div className="text-slate-400 text-[11px]">Passed cylinder test (3,500 psi) • Handover verified</div>
+                      </div>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#237A3B]/30 text-emerald-300">
+                        Completed
+                      </span>
+                    </div>
+
+                    <div className="p-3 bg-[#051322] rounded-xl border border-white/5 flex items-center justify-between">
+                      <div>
+                        <div className="font-semibold text-white">M2: 2nd Storey Superstructure Framing & Shear Walls</div>
+                        <div className="text-slate-400 text-[11px]">Rebar inspection certified • Forms stripped</div>
+                      </div>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#237A3B]/30 text-emerald-300">
+                        Completed
+                      </span>
+                    </div>
+
+                    <div className="p-3 bg-[#051322] rounded-xl border border-[#C6922D]/30 flex items-center justify-between">
+                      <div>
+                        <div className="font-semibold text-white">M3: Roof Truss Assembly & Solar Roughing-In</div>
+                        <div className="text-slate-400 text-[11px]">Structural steel erection underway</div>
+                      </div>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#C6922D]/30 text-[#C6922D] animate-pulse">
+                        In Progress
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Missing Documents & Action Required */}
+                <div className="bg-[#09223d] border border-white/10 rounded-3xl p-6 shadow-xl space-y-4">
+                  <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-[#C6922D]" />
+                      <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+                        Document Compliance & CDE Status
+                      </h3>
+                    </div>
+                    <button
+                      onClick={() => setActiveSection('documents')}
+                      className="text-[#C6922D] text-xs font-bold hover:underline"
+                    >
+                      Open Archive →
+                    </button>
+                  </div>
+
+                  <div className="space-y-2.5 text-xs">
+                    <div className="p-3 bg-amber-950/40 border border-amber-500/30 rounded-xl text-amber-200 flex items-start gap-2.5">
+                      <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                      <div>
+                        <strong className="text-white block">Action Required: Sign MEPFS Drawings</strong>
+                        <span>Final Mechanical & Electrical signed drawings needed for Angeles City OBO permit submittal.</span>
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-[#051322] rounded-xl border border-white/5 flex items-center justify-between">
+                      <div>
+                        <div className="font-semibold text-white">TCT Certified True Copy & Tax Clearance</div>
+                        <div className="text-slate-400 text-[11px]">Folder 02 — Verified with Angeles Registry of Deeds</div>
+                      </div>
+                      <span className="text-emerald-400 font-bold text-[11px]">Archived</span>
+                    </div>
+
+                    <div className="p-3 bg-[#051322] rounded-xl border border-white/5 flex items-center justify-between">
+                      <div>
+                        <div className="font-semibold text-white">Bill of Quantities (BOQ) Unpriced Tender Copy</div>
+                        <div className="text-slate-400 text-[11px]">Folder 05 — Distributed to 3 bidding contractors</div>
+                      </div>
+                      <span className="text-emerald-400 font-bold text-[11px]">Active</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ---------------------------------------------------- */}
+          {/* SECTION 2: CLIENT INFO & PROFILE FORM */}
+          {/* ---------------------------------------------------- */}
+          {activeSection === 'client_info' && (
+            <div className="space-y-6">
+              <ClientInfoForm
+                initialProfile={clientProfile}
+                onSave={(upd) => {
+                  setClientProfile(upd);
+                  setActionMessage('Client details updated and verified successfully.');
+                  setTimeout(() => setActionMessage(null), 4000);
+                }}
+                portalTheme={portalTheme}
+              />
+            </div>
+          )}
+
+          {/* ---------------------------------------------------- */}
+          {/* SECTION 3: NEEDS INTERVIEWER QUESTIONNAIRE */}
+          {/* ---------------------------------------------------- */}
+          {activeSection === 'interviewer' && (
+            <div className="space-y-6">
+              <ClientNeedsInterviewer
+                onApplyReportToProject={handleApplyNarrativeToActiveProject}
+                portalTheme={portalTheme}
+              />
+            </div>
+          )}
+
+          {/* ---------------------------------------------------- */}
+          {/* SECTION 4: MY PROJECTS CATALOG */}
+          {/* ---------------------------------------------------- */}
+          {activeSection === 'projects' && (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-[#09223d] border border-white/10">
                 <div>
-                  <span className="font-mono text-xs text-[#C6922D] uppercase font-bold">
-                    Project Ref: LDL-PRJ-2024-001
-                  </span>
-                  <h2 className="text-xl sm:text-2xl font-bold text-white mt-1">
-                    Angeles City Residential Villa Cluster
-                  </h2>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    Client Organization: Angeles Villa Holdings Group • Anunas, Angeles City
+                  <h2 className="text-2xl font-bold text-white font-['Montserrat']">My Development Projects</h2>
+                  <p className="text-xs text-slate-300 mt-1">
+                    Manage active developments, create new project briefs, and monitor contractor bidding rooms.
                   </p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="text-right">
-                    <div className="text-[10px] text-slate-400 uppercase font-bold">Overall Progress</div>
-                    <div className="text-xl font-mono font-black text-emerald-400">68.4%</div>
-                  </div>
-                  <div className="w-12 h-12 rounded-full border-4 border-emerald-500 flex items-center justify-center text-xs font-bold font-mono">
-                    68%
-                  </div>
-                </div>
+                <button
+                  onClick={() => setCreateProjectModalOpen(true)}
+                  className="px-4 py-2.5 rounded-xl bg-[#C6922D] hover:bg-[#d8a339] text-[#071A2F] font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-md"
+                >
+                  <FolderPlus className="w-4 h-4" />
+                  <span>Create New Project</span>
+                </button>
               </div>
 
-              {/* Progress Bar */}
-              <div className="pt-6">
-                <div className="flex justify-between text-xs text-slate-300 mb-2">
-                  <span>Current Phase: Superstructure & Roof Framing Roughing-In</span>
-                  <span>Target Handover: Q1 2026</span>
-                </div>
-                <div className="w-full bg-[#051322] h-3 rounded-full overflow-hidden border border-white/10">
-                  <div className="bg-[#C6922D] h-full rounded-full transition-all duration-500" style={{ width: '68%' }} />
-                </div>
-              </div>
-            </div>
-
-            {/* Milestones & RFIs Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Milestones */}
-              <div className="bg-[#09223d] border border-white/10 rounded-2xl p-6">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4 flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-[#C6922D]" />
-                  <span>Scheduled Project Milestones</span>
-                </h3>
-                <div className="space-y-3 text-xs">
-                  <div className="p-3 bg-[#051322] rounded-xl border border-white/5 flex items-center justify-between">
-                    <div>
-                      <div className="font-semibold text-white">M1: Geotechnical Survey & Foundation Concrete Cast</div>
-                      <div className="text-slate-400 text-[11px]">Completed March 2024 • Passed cylinder test (3,500 psi)</div>
-                    </div>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#237A3B]/30 text-emerald-300">
-                      Completed
-                    </span>
-                  </div>
-
-                  <div className="p-3 bg-[#051322] rounded-xl border border-white/5 flex items-center justify-between">
-                    <div>
-                      <div className="font-semibold text-white">M2: 2nd Storey Superstructure Framing & Shear Walls</div>
-                      <div className="text-slate-400 text-[11px]">Completed August 2024 • Rebar inspection certified</div>
-                    </div>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#237A3B]/30 text-emerald-300">
-                      Completed
-                    </span>
-                  </div>
-
-                  <div className="p-3 bg-[#051322] rounded-xl border border-[#C6922D]/30 flex items-center justify-between">
-                    <div>
-                      <div className="font-semibold text-white">M3: Roof Truss Assembly & Solar Conduit Roughing-In</div>
-                      <div className="text-slate-400 text-[11px]">In Progress • Structural steel erection underway</div>
-                    </div>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#C6922D]/30 text-[#C6922D] animate-pulse">
-                      In Progress
-                    </span>
-                  </div>
-
-                  <div className="p-3 bg-[#051322] rounded-xl border border-white/5 flex items-center justify-between opacity-60">
-                    <div>
-                      <div className="font-semibold text-white">M4: Architectural Finishes & Solar BESS Commissioning</div>
-                      <div className="text-slate-400 text-[11px]">Scheduled December 2024 – February 2025</div>
-                    </div>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-white/10 text-slate-400">
-                      Pending
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Submittals & Change Orders */}
-              <div className="bg-[#09223d] border border-white/10 rounded-2xl p-6">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4 flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-[#C6922D]" />
-                  <span>Approved Submittals & Change Requests</span>
-                </h3>
-                <div className="space-y-3 text-xs">
-                  <div className="p-3 bg-[#051322] rounded-xl border border-white/5 flex items-center justify-between">
-                    <div>
-                      <div className="font-semibold text-white">SUB-041: TopCon Monocrystalline Solar Panel Spec</div>
-                      <div className="text-slate-400 text-[11px]">Submittal approved by Lead Electrical Engineer</div>
-                    </div>
-                    <span className="text-emerald-400 font-bold text-[11px]">Approved</span>
-                  </div>
-
-                  <div className="p-3 bg-[#051322] rounded-xl border border-white/5 flex items-center justify-between">
-                    <div>
-                      <div className="font-semibold text-white">CR-002: Underground Cistern Capacity Expansion (20,000L)</div>
-                      <div className="text-slate-400 text-[11px]">Change order signed by Client Representative</div>
-                    </div>
-                    <span className="text-emerald-400 font-bold text-[11px]">Approved</span>
-                  </div>
-
-                  <div className="p-3 bg-[#051322] rounded-xl border border-white/5 flex items-center justify-between">
-                    <div>
-                      <div className="font-semibold text-white">RFI-018: Window Sill Flashing Detail Verification</div>
-                      <div className="text-slate-400 text-[11px]">Resolved by Project Architect • Architectural drawing updated</div>
-                    </div>
-                    <span className="text-blue-400 font-bold text-[11px]">Resolved</span>
-                  </div>
-                </div>
-
-                <div className="mt-4 pt-4 border-t border-white/5 flex justify-between items-center text-xs">
-                  <span className="text-slate-400">3 Verified Document Packages</span>
-                  <button
-                    onClick={() => onNavigate('contact')}
-                    className="text-[#C6922D] font-bold hover:underline"
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {projects.map((proj) => (
+                  <div
+                    key={proj.id}
+                    className="p-6 rounded-3xl bg-[#09223d] border border-white/10 hover:border-[#C6922D]/40 transition-all shadow-xl space-y-4 flex flex-col justify-between"
                   >
-                    Open RFI Thread
-                  </button>
-                </div>
+                    <div>
+                      <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                        <span className="font-mono text-[10px] text-[#C6922D] font-bold">{proj.id}</span>
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono bg-blue-950 text-blue-300 border border-blue-800">
+                          {proj.status}
+                        </span>
+                      </div>
+
+                      <h3 className="text-lg font-bold text-white mt-3">{proj.title}</h3>
+                      <p className="text-xs text-slate-400 mt-1">{proj.location}</p>
+
+                      <div className="grid grid-cols-2 gap-3 mt-4 text-xs">
+                        <div className="p-3 bg-[#051322] rounded-xl border border-white/5">
+                          <span className="text-slate-400 text-[10px] block">Target Budget</span>
+                          <span className="text-emerald-400 font-mono font-bold text-sm">
+                            ₱{(proj.targetBudgetPHP).toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="p-3 bg-[#051322] rounded-xl border border-white/5">
+                          <span className="text-slate-400 text-[10px] block">Area (GFA)</span>
+                          <span className="text-white font-mono font-bold text-sm">
+                            {proj.buildingAreaSqM} sqm ({proj.numberOfFloors} Storeys)
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="mt-4">
+                        <div className="flex justify-between text-xs text-slate-300 mb-1">
+                          <span>Overall Progress</span>
+                          <span className="font-mono font-bold">{proj.overallProgressPercent}%</span>
+                        </div>
+                        <div className="w-full bg-[#051322] h-2 rounded-full overflow-hidden">
+                          <div
+                            className="bg-[#C6922D] h-full rounded-full"
+                            style={{ width: `${proj.overallProgressPercent}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-4 border-t border-white/10 flex items-center justify-between">
+                      <button
+                        onClick={() => {
+                          setActiveProjectId(proj.id);
+                          setActiveSection('workspace');
+                        }}
+                        className="text-[#C6922D] font-bold text-xs hover:underline flex items-center gap-1"
+                      >
+                        <span>Open Workspace</span>
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setActiveProjectId(proj.id);
+                          setActiveSection('contractors');
+                        }}
+                        className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-white font-bold text-xs uppercase"
+                      >
+                        Contractor Bids
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* ---------------------------------------------------- */}
-        {/* 2. BUILDER AI CREDITS & WALLET TAB */}
-        {/* ---------------------------------------------------- */}
-        {activeTab === 'billing' && (
+          {/* ---------------------------------------------------- */}
+          {/* SECTION 5: PROJECT WORKSPACE DEEP VIEWS */}
+          {/* ---------------------------------------------------- */}
+          {activeSection === 'workspace' && (
+            <div className="space-y-6">
+              <ProjectWorkspaceView
+                project={activeProject}
+                onOpenNeedsInterviewer={() => setActiveSection('interviewer')}
+                onOpenUploadModal={() => setActiveSection('documents')}
+                onUpdateProject={handleUpdateProject}
+                subTab="overview"
+                portalTheme={portalTheme}
+              />
+            </div>
+          )}
+
+          {/* ---------------------------------------------------- */}
+          {/* SECTION 6: DRAWINGS AND PLANS */}
+          {/* ---------------------------------------------------- */}
+          {activeSection === 'drawings' && (
+            <div className="space-y-6">
+              <ProjectWorkspaceView
+                project={activeProject}
+                onOpenNeedsInterviewer={() => setActiveSection('interviewer')}
+                onOpenUploadModal={() => setActiveSection('documents')}
+                onUpdateProject={handleUpdateProject}
+                subTab="design"
+                portalTheme={portalTheme}
+              />
+            </div>
+          )}
+
+          {/* ---------------------------------------------------- */}
+          {/* SECTION 7: LOOKING FOR CONTRACTORS / BIDDING */}
+          {/* ---------------------------------------------------- */}
+          {activeSection === 'contractors' && (
+            <div className="space-y-6">
+              <ProjectWorkspaceView
+                project={activeProject}
+                onOpenNeedsInterviewer={() => setActiveSection('interviewer')}
+                onOpenUploadModal={() => setActiveSection('documents')}
+                onUpdateProject={handleUpdateProject}
+                subTab="contractors"
+                portalTheme={portalTheme}
+              />
+            </div>
+          )}
+
+          {/* ---------------------------------------------------- */}
+          {/* SECTION 8: PROJECT MILESTONES */}
+          {/* ---------------------------------------------------- */}
+          {activeSection === 'milestones' && (
+            <div className="space-y-6">
+              <ProjectWorkspaceView
+                project={activeProject}
+                onOpenNeedsInterviewer={() => setActiveSection('interviewer')}
+                onOpenUploadModal={() => setActiveSection('documents')}
+                onUpdateProject={handleUpdateProject}
+                subTab="milestones"
+                portalTheme={portalTheme}
+              />
+            </div>
+          )}
+
+          {/* ---------------------------------------------------- */}
+          {/* SECTION 9: INTELLIGENT DOCUMENT CENTER & CDE */}
+          {/* ---------------------------------------------------- */}
+          {activeSection === 'documents' && (
+            <div className="space-y-6">
+              <IntelligentDocumentCenter
+                portalTheme={portalTheme}
+                projectId={activeProjectId}
+              />
+            </div>
+          )}
+
+          {/* ---------------------------------------------------- */}
+          {/* SECTION 10: PROPOSALS AND WALLET */}
+          {/* ---------------------------------------------------- */}
+          {(activeSection === 'proposals' || activeTab === 'billing') && (
           <div className="space-y-8">
             {/* Top Bar: Subscription Overview Card */}
             <div className="bg-[#09223d] border border-[#C6922D]/30 rounded-3xl p-6 sm:p-8 shadow-xl">
@@ -963,7 +1511,7 @@ export const PortalPage: React.FC<PortalPageProps> = ({
                   </div>
                   <div className="text-3xl font-black text-white font-mono mt-1">
                     {subscription?.wallet?.totalCreditsRemaining != null
-                      ? subscription.wallet.totalCreditsRemaining.toLocaleString()
+                      ? Number(subscription.wallet.totalCreditsRemaining).toLocaleString()
                       : '2,650'}
                   </div>
                   <div className="text-[11px] text-[#C6922D] mt-1 font-semibold">
@@ -978,7 +1526,7 @@ export const PortalPage: React.FC<PortalPageProps> = ({
                   </div>
                   <div className="text-2xl font-black text-white font-mono mt-1">
                     {subscription?.wallet?.subscriptionCreditsRemaining != null
-                      ? subscription.wallet.subscriptionCreditsRemaining.toLocaleString()
+                      ? Number(subscription.wallet.subscriptionCreditsRemaining).toLocaleString()
                       : '2,150'}
                   </div>
                   <div className="text-[11px] text-slate-400 mt-1">
@@ -993,7 +1541,7 @@ export const PortalPage: React.FC<PortalPageProps> = ({
                   </div>
                   <div className="text-2xl font-black text-emerald-300 font-mono mt-1">
                     {subscription?.wallet?.topUpCreditsRemaining != null
-                      ? subscription.wallet.topUpCreditsRemaining.toLocaleString()
+                      ? Number(subscription.wallet.topUpCreditsRemaining).toLocaleString()
                       : '500'}
                   </div>
                   <div className="text-[11px] text-slate-400 mt-1">Never expire • Used after plan pool</div>
@@ -1006,7 +1554,7 @@ export const PortalPage: React.FC<PortalPageProps> = ({
                   </div>
                   <div className="text-2xl font-black text-amber-300 font-mono mt-1">
                     {subscription?.wallet?.reservedCredits != null
-                      ? subscription.wallet.reservedCredits.toLocaleString()
+                      ? Number(subscription.wallet.reservedCredits).toLocaleString()
                       : '0'}
                   </div>
                   <div className="text-[11px] text-slate-400 mt-1">2-phase transactional lock buffer</div>
@@ -1139,11 +1687,11 @@ export const PortalPage: React.FC<PortalPageProps> = ({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
-                    {ledger.map((item) => (
-                      <tr key={item.id} className="hover:bg-white/5 transition-colors">
+                    {ledger.map((item, idx) => (
+                      <tr key={item.id || `ledger-${idx}`} className="hover:bg-white/5 transition-colors">
                         <td className="py-3 px-4 font-mono font-semibold text-slate-300">{item.id}</td>
                         <td className="py-3 px-4 text-slate-400 whitespace-nowrap">
-                          {new Date(item.timestamp).toLocaleString()}
+                          {item.timestamp ? new Date(item.timestamp).toLocaleString() : '—'}
                         </td>
                         <td className="py-3 px-4">
                           <div className="font-bold text-white">{item.activity}</div>
@@ -1159,7 +1707,7 @@ export const PortalPage: React.FC<PortalPageProps> = ({
                           {item.amount > 0 ? `+${item.amount}` : item.amount}
                         </td>
                         <td className="py-3 px-4 text-right font-mono text-slate-200">
-                          {item.balanceAfter.toLocaleString()}
+                          {Number(item.balanceAfter || 0).toLocaleString()}
                         </td>
                         <td className="py-3 px-4 font-mono text-[11px] text-[#C6922D]">
                           {item.receiptId || '—'}
@@ -1295,8 +1843,8 @@ export const PortalPage: React.FC<PortalPageProps> = ({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5 font-sans">
-                    {reconciliationRecords.map((rec) => (
-                      <tr key={rec.planId} className="hover:bg-white/5 transition-colors">
+                    {reconciliationRecords.map((rec, idx) => (
+                      <tr key={rec.planId || `rec-${idx}`} className="hover:bg-white/5 transition-colors">
                         <td className="py-3 px-3">
                           <div className="font-bold text-white uppercase">{rec.planName}</div>
                           <div className="text-[10px] text-slate-500 font-mono">ID: {rec.planId} • {rec.billingInterval}</div>
@@ -1515,11 +2063,11 @@ export const PortalPage: React.FC<PortalPageProps> = ({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5 font-sans">
-                    {TOP_UP_ECONOMIC_AUDIT.map((pkg) => (
-                      <tr key={pkg.packageId} className="hover:bg-white/5 transition-colors">
+                    {TOP_UP_ECONOMIC_AUDIT.map((pkg, idx) => (
+                      <tr key={pkg.packageId || `pkg-audit-${idx}`} className="hover:bg-white/5 transition-colors">
                         <td className="py-3 px-3 font-bold text-white">{pkg.name}</td>
                         <td className="py-3 px-3 text-right font-mono font-bold text-emerald-400">${pkg.priceUSD}</td>
-                        <td className="py-3 px-3 text-right font-mono text-slate-300">{pkg.credits.toLocaleString()} credits</td>
+                        <td className="py-3 px-3 text-right font-mono text-slate-300">{Number(pkg.credits || 0).toLocaleString()} credits</td>
                         <td className="py-3 px-3 text-right font-mono text-slate-300">${(pkg.infrastructureAllocationUSD ?? 1.25).toFixed(2)}</td>
                         <td className="py-3 px-3 text-right font-mono text-slate-400">${(pkg.paymentProcessingFeeUSD ?? 1.61).toFixed(2)}</td>
                         <td className="py-3 px-3 text-right font-mono text-slate-400">${(pkg.supportAllocationUSD ?? 2.50).toFixed(2)}</td>
@@ -1583,45 +2131,48 @@ export const PortalPage: React.FC<PortalPageProps> = ({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5 font-sans">
-                    {bankTransfers.map((bt) => (
-                      <tr key={bt.id} className="hover:bg-white/5 transition-colors">
-                        <td className="py-3 px-3 font-mono font-bold text-[#C6922D]">{bt.id}</td>
-                        <td className="py-3 px-3">
-                          <div className="font-bold text-white">{bt.companyName}</div>
-                          <div className="text-[10px] text-slate-500 font-mono">{bt.userEmail}</div>
-                        </td>
-                        <td className="py-3 px-3 uppercase font-semibold text-slate-200">{bt.planId}</td>
-                        <td className="py-3 px-3 text-right font-mono font-bold text-emerald-400">${bt.amountUSD.toLocaleString()}</td>
-                        <td className="py-3 px-3 text-right font-mono text-slate-400">₱{bt.amountPHP.toLocaleString()}</td>
-                        <td className="py-3 px-3 text-slate-400 font-mono text-[11px]">{bt.bankReferenceNumber}</td>
-                        <td className="py-3 px-3 text-slate-300 font-mono text-[11px]">{bt.recordedBy}</td>
-                        <td className="py-3 px-3 text-slate-400 font-mono text-[11px]">{bt.approvedBy || 'Pending'}</td>
-                        <td className="py-3 px-3">
-                          <span
-                            className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                              bt.status === 'APPROVED'
-                                ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
-                                : 'bg-amber-950 text-amber-300 border border-amber-800'
-                            }`}
-                          >
-                            {bt.status}
-                          </span>
-                        </td>
-                        <td className="py-3 px-3 text-right whitespace-nowrap">
-                          {bt.status === 'PENDING_APPROVAL' ? (
-                            <button
-                              onClick={() => handleApproveBankTransfer(bt.id)}
-                              className="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] uppercase rounded transition-colors"
-                              title="Dual control: maker cannot approve"
+                    {bankTransfers.map((bt, idx) => {
+                      const transferKey = bt.transferId || bt.id || `bt-${idx}`;
+                      return (
+                        <tr key={transferKey} className="hover:bg-white/5 transition-colors">
+                          <td className="py-3 px-3 font-mono font-bold text-[#C6922D]">{transferKey}</td>
+                          <td className="py-3 px-3">
+                            <div className="font-bold text-white">{bt.companyName || bt.organizationName || bt.clientName || 'Client Org'}</div>
+                            <div className="text-[10px] text-slate-500 font-mono">{bt.userEmail || bt.clientEmail}</div>
+                          </td>
+                          <td className="py-3 px-3 uppercase font-semibold text-slate-200">{bt.planId}</td>
+                          <td className="py-3 px-3 text-right font-mono font-bold text-emerald-400">${Number(bt.amountUSD || 0).toLocaleString()}</td>
+                          <td className="py-3 px-3 text-right font-mono text-slate-400">₱{Number(bt.amountPHP || (bt.amountUSD ? bt.amountUSD * 58.5 : 0)).toLocaleString()}</td>
+                          <td className="py-3 px-3 text-slate-400 font-mono text-[11px]">{bt.bankReferenceNumber}</td>
+                          <td className="py-3 px-3 text-slate-300 font-mono text-[11px]">{bt.recordedBy}</td>
+                          <td className="py-3 px-3 text-slate-400 font-mono text-[11px]">{bt.approvedBy || 'Pending'}</td>
+                          <td className="py-3 px-3">
+                            <span
+                              className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                                bt.status === 'APPROVED'
+                                  ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
+                                  : 'bg-amber-950 text-amber-300 border border-amber-800'
+                              }`}
                             >
-                              Verify & Activate
-                            </button>
-                          ) : (
-                            <span className="text-slate-500 text-[11px]">Enforced</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
+                              {bt.status}
+                            </span>
+                          </td>
+                          <td className="py-3 px-3 text-right whitespace-nowrap">
+                            {bt.status === 'PENDING_APPROVAL' ? (
+                              <button
+                                onClick={() => handleApproveBankTransfer(transferKey)}
+                                className="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] uppercase rounded transition-colors"
+                                title="Dual control: maker cannot approve"
+                              >
+                                Verify & Activate
+                              </button>
+                            ) : (
+                              <span className="text-slate-500 text-[11px]">Enforced</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -1749,8 +2300,8 @@ export const PortalPage: React.FC<PortalPageProps> = ({
                     <span className="text-[11px] font-mono text-slate-400">{qaResults.timestamp}</span>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-60 overflow-y-auto text-[11px]">
-                    {qaResults.results?.map((t: any) => (
-                      <div key={t.id} className="p-2 bg-[#09223d] rounded border border-white/5 flex items-start gap-2">
+                    {qaResults.results?.map((t: any, idx: number) => (
+                      <div key={t.id != null ? `qa-${t.id}` : `qa-${idx}`} className="p-2 bg-[#09223d] rounded border border-white/5 flex items-start gap-2">
                         <span className="font-mono text-[#C6922D] font-bold">#{t.id}</span>
                         <div>
                           <div className="font-semibold text-white">{t.name}</div>
@@ -1772,13 +2323,13 @@ export const PortalPage: React.FC<PortalPageProps> = ({
                     <span className="text-[11px] font-mono text-slate-400">Strict Boundaries Enforced</span>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px]">
-                    {boundaryResults.results?.map((t: any) => (
-                      <div key={t.id} className="p-2.5 bg-[#09223d] rounded border border-white/5">
+                    {(boundaryResults.tests || boundaryResults.results)?.map((t: any, idx: number) => (
+                      <div key={t.id != null ? `bnd-${t.id}` : `bnd-${idx}`} className="p-2.5 bg-[#09223d] rounded border border-white/5">
                         <div className="flex items-center justify-between">
-                          <span className="font-bold text-white">{t.name}</span>
+                          <span className="font-bold text-white">{t.scenario || t.name}</span>
                           <span className="text-[10px] font-mono text-emerald-400 font-bold">PASS</span>
                         </div>
-                        <div className="text-[10px] text-slate-400 mt-1">{t.evidence}</div>
+                        <div className="text-[10px] text-slate-400 mt-1">{t.expectedBehavior || t.evidence}</div>
                       </div>
                     ))}
                   </div>
@@ -1796,12 +2347,12 @@ export const PortalPage: React.FC<PortalPageProps> = ({
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px]">
                     {firebaseRbacResults.invariants?.map((inv: any, i: number) => (
-                      <div key={i} className="p-2.5 bg-[#09223d] rounded border border-white/5">
+                      <div key={inv.id != null ? `inv-${inv.id}` : `inv-${i}`} className="p-2.5 bg-[#09223d] rounded border border-white/5">
                         <div className="flex items-center justify-between">
-                          <span className="font-bold text-white">{inv.invariant}</span>
+                          <span className="font-bold text-white">{inv.invariant || inv.description}</span>
                           <span className="text-[10px] font-mono text-emerald-400 font-bold">ENFORCED</span>
                         </div>
-                        <div className="text-[10px] text-slate-400 mt-1">{inv.enforcement}</div>
+                        <div className="text-[10px] text-slate-400 mt-1">{inv.enforcement || inv.enforcedIn}</div>
                       </div>
                     ))}
                   </div>
@@ -1863,7 +2414,7 @@ export const PortalPage: React.FC<PortalPageProps> = ({
                 <div className="space-y-3">
                   {inquiries.map((inq, idx) => (
                     <div
-                      key={idx}
+                      key={inq.inquiryNumber || inq.id || `inq-${idx}`}
                       className="p-4 bg-[#051322] border border-white/5 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs"
                     >
                       <div>
@@ -1912,9 +2463,9 @@ export const PortalPage: React.FC<PortalPageProps> = ({
               </div>
 
               <div className="max-h-96 overflow-y-auto space-y-2 text-xs">
-                {knowledgeSources.map((doc) => (
+                {knowledgeSources.map((doc, idx) => (
                   <div
-                    key={doc.id}
+                    key={doc.id || `doc-${idx}`}
                     className="p-3 bg-[#051322] border border-white/5 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                   >
                     <div>
@@ -1968,9 +2519,9 @@ export const PortalPage: React.FC<PortalPageProps> = ({
               </div>
 
               <div className="max-h-72 overflow-y-auto space-y-2 text-[11px] font-mono">
-                {auditLogs.map((log) => (
+                {auditLogs.map((log, idx) => (
                   <div
-                    key={log.id}
+                    key={log.id || `log-${idx}`}
                     className="p-2.5 bg-[#051322] border border-white/5 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-2"
                   >
                     <div className="flex items-center gap-2">
@@ -2024,9 +2575,9 @@ export const PortalPage: React.FC<PortalPageProps> = ({
               </p>
 
               <div className="space-y-3">
-                {TOP_UP_PACKAGES.map((pkg) => (
+                {TOP_UP_PACKAGES.map((pkg, idx) => (
                   <div
-                    key={pkg.id}
+                    key={pkg.id || `topup-${idx}`}
                     className="p-4 bg-[#051322] border border-white/10 hover:border-[#C6922D]/60 rounded-2xl flex items-center justify-between transition-all"
                   >
                     <div>
@@ -2039,7 +2590,7 @@ export const PortalPage: React.FC<PortalPageProps> = ({
                         )}
                       </div>
                       <div className="text-xs text-[#C6922D] font-mono font-bold mt-0.5">
-                        +{pkg.credits.toLocaleString()} Autonomous Credits
+                        +{Number(pkg.credits || 0).toLocaleString()} Autonomous Credits
                       </div>
                       <div className="text-[11px] text-slate-400 mt-0.5">{pkg.description}</div>
                     </div>
@@ -2165,6 +2716,16 @@ export const PortalPage: React.FC<PortalPageProps> = ({
               </form>
             </div>
           </div>
+        )}
+
+        {/* Project Creation Modal */}
+        {createProjectModalOpen && (
+          <ProjectCreationModal
+            isOpen={createProjectModalOpen}
+            onClose={() => setCreateProjectModalOpen(false)}
+            onCreateProject={handleCreateProject}
+            clientOrgName={clientProfile.organizationName}
+          />
         )}
         </main>
       </div>
