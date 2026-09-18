@@ -541,9 +541,17 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="pt-8 text-xs text-slate-400 space-y-2 border-t border-white/10 mt-6">
             <div className="font-semibold text-slate-300">LDL Dhenze Residential Building Construction</div>
             <div className="text-[11px] leading-relaxed">
-              KMC | One West Aeropark, Clark Freeport Zone, Mabalacat City, 2010 Pampanga
+              <div className="text-slate-200 font-medium">KMC | One West Aeropark, Clark Pampanga</div>
+              <div className="text-slate-400">Mabalacat City, 2010 Pampanga, Philippines</div>
             </div>
-            <div className="text-[11px] font-mono text-slate-500">
+            <div className="text-[11px] text-slate-300 pt-1">
+              <a href="tel:+639179668814" className="hover:text-[#C6922D] transition-colors font-medium text-slate-200">+63 917 966 8814</a>
+            </div>
+            <div className="text-[11px] space-y-0.5 text-slate-400">
+              <a href="mailto:info@dhenzebuilder.com" className="block text-slate-200 hover:text-[#C6922D]">info@dhenzebuilder.com</a>
+              <a href="mailto:dhenzebuilders@gmail.com" className="block text-slate-400 hover:text-[#C6922D]">dhenzebuilders@gmail.com</a>
+            </div>
+            <div className="text-[10px] font-mono text-slate-500 pt-1 border-t border-white/5">
               DTI BN: 4812272 • PSIC 42900 Civil Engineering
             </div>
           </div>

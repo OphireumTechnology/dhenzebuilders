@@ -63,7 +63,8 @@ export const AccessibilityStatementPage: React.FC<LegalPageProps> = ({ onNavigat
             <p className="text-slate-400">
               If you experience any accessibility barrier while accessing our drawings, reports, or submission workflows:
             </p>
-            <p className="mt-2 text-white font-medium">Email: <span className="text-amber-400">accessibility@dhenzebuilder.com</span></p>
+            <p className="mt-2 text-white font-medium">Email: <span className="text-amber-400">info@dhenzebuilder.com</span> • <span className="text-amber-400">dhenzebuilders@gmail.com</span></p>
+            <p className="mt-1 text-slate-300 text-xs">Direct Line: +63 917 966 8814 • Executive Office: KMC | One West Aeropark, Clark Pampanga, Mabalacat City, 2010 Pampanga, Philippines</p>
           </section>
         </div>
       </div>

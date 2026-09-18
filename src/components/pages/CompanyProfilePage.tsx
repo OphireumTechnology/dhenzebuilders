@@ -455,7 +455,7 @@ export const CompanyProfilePage: React.FC<CompanyProfilePageProps> = ({
               Require a Bound Physical Copy or Executive Briefing?
             </h3>
             <p className="text-xs text-slate-400">
-              Direct inquiries to the Executive Office at KMC | One West Aeropark, Clark Freeport Zone.
+              Direct inquiries to the Executive Office at KMC | One West Aeropark, Clark Pampanga, Mabalacat City, 2010 Pampanga, Philippines.
             </p>
           </div>
 

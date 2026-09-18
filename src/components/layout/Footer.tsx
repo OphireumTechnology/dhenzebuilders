@@ -320,7 +320,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenAssistant }) =
                   PSIC: <strong className="text-[#C6922D]">42900 (Civil Engineering)</strong>
                 </span>
                 <span className="bg-white/5 px-2.5 py-1 rounded border border-white/10">
-                  Location: <strong className="text-slate-200">Clark Freeport Zone, Pampanga</strong>
+                  Location: <strong className="text-slate-200">KMC | One West Aeropark, Clark Pampanga</strong>
                 </span>
               </div>
             </div>

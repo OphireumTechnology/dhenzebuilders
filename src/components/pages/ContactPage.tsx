@@ -31,7 +31,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onNavigate, onOpenAssi
   const faqs = [
     {
       q: 'Where is LDL Dhenze Residential Building Construction officially located?',
-      a: 'Our registered corporate office is situated at 704 Nile St., Anunas 2009, City of Angeles, Pampanga, Philippines. We serve project developments throughout Central Luzon, Metro Manila, and key Philippine growth regions.',
+      a: 'Our registered executive corporate office is situated at KMC | One West Aeropark, Clark Pampanga, Mabalacat City, 2010 Pampanga, Philippines. We serve project developments throughout Central Luzon, Metro Manila, and key Philippine growth regions.',
     },
     {
       q: 'What is LDL Dhenze’s registered line of business with the BIR?',

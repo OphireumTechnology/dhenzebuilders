@@ -78,8 +78,9 @@ export const PrivacyPolicyPage: React.FC<LegalPageProps> = ({ onNavigate }) => {
             <div className="mt-3 text-slate-300 space-y-1">
               <p><strong>Office of the Data Protection Officer</strong></p>
               <p>LDL Dhenze Residential Building Construction</p>
-              <p>One West Aeropark, Clark Global City, Clark Freeport Zone, Pampanga 2023</p>
-              <p>Email: <span className="text-amber-400">privacy@dhenzebuilder.com</span></p>
+              <p>KMC | One West Aeropark, Clark Pampanga, Mabalacat City, 2010 Pampanga, Philippines</p>
+              <p>Direct Phone: <span className="text-slate-200">+63 917 966 8814</span></p>
+              <p>Email: <span className="text-amber-400">info@dhenzebuilder.com</span> • <span className="text-amber-400">dhenzebuilders@gmail.com</span></p>
             </div>
           </section>
         </div>

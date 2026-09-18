@@ -310,7 +310,7 @@ export const CeoCornerSection: React.FC<CeoCornerSectionProps> = ({ onNavigate }
                 <div className="sm:text-right shrink-0 text-[11px] font-mono text-slate-400 border-t sm:border-t-0 pt-2 sm:pt-0 border-white/5">
                   <div className="text-slate-300 font-bold">LDL Dhenze Residential Building Construction</div>
                   <div>DTI Certificate No. 4812272</div>
-                  <div className="text-[10px] text-[#C6922D]">Angeles City, Pampanga</div>
+                  <div className="text-[10px] text-[#C6922D]">KMC | One West Aeropark, Clark Pampanga</div>
                 </div>
               </div>
             </div>

@@ -189,7 +189,7 @@ export const BookConsultationPage: React.FC<BookConsultationPageProps> = ({ onNa
                     className="w-full bg-[#051322] border border-white/10 focus:border-[#C6922D] rounded-xl px-4 py-2 text-xs text-white focus:outline-none"
                   >
                     <option value="Virtual Technical Video Conference">Virtual Video Conference</option>
-                    <option value="In-Person at Angeles City HQ">In-Person at Angeles City HQ</option>
+                    <option value="In-Person at KMC One West Aeropark, Clark HQ">In-Person at KMC One West Aeropark, Clark HQ</option>
                     <option value="Prospective Site Visit">Prospective Site Visit</option>
                   </select>
                 </div>

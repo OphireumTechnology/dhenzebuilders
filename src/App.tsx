@@ -74,7 +74,7 @@ const ROUTE_METADATA: Record<string, { title: string; description: string }> = {
   },
   contact: {
     title: 'Executive Inquiries & Headquarters | LDL Dhenze',
-    description: 'Direct inquiries to LDL Dhenze executive offices at KMC | One West Aeropark, Clark Freeport Zone, Pampanga.',
+    description: 'Direct inquiries to LDL Dhenze executive offices at KMC | One West Aeropark, Clark Pampanga, Mabalacat City, 2010 Pampanga, Philippines.',
   },
   'start-project': {
     title: 'Discuss a Project | Development Inquiry | LDL Dhenze',
