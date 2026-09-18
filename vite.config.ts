@@ -1,10 +1,11 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
-import path from 'path';
+import path from 'node:path';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  // Custom domain: https://dhenzebuilder.com
+  // Production custom domain:
+  // https://dhenzebuilder.com
   base: '/',
 
   plugins: [
