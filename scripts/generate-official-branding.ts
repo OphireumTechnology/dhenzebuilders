@@ -1,6 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
+// @ts-ignore
 import { Resvg } from '@resvg/resvg-js';
+// @ts-ignore
 import sharp from 'sharp';
 
 const BRANDING_DIR = path.resolve(process.cwd(), 'public/branding');
