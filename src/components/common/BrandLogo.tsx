@@ -4,7 +4,7 @@ import { CompanyLogo, CompanyLogoProps } from './CompanyLogo';
 export interface BrandLogoProps {
   className?: string;
   variant?: 'light' | 'dark' | 'symbol-only' | 'full';
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'header';
   showTagline?: boolean;
   stacked?: boolean;
 }

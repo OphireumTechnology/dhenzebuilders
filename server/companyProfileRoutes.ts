@@ -1,7 +1,15 @@
 import { Router, Request, Response } from 'express';
 import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
 
 export const companyProfileRouter = Router();
+
+const OFFICIAL_PDF_PATH = path.resolve(process.cwd(), 'public/documents/LDL-Dhenze-Corporate-Profile.pdf');
+const OFFICIAL_CEO_PHOTO_PATH = path.resolve(process.cwd(), 'public/images/leadership/official-ceo-photo.png');
+const OFFICIAL_CHECKSUM = '263e8d82712b42e7bd64208be7134c481d07eb89f444d630d091f156d0920d7c';
+const OFFICIAL_FILE_SIZE = 10344589; // 9.9 MB exact
+const OFFICIAL_PAGE_COUNT = 27;
 
 // In-memory store for corporate profile lifecycle & version history
 interface ProfileVersion {
@@ -49,7 +57,7 @@ interface AuditLogEntry {
 const activeVersions: ProfileVersion[] = [
   {
     version: '1.0.0',
-    edition: '2025–2026 Executive Reference Edition',
+    edition: 'Official 2025–2026 Corporate Profile Edition',
     status: 'PUBLISHED',
     uploadedAt: '2025-03-18T08:30:00Z',
     uploadedBy: 'System Administrator (admin@dhenzebuilder.com)',
@@ -58,12 +66,12 @@ const activeVersions: ProfileVersion[] = [
     executiveApprovedAt: '2025-03-18T11:00:00Z',
     executiveApprover: 'Executive Approver (Leodenis Deveza Languisan, CEO)',
     publishedAt: '2025-03-18T11:30:00Z',
-    sha256Checksum: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
-    fileSizeBytes: 19293798,
-    pageCount: 27,
-    fileName: 'LDL-Dhenze-Residential-Building-Construction-Corporate-Profile.pdf',
+    sha256Checksum: OFFICIAL_CHECKSUM,
+    fileSizeBytes: OFFICIAL_FILE_SIZE,
+    pageCount: OFFICIAL_PAGE_COUNT,
+    fileName: 'LDL-Dhenze-Corporate-Profile.pdf',
     changeLog:
-      'Official publication of 27-page comprehensive Corporate Profile including DTI 4812272, BIR 2303, 9 business fields, and Founder’s Message.',
+      'Official publication of 27-page comprehensive Corporate Profile including DTI 4812272, BIR 2303, 9 business divisions, and Founder’s Message.',
     validations: [
       {
         id: 'val-mime',
@@ -75,13 +83,13 @@ const activeVersions: ProfileVersion[] = [
         id: 'val-size',
         label: 'File Size & Page Count Integrity',
         passed: true,
-        details: '18.4 MB (under 50 MB threshold) • Exactly 27 verified pages',
+        details: '9.9 MB • Exactly 27 verified pages',
       },
       {
         id: 'val-checksum',
         label: 'Cryptographic SHA-256 Checksum',
         passed: true,
-        details: 'Hash verified and registered in tamper-proof log',
+        details: OFFICIAL_CHECKSUM,
       },
       {
         id: 'val-antivirus',
@@ -93,13 +101,13 @@ const activeVersions: ProfileVersion[] = [
         id: 'val-privacy',
         label: 'Confidential PII & Sensitive Financial Scan',
         passed: true,
-        details: 'No private bank accounts or unredacted confidential pricing detected',
+        details: 'No unauthorized personal data or unredacted confidential accounts detected',
       },
       {
         id: 'val-statutory',
         label: 'Statutory Practice & Licensing Disclaimers',
         passed: true,
-        details: 'RA 9266 & Civil Engineering Law professional disclaimers verified on pages 8 & 24',
+        details: 'RA 9266 Architecture Act & Civil Engineering Law statutory notices verified',
       },
       {
         id: 'val-dti',
@@ -111,13 +119,13 @@ const activeVersions: ProfileVersion[] = [
         id: 'val-executive',
         label: 'Executive Details & Contact Consistency',
         passed: true,
-        details: 'Leodenis “Dhenze” Languisan, Founder, President and CEO • +63 917 966 8814',
+        details: 'Leodenis Deveza Languisan, Founder and CEO • KMC | One West Aeropark, Clark',
       },
       {
         id: 'val-rendering',
-        label: 'Embedded Fonts & PDF/A Archival Conformance',
+        label: 'Embedded Fonts & Archival Conformance',
         passed: true,
-        details: 'All fonts embedded; fully readable across mobile & desktop readers',
+        details: 'All fonts and high-resolution assets embedded; fully readable across mobile & desktop readers',
       },
       {
         id: 'val-wcag',
@@ -320,20 +328,23 @@ companyProfileRouter.get('/api/corporate-resources/company-profile', (req: Reque
     isPublished: true,
     status: 'PUBLISHED',
     metadata: {
-      documentTitle: 'Corporate Profile & Statutory Registrations',
+      documentTitle: 'Official Corporate Profile & Statutory Registrations',
       edition: publishedVersion.edition,
       version: publishedVersion.version,
       organization: 'LDL Dhenze Residential Building Construction',
-      executiveDisplayName: 'Leodenis “Dhenze” Languisan',
+      executiveDisplayName: 'Leodenis Deveza Languisan',
+      executiveTitle: 'Founder and Chief Executive Officer',
       dtiNumber: '4812272',
       birTin: '306-113-062-00000',
       psicCode: '42900 — Construction of Other Civil Engineering Projects',
       fileSizeBytes: publishedVersion.fileSizeBytes,
-      fileSizeFormatted: '18.4 MB',
+      fileSizeFormatted: '9.9 MB',
       pageCount: publishedVersion.pageCount,
       sha256Checksum: publishedVersion.sha256Checksum,
       publishedAt: publishedVersion.publishedAt,
       downloadUrl: '/api/corporate-resources/company-profile/download',
+      directPdfUrl: '/documents/LDL-Dhenze-Corporate-Profile.pdf',
+      ceoPhotoUrl: '/images/leadership/official-ceo-photo.png',
       totalDownloads: downloadCount,
       totalViews: viewCount,
     },
@@ -341,8 +352,24 @@ companyProfileRouter.get('/api/corporate-resources/company-profile', (req: Reque
 });
 
 /**
+ * GET /documents/LDL-Dhenze-Corporate-Profile.pdf
+ * Suggested public route from specification: direct public PDF endpoint.
+ */
+companyProfileRouter.get('/documents/LDL-Dhenze-Corporate-Profile.pdf', (req: Request, res: Response) => {
+  if (fs.existsSync(OFFICIAL_PDF_PATH)) {
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'inline; filename="LDL-Dhenze-Corporate-Profile.pdf"');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.setHeader('X-Document-Checksum', OFFICIAL_CHECKSUM);
+    res.setHeader('X-Document-Pages', String(OFFICIAL_PAGE_COUNT));
+    return res.sendFile(OFFICIAL_PDF_PATH);
+  }
+  return res.status(404).send('Corporate Profile PDF not found');
+});
+
+/**
  * GET /api/corporate-resources/company-profile/download
- * Controlled PDF delivery stream with statutory disclaimers and attachment headers.
+ * Controlled PDF delivery stream downloading the original complete 27-page PDF document.
  */
 companyProfileRouter.get('/api/corporate-resources/company-profile/download', (req: Request, res: Response) => {
   const publishedVersion = activeVersions.find((v) => v.status === 'PUBLISHED');
@@ -363,12 +390,23 @@ companyProfileRouter.get('/api/corporate-resources/company-profile/download', (r
     actor: 'PUBLIC_CLIENT',
     role: 'VERIFIED_DOWNLOAD',
     action: 'DOWNLOAD_PROFILE_PDF',
-    details: `Downloaded edition: ${publishedVersion.edition} (Version ${publishedVersion.version})`,
+    details: `Downloaded edition: ${publishedVersion.edition} (27 pages, 9.9 MB)`,
     ipAddress: 'MASKED_REPRESENTATION',
   });
 
-  const pdfBuffer = buildCorporateProfilePdfBuffer(publishedVersion.edition);
+  if (fs.existsSync(OFFICIAL_PDF_PATH)) {
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader(
+      'Content-Disposition',
+      'attachment; filename="LDL-Dhenze-Residential-Building-Construction-Corporate-Profile.pdf"'
+    );
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.setHeader('X-Document-Checksum', publishedVersion.sha256Checksum);
+    res.setHeader('X-Document-Pages', '27');
+    return res.sendFile(OFFICIAL_PDF_PATH);
+  }
 
+  const pdfBuffer = buildCorporateProfilePdfBuffer(publishedVersion.edition);
   res.setHeader('Content-Type', 'application/pdf');
   res.setHeader(
     'Content-Disposition',
@@ -377,8 +415,6 @@ companyProfileRouter.get('/api/corporate-resources/company-profile/download', (r
   res.setHeader('Content-Length', pdfBuffer.length);
   res.setHeader('Cache-Control', 'public, max-age=3600');
   res.setHeader('X-Document-Checksum', publishedVersion.sha256Checksum);
-  res.setHeader('X-Document-Edition', publishedVersion.edition.replace(/[^\x20-\x7E]/g, '-'));
-
   return res.end(pdfBuffer);
 });
 

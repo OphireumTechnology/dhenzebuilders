@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
-  STRATEGIC_SECTORS_LIST,
   PORTFOLIO_PROJECTS,
-  FOUNDER_INFO,
 } from '../../data/companyData';
-import { CORPORATE_INFO } from '../../data/corporateInfo';
-import { CeoCornerSection } from '../company/CeoCornerSection';
+import {
+  OFFICIAL_CEO_PROFILE,
+  OFFICIAL_PROFILE_METADATA,
+  NINE_CORE_DIVISIONS,
+} from '../../data/companyProfileData';
 import {
   ArrowRight,
   ShieldCheck,
@@ -18,6 +19,19 @@ import {
   Sparkles,
   ArrowUpRight,
   CheckCircle2,
+  Download,
+  FileText,
+  Truck,
+  Wrench,
+  Sun,
+  Cpu,
+  Network,
+  Bot,
+  Workflow,
+  ExternalLink,
+  Award,
+  Layers,
+  Eye,
 } from 'lucide-react';
 
 interface HomePageProps {
@@ -26,85 +40,133 @@ interface HomePageProps {
 }
 
 export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenAssistant }) => {
-  // Highlighted projects with clear status classification
+  const [downloading, setDownloading] = useState(false);
   const featuredProjects = PORTFOLIO_PROJECTS.slice(0, 4);
 
+  const handleDownloadProfile = () => {
+    setDownloading(true);
+    const link = document.createElement('a');
+    link.href = OFFICIAL_PROFILE_METADATA.directPdfUrl;
+    link.setAttribute(
+      'download',
+      'LDL-Dhenze-Residential-Building-Construction-Corporate-Profile.pdf'
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(() => setDownloading(false), 1500);
+  };
+
+  const getDivisionIcon = (iconName: string) => {
+    switch (iconName) {
+      case 'Building2':
+        return <Building2 className="w-6 h-6 text-[#C69A4B]" />;
+      case 'Truck':
+        return <Truck className="w-6 h-6 text-[#C69A4B]" />;
+      case 'Wrench':
+        return <Wrench className="w-6 h-6 text-[#C69A4B]" />;
+      case 'Compass':
+        return <Compass className="w-6 h-6 text-[#C69A4B]" />;
+      case 'Sun':
+        return <Sun className="w-6 h-6 text-[#C69A4B]" />;
+      case 'Cpu':
+        return <Cpu className="w-6 h-6 text-[#C69A4B]" />;
+      case 'Network':
+        return <Network className="w-6 h-6 text-[#C69A4B]" />;
+      case 'Bot':
+        return <Bot className="w-6 h-6 text-[#C69A4B]" />;
+      case 'Workflow':
+        return <Workflow className="w-6 h-6 text-[#C69A4B]" />;
+      default:
+        return <Layers className="w-6 h-6 text-[#C69A4B]" />;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#071A2F] text-slate-100 selection:bg-[#C6922D] selection:text-[#071A2F]">
+    <div className="min-h-screen bg-[#071A2F] text-slate-100 selection:bg-[#C69A4B] selection:text-[#071A2F]">
       {/* ---------------------------------------------------- */}
-      {/* 1. EDITORIAL HERO SECTION */}
+      {/* 1. PREMIUM CORPORATE HERO SECTION (WHITE / GOLD IDENTITY) */}
       {/* ---------------------------------------------------- */}
-      <section className="relative pt-24 pb-28 lg:pt-36 lg:pb-40 overflow-hidden border-b border-[#C6922D]/20">
-        {/* Background Image with warm architectural overlay */}
-        <div className="absolute inset-0 z-0">
-          <picture>
-            <source srcSet="/assets/images/hero-central-luzon.jpg" type="image/jpeg" />
-            <img
-              src="/assets/images/hero-central-luzon.jpg"
-              alt="Central Luzon development and civil engineering site by LDL Dhenze"
-              className="w-full h-full object-cover object-center transform scale-105 transition-transform duration-1000 ease-out"
-              loading="eager"
-            />
-          </picture>
-          <div className="absolute inset-0 bg-gradient-to-r from-[#071A2F] via-[#071A2F]/92 to-[#071A2F]/75" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#071A2F] via-transparent to-[#071A2F]/60" />
-          <div className="absolute inset-0 blueprint-grid opacity-20 pointer-events-none" />
-        </div>
+      <section className="relative bg-[#FFFFFF] text-[#071A2F] pt-16 pb-20 sm:pt-20 sm:pb-24 border-b border-[#C69A4B]/30 overflow-hidden">
+        {/* Subtle geometric architectural pattern overlay */}
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#071A2F_1px,transparent_1px)] [background-size:24px_24px]" />
+        
+        {/* Soft elegant warm accent glows */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#C69A4B]/8 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#071A2F]/5 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="max-w-3xl">
-            {/* Restrained Eyebrow Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-[#C6922D]/35 text-xs text-slate-200 mb-6 backdrop-blur-md">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#C6922D]" />
-              <span className="tracking-widest uppercase font-semibold text-[11px] text-[#e5b95d]">
-                PRIVATE DEVELOPMENT • ENGINEERING • INFRASTRUCTURE
+          <div className="max-w-4xl mx-auto text-center">
+            {/* Supporting Heading / Entity Identification Kicker (Unboxed Corporate Standard) */}
+            <div className="flex items-center justify-center gap-2.5 mb-4">
+              <span className="w-5 sm:w-8 h-[1.5px] bg-[#C69A4B] shrink-0" />
+              <span className="font-['Montserrat'] font-bold tracking-[0.20em] uppercase text-xs sm:text-[13px] text-[#071A2F]">
+                LDL DHENZE RESIDENTIAL BUILDING CONSTRUCTION
               </span>
+              <span className="w-5 sm:w-8 h-[1.5px] bg-[#C69A4B] shrink-0" />
             </div>
 
-            {/* Headline */}
-            <h1 className="font-serif-display text-4xl sm:text-6xl lg:text-7xl font-normal tracking-tight text-white leading-[1.08] mb-6">
-              Building Enduring Assets for Generations.
+            {/* Main Heading — Balanced 42–52px Corporate Scale */}
+            <h1 className="font-['Montserrat'] text-[28px] sm:text-[36px] md:text-[44px] lg:text-[48px] font-bold text-[#071A2F] tracking-tight leading-[1.16] max-w-[1000px] mx-auto mb-5 sm:mb-6">
+              BUILDING TODAY.
+              <br />
+              <span className="text-[#071A2F]">ENGINEERING TOMORROW.</span>
+              <br />
+              <span className="bg-gradient-to-r from-[#C69A4B] via-[#d4a856] to-[#b88938] bg-clip-text text-transparent">
+                POWERING THE FUTURE.
+              </span>
             </h1>
 
-            {/* Supporting Statement */}
-            <p className="font-sans-body text-base sm:text-lg text-slate-200 leading-relaxed max-w-2xl mb-10 font-normal">
-              LDL Dhenze brings disciplined development planning, coordinated engineering, construction execution, and resilient infrastructure together for private, institutional, and strategic projects across the Philippines.
+            {/* Corporate Subtitle & Mission Statement */}
+            <p className="text-[15px] sm:text-[17px] text-slate-600 max-w-[750px] mx-auto leading-relaxed font-sans font-normal mb-7 sm:mb-8">
+              A Philippine development and civil engineering enterprise coordinating disciplined planning, licensed architecture, infrastructure delivery, renewable energy, and intelligent systems.
             </p>
 
-            {/* CTAs */}
-            <div className="flex flex-wrap items-center gap-4">
+            {/* Call-to-Action Buttons */}
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
               <button
-                id="hero-discuss-project-btn"
-                onClick={() => onNavigate('start-project')}
-                className="px-7 py-3.5 rounded-md font-semibold text-xs tracking-wider uppercase bg-[#C6922D] hover:bg-[#d8a339] text-[#071A2F] transition-all shadow-xl hover:shadow-[#C6922D]/20 inline-flex items-center gap-2"
+                id="hero-explore-company-btn"
+                onClick={() => onNavigate('corporate-profile')}
+                className="h-[42px] px-6 rounded-md font-bold text-xs uppercase tracking-wider bg-[#071A2F] hover:bg-[#0c2847] text-white transition-all shadow-md hover:shadow-lg inline-flex items-center justify-center gap-2"
               >
-                <span>Discuss a Project</span>
-                <ArrowRight className="w-4 h-4" />
+                <span>Explore Our Company</span>
+                <ArrowRight className="w-4 h-4 text-[#C69A4B]" />
               </button>
 
               <button
-                id="hero-explore-expertise-btn"
-                onClick={() => onNavigate('capabilities')}
-                className="px-6 py-3.5 rounded-md font-medium text-xs tracking-wider uppercase text-slate-200 hover:text-white bg-white/5 hover:bg-white/10 border border-white/20 transition-all inline-flex items-center gap-2 backdrop-blur-sm"
+                id="hero-download-profile-btn"
+                onClick={handleDownloadProfile}
+                disabled={downloading}
+                className="h-[42px] px-6 rounded-md font-bold text-xs uppercase tracking-wider bg-[#C69A4B] hover:bg-[#d8a339] text-[#071A2F] transition-all shadow-md hover:shadow-lg inline-flex items-center justify-center gap-2"
               >
-                <span>Explore Our Expertise</span>
-                <ChevronRight className="w-4 h-4 text-[#C6922D]" />
+                <Download className="w-4 h-4 shrink-0" />
+                <span>
+                  {downloading ? 'Preparing PDF...' : 'Download Corporate Profile'}
+                </span>
               </button>
             </div>
 
-            {/* Subtle Assurance Indicators */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 pt-10 mt-10 border-t border-white/10 text-xs">
-              <div>
-                <div className="text-slate-400 text-[11px] uppercase tracking-wider">Corporate Status</div>
-                <div className="font-semibold text-slate-200 mt-0.5">DTI Registered #4812272</div>
+            {/* Trust & Statutory Indicators */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-8 mt-6 border-t border-slate-200 text-xs">
+              <div className="text-left bg-slate-50 border border-slate-200/80 p-3.5 rounded-xl">
+                <div className="text-slate-500 text-[10px] uppercase font-bold tracking-wider">Entity Registration</div>
+                <div className="font-bold text-[#071A2F] mt-0.5">DTI No. 4812272</div>
+                <div className="text-[10px] text-slate-500">2023–2028 Validated</div>
               </div>
-              <div>
-                <div className="text-slate-400 text-[11px] uppercase tracking-wider">Professional Standard</div>
-                <div className="font-semibold text-slate-200 mt-0.5">RA 9266 & PRC Coordination</div>
+              <div className="text-left bg-slate-50 border border-slate-200/80 p-3.5 rounded-xl">
+                <div className="text-slate-500 text-[10px] uppercase font-bold tracking-wider">Tax Registration</div>
+                <div className="font-bold text-[#071A2F] mt-0.5">BIR Form 2303</div>
+                <div className="text-[10px] text-slate-500">TIN 306-113-062-00000</div>
               </div>
-              <div>
-                <div className="text-slate-400 text-[11px] uppercase tracking-wider">Executive Office</div>
-                <div className="font-semibold text-slate-200 mt-0.5">Clark Freeport Zone, Pampanga</div>
+              <div className="text-left bg-slate-50 border border-slate-200/80 p-3.5 rounded-xl">
+                <div className="text-slate-500 text-[10px] uppercase font-bold tracking-wider">Primary Line (PSIC)</div>
+                <div className="font-bold text-[#C69A4B] mt-0.5">PSIC 42900</div>
+                <div className="text-[10px] text-slate-500">Other Civil Engineering</div>
+              </div>
+              <div className="text-left bg-slate-50 border border-slate-200/80 p-3.5 rounded-xl">
+                <div className="text-slate-500 text-[10px] uppercase font-bold tracking-wider">Official Document</div>
+                <div className="font-bold text-emerald-700 mt-0.5">27-Page Profile</div>
+                <div className="text-[10px] text-slate-500">View Online or PDF</div>
               </div>
             </div>
           </div>
@@ -112,73 +174,91 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenAssistant 
       </section>
 
       {/* ---------------------------------------------------- */}
-      {/* 2. INSTITUTIONAL STEWARDSHIP (ASYMMETRIC TWO-COLUMN LAYOUT) */}
+      {/* 2. CEO INTRODUCTION SECTION (SECTION 6) */}
       {/* ---------------------------------------------------- */}
-      <section className="py-20 lg:py-28 bg-[#061325] border-b border-[#C6922D]/20 relative overflow-hidden">
+      <section className="py-20 lg:py-28 bg-[#061325] border-b border-[#C69A4B]/20 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-            {/* Column A: Left 7 Columns - Narrative & Strategic Context */}
-            <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C6922D]/10 border border-[#C6922D]/30 text-[#C6922D] text-xs font-mono font-bold uppercase tracking-widest">
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>{CORPORATE_INFO.stewardship.eyebrow}</span>
-              </div>
-
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white font-['Montserrat'] tracking-tight leading-tight">
-                {CORPORATE_INFO.stewardship.heading}
-              </h2>
-
-              <div className="space-y-4 text-base sm:text-lg text-slate-300 leading-relaxed font-sans font-normal">
-                <p>{CORPORATE_INFO.stewardship.body1}</p>
-                <p>{CORPORATE_INFO.stewardship.body2}</p>
-              </div>
-
-              <p className="text-xs sm:text-sm text-slate-400 italic pt-2 border-t border-white/10 font-serif">
-                {CORPORATE_INFO.stewardship.supportingStatement}
-              </p>
-
-              <div className="pt-2">
-                <button
-                  onClick={() => onNavigate(CORPORATE_INFO.stewardship.actionRoute)}
-                  className="px-6 py-3 rounded-lg bg-[#C6922D] hover:bg-[#d8a339] text-[#071A2F] font-bold text-xs uppercase tracking-wider transition-colors inline-flex items-center gap-2 shadow-lg"
-                >
-                  <span>{CORPORATE_INFO.stewardship.actionLabel}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Column B: Right 5 Columns - Stewardship Three-Pillar Framework */}
-            <div className="lg:col-span-5 space-y-4">
-              <div className="text-xs font-mono uppercase tracking-widest text-[#C6922D] font-bold pb-1">
-                Core Governance Framework
-              </div>
-
-              {CORPORATE_INFO.stewardship.framework.map((item) => (
-                <div
-                  key={item.number}
-                  className="bg-[#071A2F] border border-white/10 rounded-xl p-5 hover:border-[#C6922D]/40 transition-colors space-y-2 group"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-sm font-bold text-[#C6922D] group-hover:text-[#e5b95d]">
-                      {item.number}
-                    </span>
-                    <span className="text-[10px] uppercase tracking-wider font-mono text-slate-500">
-                      Discipline
-                    </span>
+          <div className="bg-[#09223D] border-2 border-[#C69A4B]/35 rounded-3xl p-6 sm:p-10 lg:p-12 shadow-2xl relative overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+              {/* Left Column (Desktop) / Top (Mobile): Official CEO Photograph */}
+              <div className="lg:col-span-5 flex flex-col items-center">
+                <div className="relative w-full rounded-2xl overflow-hidden border-2 border-[#C69A4B]/50 shadow-2xl bg-[#040E1B] group">
+                  <img
+                    src={OFFICIAL_CEO_PROFILE.photoUrl}
+                    alt="Leodenis Deveza Languisan, Founder and CEO of LDL Dhenze Residential Building Construction"
+                    className="w-full h-auto object-cover object-center block transform group-hover:scale-[1.01] transition-transform duration-500"
+                    loading="eager"
+                  />
+                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-[#071A2F]/95 via-[#071A2F]/70 to-transparent p-4 text-center">
+                    <div className="text-xs font-mono font-bold text-[#E5B95D] uppercase tracking-wider">
+                      {OFFICIAL_CEO_PROFILE.fullName}
+                    </div>
+                    <div className="text-[11px] text-slate-300">
+                      Founder and Chief Executive Officer
+                    </div>
                   </div>
-                  <h3 className="text-base font-bold text-white font-['Montserrat']">
-                    {item.title}
-                  </h3>
-                  <p className="text-xs text-slate-300 leading-relaxed font-sans">
-                    {item.description}
+                </div>
+                <p className="text-[11px] text-slate-400 italic text-center mt-3 max-w-sm">
+                  {OFFICIAL_CEO_PROFILE.photoCaption}
+                </p>
+              </div>
+
+              {/* Right Column: Executive Title, Introduction & Founder's Statement */}
+              <div className="lg:col-span-7 space-y-6">
+                <div>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C69A4B]/15 text-[#C69A4B] text-xs font-mono font-bold uppercase tracking-wider mb-2">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>Founder &amp; Chief Executive Officer</span>
+                  </div>
+                  <h2 className="text-2xl sm:text-4xl font-black text-white font-['Montserrat'] tracking-tight">
+                    {OFFICIAL_CEO_PROFILE.fullName}
+                  </h2>
+                  <div className="text-sm font-semibold text-[#E5B95D] mt-1">
+                    Founder and Chief Executive Officer • LDL Dhenze Residential Building Construction
+                  </div>
+                </div>
+
+                {/* Concise Founder's Message from Profile */}
+                <div className="bg-[#051322] border-l-4 border-[#C69A4B] p-5 rounded-r-2xl space-y-2">
+                  <p className="text-sm sm:text-base font-serif italic text-slate-200 leading-relaxed">
+                    “When we build, we do not merely raise structures. We build opportunities. We build progress. We build legacies. And above all, we build trust.”
+                  </p>
+                  <p className="text-xs text-slate-300 leading-relaxed pt-1">
+                    At LDL Dhenze, our mission is clear: to lawfully deliver world-class infrastructure and integrated solutions that improve lives and strengthen the nation—today, tomorrow, and for generations to come.
                   </p>
                 </div>
-              ))}
 
-              <div className="bg-[#071A2F]/60 border border-white/5 rounded-xl p-4 text-[11px] text-slate-400 flex items-center gap-2.5">
-                <Scale className="w-4 h-4 text-[#C6922D] shrink-0" />
-                <span>Strict statutory compliance under RA 9266 and Philippine building laws.</span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  <div className="bg-[#051322] p-3.5 rounded-xl border border-white/5">
+                    <div className="text-[#C69A4B] uppercase text-[10px] font-bold">Banking Governance</div>
+                    <div className="text-slate-200 font-semibold mt-0.5">JPMorgan Chase Experience</div>
+                    <div className="text-slate-400 text-[11px] mt-0.5">Risk controls &amp; financial accountability</div>
+                  </div>
+                  <div className="bg-[#051322] p-3.5 rounded-xl border border-white/5">
+                    <div className="text-[#C69A4B] uppercase text-[10px] font-bold">Educational Pedigree</div>
+                    <div className="text-slate-200 font-semibold mt-0.5">B.Comm (Banking) &amp; B.S. IT</div>
+                    <div className="text-slate-400 text-[11px] mt-0.5">STI College &amp; DCCP Baguio City</div>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="pt-2 flex flex-wrap items-center gap-3">
+                  <button
+                    onClick={() => onNavigate('leadership')}
+                    className="px-6 py-3 rounded-xl bg-[#C69A4B] hover:bg-[#d8a339] text-[#071A2F] font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg transition-all"
+                  >
+                    <span>Read Full Leadership Profile</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+
+                  <button
+                    onClick={() => onNavigate('corporate-profile')}
+                    className="px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/20 text-slate-200 text-xs font-semibold uppercase tracking-wider flex items-center gap-2 transition-all"
+                  >
+                    <FileText className="w-4 h-4 text-[#C69A4B]" />
+                    <span>View 27-Page Corporate Profile</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -186,166 +266,130 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenAssistant 
       </section>
 
       {/* ---------------------------------------------------- */}
-      {/* 3. THREE PRINCIPAL EXPERTISE PILLARS */}
+      {/* 3. CORPORATE BUSINESS OPERATIONS (SECTION 7) */}
       {/* ---------------------------------------------------- */}
-      <section className="py-24 lg:py-32 bg-[#071A2F] border-b border-[#C6922D]/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 pb-6 border-b border-white/10">
+      <section className="py-24 lg:py-32 bg-[#071A2F] border-b border-[#C69A4B]/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-white/10">
             <div>
-              <span className="text-xs font-mono text-[#C6922D] uppercase tracking-widest">
-                Strategic Disciplines
-              </span>
-              <h2 className="font-serif-display text-3xl sm:text-4xl lg:text-5xl text-white font-normal mt-2">
-                Integrated expertise for complex developments.
+              <div className="text-xs font-mono text-[#C69A4B] uppercase tracking-widest font-bold">
+                Fields of Business
+              </div>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white font-['Montserrat'] tracking-tight mt-2">
+                OUR CORE BUSINESS DIVISIONS
               </h2>
             </div>
-            <p className="text-sm text-slate-300 max-w-md font-sans-body leading-relaxed">
-              From early feasibility and technical coordination to construction delivery, renewable-energy integration, and project handover, LDL Dhenze provides a structured point of coordination throughout the development lifecycle.
+            <p className="text-sm text-slate-300 max-w-md leading-relaxed">
+              The nine core divisions described in the official Corporate Profile, distinguishing our BIR-registered construction core from strategic future capabilities.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Pillar 1 */}
-            <div className="bg-[#081F38] border border-white/10 rounded-xl p-8 flex flex-col justify-between hover:border-[#C6922D]/40 transition-all group">
-              <div>
-                <div className="text-xs font-mono text-[#C6922D] uppercase tracking-wider mb-3">Pillar I</div>
-                <h3 className="font-serif-display text-2xl text-white font-normal mb-3 group-hover:text-[#e5b95d] transition-colors">
-                  Development Advisory & Feasibility
-                </h3>
-                <p className="text-xs text-slate-300 leading-relaxed mb-6 font-sans-body">
-                  Aligning site potential, zoning, title clearances, environmental guidelines, and capital expenditure sequencing to de-risk investment before ground is broken.
-                </p>
-                <ul className="space-y-2 text-xs text-slate-400">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#C6922D]" />
-                    <span>Highest-and-best-use (HBU) valuation studies</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#C6922D]" />
-                    <span>Statutory permitting roadmap & agency review</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#C6922D]" />
-                    <span>Capital expenditure & cash-flow modeling</span>
-                  </li>
-                </ul>
-              </div>
-              <div className="pt-8 mt-6 border-t border-white/5">
-                <button
-                  onClick={() => onNavigate('capabilities')}
-                  className="text-xs font-semibold text-[#C6922D] hover:text-[#e5b95d] inline-flex items-center gap-1 group-hover:translate-x-1 transition-transform"
+          {/* 9 Divisions Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {NINE_CORE_DIVISIONS.map((div) => {
+              const isCurrent = div.category === 'CURRENT_REGISTERED';
+              return (
+                <div
+                  key={div.id}
+                  className={`rounded-2xl p-6 sm:p-7 flex flex-col justify-between border transition-all group ${
+                    isCurrent
+                      ? 'bg-[#09223D] border-[#C69A4B]/60 shadow-xl'
+                      : 'bg-[#081F38] border-white/10 hover:border-[#C69A4B]/40'
+                  }`}
                 >
-                  <span>Learn about advisory</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="w-12 h-12 rounded-xl bg-[#051322] border border-white/10 flex items-center justify-center group-hover:border-[#C69A4B]/50 transition-colors">
+                        {getDivisionIcon(div.iconName)}
+                      </div>
+                      <span className="font-mono text-xs font-bold text-[#C69A4B] px-2.5 py-1 rounded bg-[#051322] border border-white/10">
+                        Division {div.divisionNumber}
+                      </span>
+                    </div>
 
-            {/* Pillar 2 */}
-            <div className="bg-[#081F38] border border-white/10 rounded-xl p-8 flex flex-col justify-between hover:border-[#C6922D]/40 transition-all group">
-              <div>
-                <div className="text-xs font-mono text-[#C6922D] uppercase tracking-wider mb-3">Pillar II</div>
-                <h3 className="font-serif-display text-2xl text-white font-normal mb-3 group-hover:text-[#e5b95d] transition-colors">
-                  Architecture & Civil Delivery
-                </h3>
-                <p className="text-xs text-slate-300 leading-relaxed mb-6 font-sans-body">
-                  Coordinating licensed Philippine professionals and accredited builders for structural engineering, MEPFS integration, and rigorous on-site execution.
-                </p>
-                <ul className="space-y-2 text-xs text-slate-400">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#C6922D]" />
-                    <span>PRC-licensed architectural & structural sign-offs</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#C6922D]" />
-                    <span>BIM multi-discipline clash resolution</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#C6922D]" />
-                    <span>Accredited civil works & heavy earthworks</span>
-                  </li>
-                </ul>
-              </div>
-              <div className="pt-8 mt-6 border-t border-white/5">
-                <button
-                  onClick={() => onNavigate('capabilities')}
-                  className="text-xs font-semibold text-[#C6922D] hover:text-[#e5b95d] inline-flex items-center gap-1 group-hover:translate-x-1 transition-transform"
-                >
-                  <span>Explore engineering</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
+                    <div>
+                      <div className="inline-block mb-1.5">
+                        <span
+                          className={`text-[10px] font-mono font-semibold px-2 py-0.5 rounded ${
+                            isCurrent
+                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                              : 'bg-white/5 text-slate-300 border border-white/10'
+                          }`}
+                        >
+                          {isCurrent ? 'Current Registered Business' : 'Strategic Development Focus'}
+                        </span>
+                      </div>
+                      <h3 className="text-lg font-bold text-white font-['Montserrat'] group-hover:text-[#E5B95D] transition-colors">
+                        {div.name}
+                      </h3>
+                    </div>
 
-            {/* Pillar 3 */}
-            <div className="bg-[#081F38] border border-white/10 rounded-xl p-8 flex flex-col justify-between hover:border-[#C6922D]/40 transition-all group">
-              <div>
-                <div className="text-xs font-mono text-[#C6922D] uppercase tracking-wider mb-3">Pillar III</div>
-                <h3 className="font-serif-display text-2xl text-white font-normal mb-3 group-hover:text-[#e5b95d] transition-colors">
-                  Renewable & Resilient Utilities
-                </h3>
-                <p className="text-xs text-slate-300 leading-relaxed mb-6 font-sans-body">
-                  Deploying rooftop solar PV, battery energy storage systems (BESS), and resilient stormwater systems engineered for operational autonomy.
-                </p>
-                <ul className="space-y-2 text-xs text-slate-400">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#C6922D]" />
-                    <span>Commercial & industrial rooftop solar PV</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#C6922D]" />
-                    <span>BESS battery peak-shaving & microgrids</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#C6922D]" />
-                    <span>Flood control & stormwater retention networks</span>
-                  </li>
-                </ul>
-              </div>
-              <div className="pt-8 mt-6 border-t border-white/5">
-                <button
-                  onClick={() => onNavigate('capabilities')}
-                  className="text-xs font-semibold text-[#C6922D] hover:text-[#e5b95d] inline-flex items-center gap-1 group-hover:translate-x-1 transition-transform"
-                >
-                  <span>Review infrastructure</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      {div.description}
+                    </p>
+
+                    <div className="space-y-1.5 pt-2 border-t border-white/5">
+                      {div.highlights.slice(0, 2).map((h, idx) => (
+                        <div key={idx} className="flex items-start gap-1.5 text-[11px] text-slate-400">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[#C69A4B] shrink-0 mt-0.5" />
+                          <span className="line-clamp-2">{h}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-6 mt-4 border-t border-white/10 flex items-center justify-between text-xs">
+                    <span className="font-mono text-[10px] text-slate-500">
+                      {div.pageReference}
+                    </span>
+                    <button
+                      onClick={() => onNavigate('corporate-profile')}
+                      className="font-semibold text-[#C69A4B] hover:text-[#e5b95d] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform"
+                    >
+                      <span>Explore details</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* ---------------------------------------------------- */}
-      {/* 4. SELECTED WORK OR VERIFIED PROJECT STUDIES */}
+      {/* 4. SELECTED WORK & VERIFIED PROJECT STUDIES */}
       {/* ---------------------------------------------------- */}
       <section className="py-24 lg:py-32 bg-[#061325] border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 pb-6 border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-white/10">
             <div>
-              <span className="text-xs font-mono text-[#C6922D] uppercase tracking-widest">
+              <span className="text-xs font-mono text-[#C69A4B] uppercase tracking-widest font-bold">
                 Portfolio Showcase
               </span>
-              <h2 className="font-serif-display text-3xl sm:text-4xl lg:text-5xl text-white font-normal mt-2">
-                Selected Work & Project Studies
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white font-['Montserrat'] mt-2">
+                Selected Work &amp; Project Studies
               </h2>
             </div>
             <button
               onClick={() => onNavigate('projects')}
-              className="text-xs font-semibold uppercase tracking-wider text-[#C6922D] hover:text-[#e5b95d] inline-flex items-center gap-1"
+              className="text-xs font-semibold uppercase tracking-wider text-[#C69A4B] hover:text-[#e5b95d] inline-flex items-center gap-1"
             >
-              <span>View complete portfolio</span>
+              <span>View complete project library</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {featuredProjects.map((p) => {
-              const isConceptual = p.isConceptual || p.stage?.toLowerCase().includes('concept') || p.stage?.toLowerCase().includes('planning');
+              const isConceptual =
+                p.isConceptual ||
+                p.stage?.toLowerCase().includes('concept') ||
+                p.stage?.toLowerCase().includes('planning');
               return (
                 <div
                   key={p.id}
-                  className="bg-[#081F38] border border-white/10 rounded-xl overflow-hidden group hover:border-[#C6922D]/40 transition-all flex flex-col"
+                  className="bg-[#081F38] border border-white/10 rounded-2xl overflow-hidden group hover:border-[#C69A4B]/40 transition-all flex flex-col"
                 >
                   <div className="relative h-64 overflow-hidden bg-slate-900">
                     <img
@@ -354,11 +398,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenAssistant 
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                       referrerPolicy="no-referrer"
                       onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src = '/assets/images/solar-storage.jpg';
+                        (e.currentTarget as HTMLImageElement).src =
+                          '/assets/images/solar-storage.jpg';
                       }}
                     />
                     <div className="absolute top-4 left-4">
-                      <span className="px-3 py-1 text-[11px] font-semibold uppercase tracking-wider bg-[#071A2F]/90 text-[#e5b95d] border border-[#C6922D]/40 rounded backdrop-blur-md">
+                      <span className="px-3 py-1 text-[11px] font-semibold uppercase tracking-wider bg-[#071A2F]/90 text-[#e5b95d] border border-[#C69A4B]/40 rounded backdrop-blur-md">
                         {p.stage}
                       </span>
                     </div>
@@ -391,184 +436,41 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenAssistant 
       </section>
 
       {/* ---------------------------------------------------- */}
-      {/* 5. STRATEGIC DEVELOPMENT SECTORS */}
+      {/* 5. DOWNLOAD CTA SECTION */}
       {/* ---------------------------------------------------- */}
-      <section className="py-24 lg:py-32 bg-[#071A2F] border-b border-[#C6922D]/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mb-16 pb-6 border-b border-white/10">
-            <span className="text-xs font-mono text-[#C6922D] uppercase tracking-widest">
-              Strategic Sectors
-            </span>
-            <h2 className="font-serif-display text-3xl sm:text-4xl lg:text-5xl text-white font-normal mt-2">
-              Development sectors served across the Philippines.
-            </h2>
+      <section className="py-20 bg-gradient-to-b from-[#071A2F] to-[#040E1B] text-center">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#C69A4B]/10 border border-[#C69A4B]/30 text-[#C69A4B] text-xs font-mono font-bold uppercase tracking-widest">
+            <FileCheck className="w-4 h-4" />
+            <span>Public Document Center</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {STRATEGIC_SECTORS_LIST.map((sector) => (
-              <div
-                key={sector.id}
-                onClick={() => onNavigate('industries')}
-                className="bg-[#081F38] border border-white/10 rounded-xl p-6 hover:border-[#C6922D]/50 cursor-pointer transition-all flex flex-col justify-between group"
-              >
-                <div>
-                  <div className="text-[10px] uppercase font-mono text-[#C6922D] tracking-wider mb-2">
-                    Sector
-                  </div>
-                  <h4 className="font-serif-display text-lg text-white font-normal mb-2 group-hover:text-[#e5b95d] transition-colors">
-                    {sector.title}
-                  </h4>
-                  <p className="text-xs text-slate-300 leading-relaxed">
-                    {sector.subtitle}
-                  </p>
-                </div>
-                <div className="pt-4 mt-4 border-t border-white/5 flex items-center justify-between text-xs text-slate-400 group-hover:text-[#C6922D]">
-                  <span>Explore sector</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ---------------------------------------------------- */}
-      {/* 6. GOVERNANCE & DELIVERY METHODOLOGY */}
-      {/* ---------------------------------------------------- */}
-      <section className="py-24 lg:py-32 bg-[#061325] border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            <div className="lg:col-span-6 space-y-6">
-              <span className="text-xs font-mono text-[#C6922D] uppercase tracking-widest">
-                Methodology & Governance
-              </span>
-              <h2 className="font-serif-display text-3xl sm:text-4xl lg:text-5xl text-white font-normal leading-tight">
-                Discipline rooted in institutional finance and engineering integrity.
-              </h2>
-              <p className="text-sm text-slate-300 leading-relaxed font-sans-body">
-                Large-scale developments fail most often not on the jobsite, but in the spreadsheet, contract, and uncoordinated drawing set. LDL Dhenze was created to bring institutional banking controls, transparent milestone accounting, and statutory diligence to Philippine property development.
-              </p>
-
-              <div className="space-y-4 pt-2">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 rounded bg-white/5 border border-white/10 text-[#C6922D]">
-                    <Scale className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-                      Statutory & Professional Clearances
-                    </h4>
-                    <p className="text-xs text-slate-400 leading-relaxed mt-1">
-                      Strict compliance with RA 9266 (The Architecture Act) and PRC regulations. All engineering designs and sign-offs are delivered exclusively by certified, qualified Filipino professionals.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="p-2 rounded bg-white/5 border border-white/10 text-[#C6922D]">
-                    <ShieldCheck className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-                      Transparent Milestone Accounting
-                    </h4>
-                    <p className="text-xs text-slate-400 leading-relaxed mt-1">
-                      Independent quantity surveying, verified milestone inspection audits, and clear escrow accounting eliminate budget surprises and contractor cost overruns.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="p-2 rounded bg-white/5 border border-white/10 text-[#C6922D]">
-                    <Building2 className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-                      Accredited Contractor Ecosystem
-                    </h4>
-                    <p className="text-xs text-slate-400 leading-relaxed mt-1">
-                      Construction execution requiring PCAB accreditation is undertaken in direct alliance with licensed builders and qualified specialist trades.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="lg:col-span-6 bg-[#081F38] border border-white/10 rounded-2xl p-8 lg:p-10 relative">
-              <div className="text-xs font-mono text-[#C6922D] uppercase tracking-wider mb-2">
-                Executive Leadership
-              </div>
-              <h3 className="font-serif-display text-2xl text-white font-normal mb-1">
-                {FOUNDER_INFO.name}
-              </h3>
-              <div className="text-xs text-slate-400 mb-6 font-medium">
-                {FOUNDER_INFO.title}
-              </div>
-
-              <blockquote className="text-xs sm:text-sm text-slate-200 italic leading-relaxed mb-6 pl-4 border-l-2 border-[#C6922D]">
-                “Our vision is to build an integrated enterprise where architectural vision, banking-grade capital discipline, and sustainable civil engineering unite to create generational value for our clients and the nation.”
-              </blockquote>
-
-              <p className="text-xs text-slate-300 leading-relaxed mb-6 font-sans-body">
-                Bringing more than two decades of multidisciplinary experience spanning JPMorgan Chase Bank loan and mortgage operations, financial risk analysis, and corporate operations, Leodenis Deveza Languisan directs LDL Dhenze with an unwavering focus on documentation integrity and fiscal stewardship.
-              </p>
-
-              <div className="pt-6 border-t border-white/10 flex items-center justify-between">
-                <button
-                  onClick={() => onNavigate('about')}
-                  className="text-xs font-semibold text-[#C6922D] hover:text-[#e5b95d] inline-flex items-center gap-1"
-                >
-                  <span>Read leadership profile</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-
-                <span className="text-[11px] font-mono text-slate-400">
-                  Clark Freeport Zone, Pampanga
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ---------------------------------------------------- */}
-      {/* CEO CORNER & FOUNDER'S SOLEMN PLEDGE (PHASE 2) */}
-      {/* ---------------------------------------------------- */}
-      <CeoCornerSection onNavigate={onNavigate} />
-
-      {/* ---------------------------------------------------- */}
-      {/* 7. PRIVATE CONSULTATION CTA */}
-      {/* ---------------------------------------------------- */}
-      <section className="py-24 lg:py-32 bg-[#071A2F] border-b border-[#C6922D]/20 relative overflow-hidden">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-[#C6922D]/35 text-xs text-[#e5b95d] mb-6">
-            <Lock className="w-3.5 h-3.5 text-[#C6922D]" />
-            <span className="font-mono text-[11px] uppercase tracking-wider">Confidential Discussion</span>
-          </div>
-
-          <h2 className="font-serif-display text-3xl sm:text-5xl lg:text-6xl text-white font-normal leading-tight mb-6">
-            A considered beginning for an important development.
+          <h2 className="text-3xl sm:text-5xl font-black text-white font-['Montserrat'] tracking-tight">
+            Review the Official Corporate Profile
           </h2>
 
-          <p className="text-sm sm:text-base text-slate-200 leading-relaxed max-w-2xl mx-auto mb-10 font-sans-body">
-            Every successful project begins with a clear understanding of the site, objectives, constraints, capital structure, and intended legacy. Speak with our team in confidence about your development.
+          <p className="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">
+            Access the complete 27-page official publication covering our registration certificates, organizational structure, leadership background, and comprehensive business divisions.
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
             <button
-              onClick={() => onNavigate('start-project')}
-              className="px-8 py-4 rounded-md font-bold text-xs uppercase tracking-wider bg-[#C6922D] hover:bg-[#d8a339] text-[#071A2F] transition-all shadow-xl hover:shadow-[#C6922D]/25 inline-flex items-center gap-2"
+              onClick={handleDownloadProfile}
+              disabled={downloading}
+              className="px-8 py-4 rounded-xl bg-[#C69A4B] hover:bg-[#d8a339] text-[#071A2F] font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-2xl transition-all"
             >
-              <span>Request a Private Consultation</span>
-              <ArrowRight className="w-4 h-4" />
+              <Download className="w-4 h-4" />
+              <span>
+                {downloading ? 'Preparing PDF...' : 'Download Official PDF (9.9 MB)'}
+              </span>
             </button>
 
             <button
-              onClick={() => onNavigate('portal')}
-              className="px-6 py-4 rounded-md font-semibold text-xs tracking-wider text-slate-200 hover:text-white bg-white/5 hover:bg-white/10 border border-white/20 transition-all inline-flex items-center gap-2"
+              onClick={() => onNavigate('corporate-profile')}
+              className="px-8 py-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/20 text-slate-200 text-xs font-semibold uppercase tracking-wider flex items-center gap-2 transition-all"
             >
-              <Lock className="w-3.5 h-3.5 text-[#C6922D]" />
-              <span>Client Portal</span>
+              <Eye className="w-4 h-4 text-[#C69A4B]" />
+              <span>View Online in PDF Viewer</span>
             </button>
           </div>
         </div>

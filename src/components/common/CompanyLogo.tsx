@@ -2,7 +2,7 @@ import React from 'react';
 import { BRAND_CONFIG } from '../../config/brand';
 
 export type CompanyLogoVariant = 'full' | 'compact' | 'emblem';
-export type CompanyLogoSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | number;
+export type CompanyLogoSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'header' | number;
 
 export interface CompanyLogoProps {
   variant?: CompanyLogoVariant;
@@ -29,6 +29,7 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
   const navyTextColor = isLight ? '#081E38' : '#FFFFFF';
   const goldColor = BRAND_CONFIG.colors.goldPrimary;
   const subtitleColor = isLight ? '#334155' : '#CBD5E1';
+  const isHeaderSize = size === 'header';
 
   // Sizing calculation in pixels
   let pixelHeight = 44;
@@ -46,6 +47,10 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
       case 'sm':
         pixelHeight = 34;
         pixelWidth = 34;
+        break;
+      case 'header':
+        pixelHeight = 44;
+        pixelWidth = 44;
         break;
       case 'md':
         pixelHeight = 44;
@@ -118,7 +123,7 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
   return (
     <div
       className={`inline-flex ${
-        stacked ? 'flex-col items-center text-center' : 'items-center gap-3'
+        stacked ? 'flex-col items-center text-center' : 'items-center gap-2.5 sm:gap-3'
       } select-none ${className}`}
       id="ldl-dhenze-brand-compact"
       onClick={onClick}
@@ -143,13 +148,21 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
         <div className="flex items-baseline tracking-[0.14em] font-black leading-none">
           <span
             style={{ color: goldColor }}
-            className="text-base sm:text-lg lg:text-xl font-black font-['Montserrat',sans-serif] mr-1.5"
+            className={`${
+              isHeaderSize
+                ? 'text-[16px] sm:text-[17px]'
+                : 'text-base sm:text-lg lg:text-xl'
+            } font-black font-['Montserrat',sans-serif] mr-1.5`}
           >
             LDL
           </span>
           <span
             style={{ color: navyTextColor }}
-            className="text-base sm:text-lg lg:text-xl font-black font-['Montserrat',sans-serif]"
+            className={`${
+              isHeaderSize
+                ? 'text-[16px] sm:text-[17px]'
+                : 'text-base sm:text-lg lg:text-xl'
+            } font-black font-['Montserrat',sans-serif]`}
           >
             DHENZE
           </span>
@@ -157,14 +170,18 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
 
         {/* Regulatory Classification Line */}
         <div className="flex items-center gap-1.5 mt-1 w-full justify-center">
-          <span className="w-2.5 h-[1.5px] bg-[#CBA135] shrink-0" />
+          <span className="w-2 sm:w-2.5 h-[1.5px] bg-[#CBA135] shrink-0" />
           <span
             style={{ color: subtitleColor }}
-            className="text-[7.5px] sm:text-[9px] uppercase font-bold tracking-[0.20em] font-['Montserrat',sans-serif] whitespace-nowrap"
+            className={`${
+              isHeaderSize
+                ? 'text-[8.5px] sm:text-[9.5px]'
+                : 'text-[7.5px] sm:text-[9px]'
+            } uppercase font-bold tracking-[0.16em] font-['Montserrat',sans-serif] whitespace-nowrap`}
           >
             Residential Building Construction
           </span>
-          <span className="w-2.5 h-[1.5px] bg-[#CBA135] shrink-0" />
+          <span className="w-2 sm:w-2.5 h-[1.5px] bg-[#CBA135] shrink-0" />
         </div>
 
         {/* Official Tagline: BUILDING BETTER TOMORROWS */}

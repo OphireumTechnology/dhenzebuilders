@@ -152,37 +152,47 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, onOpenAssistan
         {/* Detailed Executive Profile */}
         <div className="bg-[#09223d] border border-white/10 rounded-3xl p-6 sm:p-10 mb-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            <div className="lg:col-span-4 bg-[#051322] border border-[#C6922D]/30 rounded-2xl p-6 text-center">
-              <div className="w-24 h-24 rounded-full bg-[#C6922D]/20 border-2 border-[#C6922D] flex items-center justify-center text-[#C6922D] mx-auto mb-4 font-black text-2xl font-['Montserrat']">
-                LDL
+            <div className="lg:col-span-5 bg-[#051322] border border-[#C6922D]/40 rounded-2xl p-5 text-center shadow-xl">
+              <div className="relative rounded-xl overflow-hidden border border-[#C6922D]/40 mb-4 bg-[#040E1B] aspect-[4/3] sm:aspect-[16/10] max-h-72 mx-auto">
+                <img
+                  src="/images/leadership/official-ceo-photo.png"
+                  alt="Leodenis Deveza Languisan, Founder and CEO of LDL Dhenze Residential Building Construction"
+                  className="w-full h-full object-cover object-center block"
+                  loading="lazy"
+                />
+                <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-[#071A2F]/90 to-transparent p-2 text-center">
+                  <span className="text-[10px] font-mono text-[#E5B95D] font-bold uppercase tracking-wider">
+                    Official Executive Photograph
+                  </span>
+                </div>
               </div>
               <h3 className="text-lg font-bold text-white font-['Montserrat']">
-                {founder.displayName || founder.name}
+                LEODENIS DEVEZA LANGUISAN
               </h3>
               <p className="text-xs text-[#C6922D] font-semibold mt-0.5">
-                {founder.title}
+                Founder and Chief Executive Officer
               </p>
-              <div className="mt-4 pt-4 border-t border-white/10 text-[11px] text-slate-400 space-y-1">
-                <div>B.Comm in Banking & Finance (STI College)</div>
+              <div className="mt-3 pt-3 border-t border-white/10 text-[11px] text-slate-400 space-y-1">
+                <div>B.Comm in Banking &amp; Finance (STI College)</div>
                 <div>B.S. Information Technology (DCCP)</div>
               </div>
               <div className="mt-4 pt-4 border-t border-white/10 space-y-2">
                 <button
-                  onClick={() => onNavigate('ceo-corner')}
-                  className="w-full py-2 px-3 rounded-lg bg-[#C6922D] hover:bg-[#d8a339] text-[#071A2F] font-bold text-[11px] uppercase tracking-wider transition-colors inline-flex items-center justify-center gap-1.5 shadow"
+                  onClick={() => onNavigate('leadership')}
+                  className="w-full py-2.5 px-3 rounded-lg bg-[#C6922D] hover:bg-[#d8a339] text-[#071A2F] font-bold text-[11px] uppercase tracking-wider transition-colors inline-flex items-center justify-center gap-1.5 shadow"
                 >
-                  <span>Founder’s Message &amp; Pledge</span>
+                  <span>Official Leadership Profile</span>
                 </button>
                 <button
-                  onClick={() => onNavigate('company-profile')}
+                  onClick={() => onNavigate('corporate-profile')}
                   className="w-full py-2 px-3 rounded-lg bg-white/5 hover:bg-white/10 text-slate-200 border border-white/15 text-[11px] font-medium transition-colors inline-flex items-center justify-center gap-1.5"
                 >
-                  <span>Company Profile &amp; Registrations</span>
+                  <span>View 27-Page Corporate Profile</span>
                 </button>
               </div>
             </div>
 
-            <div className="lg:col-span-8 space-y-4 text-xs sm:text-sm text-slate-300 leading-relaxed">
+            <div className="lg:col-span-7 space-y-4 text-xs sm:text-sm text-slate-300 leading-relaxed">
               <span className="text-xs font-mono font-bold text-[#C6922D] uppercase tracking-widest">
                 Executive Biography & Foundations
               </span>

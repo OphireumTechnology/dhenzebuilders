@@ -222,21 +222,40 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenAssistant }) =
               </li>
               <li>
                 <button
-                  onClick={() => onNavigate('ceo-corner')}
-                  className="hover:text-[#C6922D] transition-colors text-left flex items-center gap-1.5 font-medium text-slate-200"
+                  onClick={() => onNavigate('corporate-profile')}
+                  className="hover:text-[#C6922D] transition-colors text-left flex items-center gap-1.5 font-bold text-slate-100"
                 >
-                  <UserCheck className="w-3.5 h-3.5 text-[#C6922D]" />
-                  Founder's Message & CEO Corner
+                  <FileText className="w-3.5 h-3.5 text-[#C6922D]" />
+                  Corporate Profile
                 </button>
               </li>
               <li>
                 <button
-                  onClick={() => onNavigate('company-profile')}
+                  onClick={() => onNavigate('leadership')}
                   className="hover:text-[#C6922D] transition-colors text-left flex items-center gap-1.5 font-medium text-slate-200"
                 >
-                  <FileText className="w-3.5 h-3.5 text-[#C6922D]" />
-                  Company Profile & Registrations
+                  <UserCheck className="w-3.5 h-3.5 text-[#C6922D]" />
+                  Leadership &amp; Founder's Message
                 </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigate('downloads')}
+                  className="hover:text-[#C6922D] transition-colors text-left flex items-center gap-1.5 font-medium text-slate-200"
+                >
+                  <FileText className="w-3.5 h-3.5 text-emerald-400" />
+                  Document Download Center
+                </button>
+              </li>
+              <li className="pt-1">
+                <a
+                  href="/documents/LDL-Dhenze-Corporate-Profile.pdf"
+                  download="LDL-Dhenze-Residential-Building-Construction-Corporate-Profile.pdf"
+                  className="hover:text-white transition-colors text-left inline-flex items-center gap-1.5 font-semibold text-xs text-[#E5B95D]"
+                >
+                  <span>Download Profile (PDF)</span>
+                  <ArrowUpRight className="w-3 h-3 text-[#C6922D]" />
+                </a>
               </li>
               <li>
                 <button

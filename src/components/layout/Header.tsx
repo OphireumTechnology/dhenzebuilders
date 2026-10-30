@@ -17,6 +17,7 @@ import {
   ShieldAlert,
   Building2,
   Users,
+  Download,
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -80,18 +81,19 @@ export const Header: React.FC<HeaderProps> = ({
 
   const navItems = [
     { label: 'Home', view: 'home' },
-    { label: 'Company', view: 'about' },
-    { label: 'Expertise', view: 'capabilities' },
-    { label: 'Sectors', view: 'industries' },
-    { label: 'Project Library', view: 'projects' },
-    { label: 'Insights', view: 'insights' },
+    { label: 'About Us', view: 'about' },
+    { label: 'Corporate Profile', view: 'corporate-profile' },
+    { label: 'Services', view: 'capabilities' },
+    { label: 'Leadership', view: 'leadership' },
+    { label: 'Projects', view: 'projects' },
     { label: 'Contact', view: 'contact' },
   ];
 
   const isViewActive = (view: string) => {
     if (view === 'about' && (currentView === 'about' || currentView === 'sustainability' || currentView === 'technology' || currentView === 'partners')) return true;
-    if (view === 'capabilities' && (currentView === 'capabilities' || currentView.startsWith('capability-') || currentView.startsWith('capabilities:'))) return true;
-    if (view === 'industries' && (currentView === 'industries' || currentView.startsWith('industry-') || currentView.startsWith('industries:'))) return true;
+    if (view === 'corporate-profile' && (currentView === 'corporate-profile' || currentView === 'company-profile' || currentView === 'downloads')) return true;
+    if (view === 'capabilities' && (currentView === 'capabilities' || currentView === 'services' || currentView.startsWith('capability-') || currentView.startsWith('capabilities:'))) return true;
+    if (view === 'leadership' && (currentView === 'leadership' || currentView === 'ceo-corner')) return true;
     if (view === 'projects' && (currentView === 'projects' || currentView === 'project-detail' || currentView.startsWith('projects/') || currentView.startsWith('project-'))) return true;
     return currentView === view;
   };
@@ -102,27 +104,27 @@ export const Header: React.FC<HeaderProps> = ({
       id="main-navigation-header"
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 h-[76px] flex items-center ${
         isScrolled
-          ? 'bg-[#061325]/95 backdrop-blur-md shadow-xl border-b border-[#C6922D]/25'
-          : 'bg-[#071A2F]/90 backdrop-blur-sm border-b border-white/5'
+          ? 'bg-[#061325]/95 backdrop-blur-md shadow-xl border-b border-[#C69A4B]/25'
+          : 'bg-[#071A2F]/95 backdrop-blur-sm border-b border-white/10'
       }`}
     >
       <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between gap-2 xl:gap-3 2xl:gap-6">
-          {/* Logo */}
+        <div className="flex items-center justify-between gap-3 lg:gap-4 xl:gap-6">
+          {/* LEFT SECTION: Company Logo and Name */}
           <div className="shrink-0 flex items-center">
             <button
               onClick={() => handleNavClick('home')}
-              className="inline-flex items-center text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C6922D] rounded py-1 transition-opacity hover:opacity-90"
+              className="inline-flex items-center text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C69A4B] rounded py-1 transition-opacity hover:opacity-90"
               aria-label="LDL Dhenze Residential Building Construction - Home"
             >
-              <BrandLogo variant="dark" size="sm" showTagline={false} />
+              <BrandLogo variant="dark" size="header" showTagline={false} />
             </button>
           </div>
 
-          {/* Desktop Primary Navigation */}
+          {/* CENTER SECTION: Main Navigation (Desktop) */}
           <nav
             id="desktop-primary-nav"
-            className="hidden xl:flex items-center justify-center gap-0.5 2xl:gap-1.5 shrink-0 px-1"
+            className="hidden xl:flex items-center justify-center gap-4 2xl:gap-5 shrink-0"
             aria-label="Primary Navigation"
           >
             {navItems.map((item) => {
@@ -131,48 +133,88 @@ export const Header: React.FC<HeaderProps> = ({
                 <button
                   key={item.label}
                   onClick={() => handleNavClick(item.view)}
-                  className={`px-2.5 py-1.5 2xl:px-3 2xl:py-2 text-[11px] 2xl:text-xs font-semibold uppercase tracking-wider transition-colors rounded-md whitespace-nowrap focus:outline-none focus-visible:ring-1 focus-visible:ring-[#C6922D] ${
+                  className={`text-[12px] 2xl:text-[13px] font-semibold tracking-wider transition-colors py-1.5 whitespace-nowrap focus:outline-none focus-visible:ring-1 focus-visible:ring-[#C69A4B] relative ${
                     active
-                      ? 'text-[#C6922D] bg-white/5 font-bold'
-                      : 'text-slate-200 hover:text-[#C6922D] hover:bg-white/5'
+                      ? 'text-[#C69A4B] font-bold'
+                      : 'text-slate-200 hover:text-[#C69A4B]'
                   }`}
                 >
-                  {item.label === 'Selected Work' ? (
-                    <>
-                      <span className="hidden 2xl:inline">Selected </span>Work
-                    </>
-                  ) : (
-                    item.label
+                  <span>{item.label}</span>
+                  {active && (
+                    <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#C69A4B] rounded-full" />
                   )}
                 </button>
               );
             })}
           </nav>
 
-          {/* Desktop Actions Cluster */}
-          <div className="hidden sm:flex items-center gap-2 2xl:gap-2.5 shrink-0">
+          {/* RIGHT SECTION: Action Cluster (Desktop) */}
+          <div className="hidden xl:flex items-center gap-2.5 2xl:gap-3 shrink-0">
+            {/* Download Profile Button */}
+            <a
+              id="header-download-company-profile-btn"
+              href="/documents/LDL-Dhenze-Corporate-Profile.pdf"
+              download="LDL-Dhenze-Residential-Building-Construction-Corporate-Profile.pdf"
+              className="h-[38px] px-4 text-[12px] font-bold uppercase tracking-wider text-[#071A2F] bg-[#C69A4B] hover:bg-[#d8a339] rounded-md transition-all shadow-sm hover:shadow-md inline-flex items-center justify-center gap-1.5 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C69A4B] shrink-0"
+              title="Download Official 27-Page Corporate Profile (PDF) - Direct Download, No Login Required"
+            >
+              <Download className="w-3.5 h-3.5 shrink-0" />
+              <span>DOWNLOAD PROFILE</span>
+            </a>
+
+            {/* Login / Authorized Session */}
+            {authenticatedUser ? (
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => handleNavClick('operations/overview')}
+                  className="h-[38px] px-3 text-[12px] font-mono text-emerald-300 border border-emerald-500/40 bg-emerald-950/40 hover:bg-emerald-900/50 rounded-md transition-all flex items-center gap-1.5 whitespace-nowrap"
+                  title="Authorized Session"
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="max-w-[90px] truncate">{authenticatedUser.loginId || 'Authorized'}</span>
+                </button>
+                <button
+                  onClick={onSignOut}
+                  className="h-[38px] px-2.5 text-[11px] text-slate-300 hover:text-white border border-white/15 hover:border-amber-400/40 hover:bg-white/10 rounded-md transition-all flex items-center gap-1"
+                  title="Lock Portals & Sign Out"
+                >
+                  <Lock className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="text-[10px] font-mono">Lock</span>
+                </button>
+              </div>
+            ) : (
+              <button
+                id="header-login-btn"
+                onClick={() => handleNavClick('login')}
+                className="h-[38px] px-3.5 text-[12px] font-semibold tracking-wider text-slate-200 hover:text-white border border-white/20 hover:border-[#C69A4B] hover:bg-white/5 rounded-md transition-all inline-flex items-center justify-center gap-1.5 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C69A4B]"
+              >
+                <Lock className="w-3.5 h-3.5 text-[#C69A4B]" />
+                <span>Login</span>
+              </button>
+            )}
+
             {/* Dashboards & Portals Dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button
                 id="header-dashboards-btn"
                 onClick={() => setDashboardsOpen(!dashboardsOpen)}
-                className={`px-2.5 py-1.5 2xl:px-3.5 2xl:py-2 text-[11px] 2xl:text-xs font-semibold tracking-wider rounded-md transition-all inline-flex items-center gap-1.5 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C6922D] ${
+                className={`h-[38px] px-3.5 text-[12px] font-semibold tracking-wider rounded-md transition-all inline-flex items-center justify-center gap-1.5 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C69A4B] ${
                   dashboardsOpen ||
                   currentView.includes('portal') ||
                   currentView.includes('operations') ||
                   currentView === 'verification-center' ||
                   currentView === 'onboarding'
-                    ? 'text-[#C6922D] bg-[#C6922D]/15 border border-[#C6922D]'
-                    : 'text-slate-200 hover:text-[#C6922D] border border-white/10 hover:border-[#C6922D]/40 hover:bg-white/5'
+                    ? 'text-[#C69A4B] bg-[#C69A4B]/15 border border-[#C69A4B]'
+                    : 'text-slate-200 hover:text-[#C69A4B] border border-white/20 hover:border-[#C69A4B]/50 hover:bg-white/5'
                 }`}
                 aria-expanded={dashboardsOpen}
                 aria-haspopup="true"
               >
-                <LayoutDashboard className="w-3.5 h-3.5 text-[#C6922D]" />
+                <LayoutDashboard className="w-3.5 h-3.5 text-[#C69A4B]" />
                 <span>Dashboards</span>
                 <ChevronDown
                   className={`w-3 h-3 transition-transform ${
-                    dashboardsOpen ? 'rotate-180 text-[#C6922D]' : 'text-slate-400'
+                    dashboardsOpen ? 'rotate-180 text-[#C69A4B]' : 'text-slate-400'
                   }`}
                 />
               </button>
@@ -181,15 +223,15 @@ export const Header: React.FC<HeaderProps> = ({
               {dashboardsOpen && (
                 <div
                   id="header-dashboards-dropdown"
-                  className="absolute right-0 mt-2 w-72 bg-[#07182C] border border-[#C6922D]/30 rounded-xl shadow-2xl p-2 z-50 backdrop-blur-xl animate-in fade-in"
+                  className="absolute right-0 mt-2 w-72 bg-[#07182C] border border-[#C69A4B]/30 rounded-xl shadow-2xl p-2 z-50 backdrop-blur-xl animate-in fade-in"
                 >
                   <div className="px-3 py-2 border-b border-white/10 flex items-center justify-between">
                     <div>
-                      <p className="text-[10px] font-mono uppercase tracking-widest text-[#C6922D]">
+                      <p className="text-[10px] font-mono uppercase tracking-widest text-[#C69A4B]">
                         Access Directory
                       </p>
                       <p className="text-xs font-serif text-white font-medium">
-                        Portals & Verification Engines
+                        Portals &amp; Verification Engines
                       </p>
                     </div>
                     {authenticatedUser ? (
@@ -208,7 +250,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <div className="py-1 space-y-0.5 text-xs">
                     <button
                       onClick={() => handleNavClick('verification-center')}
-                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#C6922D]/10 hover:text-white text-slate-200 flex items-start gap-2.5 transition-colors group"
+                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#C69A4B]/10 hover:text-white text-slate-200 flex items-start gap-2.5 transition-colors group"
                     >
                       <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                       <div className="flex-1 min-w-0">
@@ -232,7 +274,7 @@ export const Header: React.FC<HeaderProps> = ({
 
                     <button
                       onClick={() => handleNavClick('onboarding')}
-                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#C6922D]/10 hover:text-white text-slate-200 flex items-start gap-2.5 transition-colors group"
+                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#C69A4B]/10 hover:text-white text-slate-200 flex items-start gap-2.5 transition-colors group"
                     >
                       <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                       <div className="flex-1 min-w-0">
@@ -245,16 +287,16 @@ export const Header: React.FC<HeaderProps> = ({
                           )}
                         </div>
                         <div className="text-[11px] text-slate-400 font-sans">
-                          Contractor, supplier, professional & client intake
+                          Contractor, supplier, professional &amp; client intake
                         </div>
                       </div>
                     </button>
 
                     <button
                       onClick={() => handleNavClick('operations/overview')}
-                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#C6922D]/10 hover:text-white text-slate-200 flex items-start gap-2.5 transition-colors group"
+                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#C69A4B]/10 hover:text-white text-slate-200 flex items-start gap-2.5 transition-colors group"
                     >
-                      <Building2 className="w-4 h-4 text-[#C6922D] shrink-0 mt-0.5" />
+                      <Building2 className="w-4 h-4 text-[#C69A4B] shrink-0 mt-0.5" />
                       <div className="flex-1 min-w-0">
                         <div className="font-semibold text-slate-200 group-hover:text-white flex items-center justify-between gap-1">
                           <span className="truncate">Operations Command</span>
@@ -265,19 +307,19 @@ export const Header: React.FC<HeaderProps> = ({
                           )}
                         </div>
                         <div className="text-[11px] text-slate-400 font-sans">
-                          Multi-tenant management, audit & finance
+                          Multi-tenant management, audit &amp; finance
                         </div>
                       </div>
                     </button>
 
                     <button
                       onClick={() => handleNavClick('portal')}
-                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#C6922D]/10 hover:text-white text-slate-200 flex items-start gap-2.5 transition-colors group"
+                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#C69A4B]/10 hover:text-white text-slate-200 flex items-start gap-2.5 transition-colors group"
                     >
                       <Users className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
                       <div className="flex-1 min-w-0">
                         <div className="font-semibold text-slate-200 group-hover:text-white flex items-center justify-between gap-1">
-                          <span className="truncate">Client & Partner Portal</span>
+                          <span className="truncate">Client &amp; Partner Portal</span>
                           {!authenticatedUser && (
                             <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-amber-400/15 text-amber-300 shrink-0 flex items-center gap-0.5">
                               <Lock className="w-2.5 h-2.5" /> Auth Req
@@ -285,14 +327,14 @@ export const Header: React.FC<HeaderProps> = ({
                           )}
                         </div>
                         <div className="text-[11px] text-slate-400 font-sans">
-                          Project milestones, billing & live documents
+                          Project milestones, billing &amp; live documents
                         </div>
                       </div>
                     </button>
 
                     <button
                       onClick={() => handleNavClick('company-profile-admin')}
-                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#C6922D]/10 hover:text-white text-slate-200 flex items-start gap-2.5 transition-colors group border-t border-white/5 pt-2 mt-1"
+                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#C69A4B]/10 hover:text-white text-slate-200 flex items-start gap-2.5 transition-colors group border-t border-white/5 pt-2 mt-1"
                     >
                       <FileCheck className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
                       <div className="flex-1 min-w-0">
@@ -305,7 +347,7 @@ export const Header: React.FC<HeaderProps> = ({
                           )}
                         </div>
                         <div className="text-[11px] text-slate-400 font-sans">
-                          Dual-custody verification & publication
+                          Dual-custody verification &amp; publication
                         </div>
                       </div>
                     </button>
@@ -313,68 +355,32 @@ export const Header: React.FC<HeaderProps> = ({
                 </div>
               )}
             </div>
-
-            {/* Portal Authentication / Session Status */}
-            {authenticatedUser ? (
-              <div className="hidden md:flex items-center gap-1.5">
-                <button
-                  onClick={() => handleNavClick('operations/overview')}
-                  className="px-2.5 py-1.5 text-[11px] font-mono text-emerald-300 border border-emerald-500/40 bg-emerald-950/40 hover:bg-emerald-900/50 rounded-md transition-all flex items-center gap-1.5 whitespace-nowrap"
-                  title="Authorized Session"
-                >
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>{authenticatedUser.loginId || 'Authorized User'}</span>
-                </button>
-                <button
-                  onClick={onSignOut}
-                  className="px-2 py-1.5 text-[11px] text-slate-300 hover:text-white border border-white/10 hover:border-amber-400/40 hover:bg-white/10 rounded-md transition-all flex items-center gap-1"
-                  title="Lock Portals & Sign Out"
-                >
-                  <Lock className="w-3.5 h-3.5 text-amber-400" />
-                  <span className="text-[10px] font-mono">Lock</span>
-                </button>
-              </div>
-            ) : (
-              <button
-                id="header-login-btn"
-                onClick={() => handleNavClick('login')}
-                className="hidden md:inline-flex px-2.5 py-1.5 2xl:px-3.5 2xl:py-2 text-[11px] 2xl:text-xs font-semibold tracking-wider text-slate-200 hover:text-white border border-[#C6922D]/40 hover:border-[#C6922D] hover:bg-[#C6922D]/10 rounded-md transition-all items-center gap-1.5 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C6922D]"
-              >
-                <Lock className="w-3.5 h-3.5 text-[#C6922D]" />
-                <span>Login</span>
-              </button>
-            )}
-
-            {/* Primary CTA: Discuss a Project */}
-            <button
-              id="header-discuss-project-btn"
-              onClick={() => handleNavClick('start-project')}
-              className="px-3 py-1.5 2xl:px-4 2xl:py-2 text-[11px] 2xl:text-xs font-bold uppercase tracking-wider text-[#071A2F] bg-[#C6922D] hover:bg-[#d8a339] rounded-md transition-all shadow-md hover:shadow-lg inline-flex items-center gap-1.5 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C6922D]"
-            >
-              <span className="hidden lg:inline">Discuss a Project</span>
-              <span className="lg:hidden">Discuss</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
           </div>
 
-          {/* Mobile & Tablet Hamburger Toggle */}
-          <div className="flex items-center gap-2 xl:hidden">
-            <button
-              onClick={() => handleNavClick('login')}
-              className="md:hidden px-2.5 py-1.5 text-[11px] font-semibold text-slate-200 border border-[#C6922D]/40 rounded inline-flex items-center gap-1"
+          {/* RESPONSIVE HEADER CONTROLS (Tablets & Mobile: < xl) */}
+          <div className="flex xl:hidden items-center gap-2 sm:gap-3">
+            {/* Tablet/Mobile Download Button (Direct PDF Access) */}
+            <a
+              id="header-download-company-profile-mobile-btn"
+              href="/documents/LDL-Dhenze-Corporate-Profile.pdf"
+              download="LDL-Dhenze-Residential-Building-Construction-Corporate-Profile.pdf"
+              className="h-[36px] sm:h-[38px] px-3 sm:px-4 text-[11px] sm:text-[12px] font-bold uppercase tracking-wider text-[#071A2F] bg-[#C69A4B] hover:bg-[#d8a339] rounded-md transition-all shadow-sm inline-flex items-center justify-center gap-1.5 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C69A4B] shrink-0"
+              title="Download Official 27-Page Corporate Profile (PDF)"
             >
-              <Lock className="w-3 h-3 text-[#C6922D]" />
-              <span>Login</span>
-            </button>
+              <Download className="w-3.5 h-3.5 shrink-0" />
+              <span className="hidden xs:inline">DOWNLOAD PROFILE</span>
+              <span className="xs:hidden">PROFILE</span>
+            </a>
 
+            {/* Mobile/Tablet Menu Drawer Toggle */}
             <button
               id="mobile-menu-toggle-btn"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 text-slate-200 hover:text-[#C6922D] hover:bg-white/5 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C6922D]"
+              className="h-[36px] w-[36px] sm:h-[38px] sm:w-[38px] flex items-center justify-center text-slate-200 hover:text-[#C69A4B] hover:bg-white/5 border border-white/15 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C69A4B]"
               aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
               aria-expanded={mobileMenuOpen}
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
@@ -517,12 +523,23 @@ export const Header: React.FC<HeaderProps> = ({
                 </button>
               )}
 
+              {/* Mobile Prominent Download Button (No Login Required) */}
+              <a
+                href="/documents/LDL-Dhenze-Corporate-Profile.pdf"
+                download="LDL-Dhenze-Residential-Building-Construction-Corporate-Profile.pdf"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full py-3.5 px-4 rounded-lg font-bold text-xs uppercase tracking-wider text-[#071A2F] bg-[#C69A4B] hover:bg-[#d8a339] flex items-center justify-center gap-2 shadow-lg"
+              >
+                <Download className="w-4 h-4" />
+                <span>DOWNLOAD PROFILE (PDF)</span>
+              </a>
+
               <button
                 onClick={() => handleNavClick('start-project')}
-                className="w-full py-3 px-4 rounded-lg font-bold text-xs uppercase tracking-wider text-[#071A2F] bg-[#C6922D] hover:bg-[#d8a339] flex items-center justify-center gap-2 shadow-lg"
+                className="w-full py-3 px-4 rounded-lg font-bold text-xs uppercase tracking-wider text-slate-200 bg-white/5 hover:bg-white/10 border border-white/20 flex items-center justify-center gap-2"
               >
                 <span>Discuss a Project</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 text-[#C69A4B]" />
               </button>
 
               <button

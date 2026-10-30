@@ -30,6 +30,9 @@ import { EmergencyPortalLockScreen } from './components/security/EmergencyPortal
 import { AdminAccessConsole } from './components/security/AdminAccessConsole';
 import { CeoCornerPage } from './components/pages/CeoCornerPage';
 import { CompanyProfilePage } from './components/pages/CompanyProfilePage';
+import { CorporateProfilePage } from './components/pages/CorporateProfilePage';
+import { LeadershipPage } from './components/pages/LeadershipPage';
+import { DownloadsPage } from './components/pages/DownloadsPage';
 import { CompanyProfileAdminConsole } from './components/admin/CompanyProfileAdminConsole';
 import { PublicProjectAdminConsole } from './components/admin/PublicProjectAdminConsole';
 import { UnifiedOnboardingDashboard } from './components/onboarding/UnifiedOnboardingDashboard';
@@ -112,13 +115,25 @@ const ROUTE_METADATA: Record<string, { title: string; description: string }> = {
     title: 'Automated QA System Console | LDL Dhenze',
     description: 'Interactive diagnostic suite verifying API endpoints, data schema integrity, and security policies.',
   },
-  'ceo-corner': {
-    title: 'Founder’s Message & CEO Corner | LDL Dhenze Residential Building Construction',
-    description: 'Official leadership message, founder pledge, and governance principles by Leodenis “Dhenze” Languisan, Founder, President and CEO.',
+  'corporate-profile': {
+    title: 'LDL Dhenze Residential Building Construction | Official Corporate Profile',
+    description: 'Explore the official Corporate Profile of LDL Dhenze Residential Building Construction, including its leadership, construction services, engineering capabilities, renewable energy initiatives and strategic development vision.',
   },
   'company-profile': {
-    title: 'Corporate Profile & Statutory Registrations | LDL Dhenze',
-    description: 'Official comprehensive Corporate Profile, DTI Certificate No. 4812272, BIR Form 2303, PSIC 42900, and nine registered business fields.',
+    title: 'LDL Dhenze Residential Building Construction | Official Corporate Profile',
+    description: 'Explore the official Corporate Profile of LDL Dhenze Residential Building Construction, including its leadership, construction services, engineering capabilities, renewable energy initiatives and strategic development vision.',
+  },
+  leadership: {
+    title: 'Leodenis Deveza Languisan | Founder and CEO | LDL Dhenze',
+    description: 'Official leadership profile, educational background, banking governance foundation, and corporate vision of Leodenis Deveza Languisan, Founder and CEO of LDL Dhenze Residential Building Construction.',
+  },
+  'ceo-corner': {
+    title: 'Leodenis Deveza Languisan | Founder and CEO | LDL Dhenze',
+    description: 'Official leadership profile, educational background, banking governance foundation, and corporate vision of Leodenis Deveza Languisan, Founder and CEO of LDL Dhenze Residential Building Construction.',
+  },
+  downloads: {
+    title: 'Official Corporate Documents & Download Center | LDL Dhenze',
+    description: 'Download official corporate documents, statutory registrations, and the verified 27-page Corporate Profile of LDL Dhenze Residential Building Construction.',
   },
   'company-profile-admin': {
     title: 'Corporate Profile Publication Console | LDL Dhenze Admin',
@@ -642,15 +657,22 @@ export default function App() {
           <QATestingConsole onNavigate={handleNavigate} />
         )}
 
-        {currentView === 'ceo-corner' && (
-          <CeoCornerPage
+        {(currentView === 'leadership' || currentView === 'ceo-corner') && (
+          <LeadershipPage
             onNavigate={handleNavigate}
             onOpenAssistant={() => setAssistantOpen(true)}
           />
         )}
 
-        {currentView === 'company-profile' && (
-          <CompanyProfilePage
+        {(currentView === 'corporate-profile' || currentView === 'company-profile') && (
+          <CorporateProfilePage
+            onNavigate={handleNavigate}
+            onOpenAssistant={() => setAssistantOpen(true)}
+          />
+        )}
+
+        {currentView === 'downloads' && (
+          <DownloadsPage
             onNavigate={handleNavigate}
             onOpenAssistant={() => setAssistantOpen(true)}
           />

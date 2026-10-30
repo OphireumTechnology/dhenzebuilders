@@ -489,6 +489,83 @@ export const CompanyProfileAdminConsole: React.FC<CompanyProfileAdminConsoleProp
         </div>
       )}
 
+      {/* Executive Branding & CEO Photograph Control Section */}
+      <div className="bg-[#071A2F] border border-white/10 rounded-2xl p-6 space-y-6">
+        <div className="flex items-center justify-between border-b border-white/10 pb-4">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="w-5 h-5 text-[#C6922D]" />
+            <h2 className="text-lg font-bold text-white font-['Montserrat']">
+              Official Executive Assets &amp; CEO Photograph Verification
+            </h2>
+          </div>
+          <span className="px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-mono text-[10px] font-bold">
+            Asset Verified &bull; Original Attachment
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+          <div className="md:col-span-4 bg-[#051322] border border-[#C6922D]/30 rounded-xl p-3 text-center">
+            <div className="relative rounded-lg overflow-hidden border border-white/10 aspect-[16/10] bg-[#020B14] mb-2">
+              <img
+                src="/images/leadership/official-ceo-photo.png"
+                alt="Official CEO Portrait"
+                className="w-full h-full object-cover object-center"
+              />
+            </div>
+            <div className="text-xs font-bold text-white font-['Montserrat']">
+              LEODENIS DEVEZA LANGUISAN
+            </div>
+            <div className="text-[10px] text-[#C6922D] font-mono">
+              Founder &amp; Chief Executive Officer
+            </div>
+            <div className="text-[10px] text-slate-400 mt-1">
+              Location: Corporate Reception Office, Clark Pampanga
+            </div>
+          </div>
+
+          <div className="md:col-span-8 space-y-3 text-xs text-slate-300">
+            <div className="bg-[#051322] border border-white/5 rounded-xl p-4 space-y-2">
+              <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#C6922D]">
+                Asset Integrity Standards (Section 1 &amp; 5 Compliance)
+              </div>
+              <ul className="space-y-1.5 text-[11px] text-slate-300">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>Original uploaded photograph preserved without AI replacement or face alterations.</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>Publicly visible on Homepage, About Us, Leadership, and Corporate Profile pages.</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>Original 16:9 reception room proportions maintained across all viewports.</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>Integrated with verified JPMorgan Chase banking operations pedigree and academic credentials.</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <button
+                onClick={() => onNavigate?.('leadership')}
+                className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/15 text-slate-200 text-xs font-semibold"
+              >
+                Inspect Public Leadership Page &rarr;
+              </button>
+              <button
+                onClick={() => onNavigate?.('corporate-profile')}
+                className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/15 text-slate-200 text-xs font-semibold"
+              >
+                Inspect Corporate Profile Page &rarr;
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Version History Table */}
       <div className="bg-[#071A2F] border border-white/10 rounded-2xl p-6 space-y-4">
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
