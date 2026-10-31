@@ -68,7 +68,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
 app.use(express.json({ limit: '10mb' }));
 
@@ -2391,6 +2391,7 @@ async function startServer() {
       server: { middlewareMode: true },
       appType: 'spa',
     });
+    app.use(express.static(path.join(process.cwd(), 'public')));
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
