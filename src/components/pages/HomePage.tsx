@@ -85,22 +85,54 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenAssistant 
   return (
     <div className="min-h-screen bg-[#071A2F] text-slate-100 selection:bg-[#C69A4B] selection:text-[#071A2F]">
       {/* ---------------------------------------------------- */}
-      {/* 1. PREMIUM CORPORATE HERO SECTION (WHITE / GOLD IDENTITY) */}
+      {/* 1. PREMIUM CORPORATE HERO SECTION WITH ARCHITECTURAL BACKGROUND */}
       {/* ---------------------------------------------------- */}
-      <section className="relative bg-[#FFFFFF] text-[#071A2F] pt-16 pb-20 sm:pt-20 sm:pb-24 border-b border-[#C69A4B]/30 overflow-hidden">
-        {/* Subtle geometric architectural pattern overlay */}
-        <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#071A2F_1px,transparent_1px)] [background-size:24px_24px]" />
-        
-        {/* Soft elegant warm accent glows */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#C69A4B]/8 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#071A2F]/5 rounded-full blur-3xl pointer-events-none" />
+      <section className="relative bg-[#F8FAFC] text-[#071A2F] pt-16 pb-20 sm:pt-20 sm:pb-24 border-b border-[#C69A4B]/30 overflow-hidden">
+        {/* Photorealistic Architectural & Engineering Background Visualization */}
+        <picture className="absolute inset-0 w-full h-full pointer-events-none select-none overflow-hidden">
+          <source
+            media="(max-width: 640px)"
+            srcSet="/assets/images/ldl-dhenze-hero-architecture-mobile.webp"
+            type="image/webp"
+          />
+          <source
+            srcSet="/assets/images/ldl-dhenze-hero-architecture.webp"
+            type="image/webp"
+          />
+          <img
+            src="/assets/images/ldl-dhenze-hero-architecture.jpg"
+            alt="LDL Dhenze Residential Building Construction — Engineering, Civil Works, and Infrastructure Development"
+            className="w-full h-full object-cover object-[center_35%] lg:object-[center_28%] transition-transform duration-1000 scale-[1.01]"
+            loading="eager"
+            decoding="async"
+          />
+        </picture>
+
+        {/* Multi-Layered Professional Architectural Overlay */}
+        {/* 1. Base luminous soft white wash */}
+        <div className="absolute inset-0 bg-white/45 backdrop-blur-[0.5px] pointer-events-none" />
+
+        {/* 2. Responsive Radial Luminous Spotlight (75-85% opacity centered behind headline, tapering to left and right) */}
+        <div
+          className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,_rgba(255,255,255,0.92)_0%,_rgba(255,255,255,0.82)_45%,_rgba(255,255,255,0.52)_75%,_rgba(255,255,255,0.30)_100%)] sm:bg-[radial-gradient(ellipse_at_center,_rgba(255,255,255,0.88)_0%,_rgba(255,255,255,0.78)_40%,_rgba(255,255,255,0.45)_75%,_rgba(255,255,255,0.22)_100%)]"
+        />
+
+        {/* 3. Subtle vertical framing gradients (top header blend & bottom card foundation) */}
+        <div className="absolute inset-0 bg-gradient-to-b from-white/90 via-transparent to-white/90 pointer-events-none" />
+
+        {/* 4. Architectural blueprint grid texture */}
+        <div className="absolute inset-0 opacity-[0.025] pointer-events-none bg-[radial-gradient(#071A2F_1px,transparent_1px)] [background-size:24px_24px]" />
+
+        {/* 5. Subtle champagne gold & navy corporate ambient accents */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#C69A4B]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#071A2F]/8 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
             {/* Supporting Heading / Entity Identification Kicker (Unboxed Corporate Standard) */}
             <div className="flex items-center justify-center gap-2.5 mb-4">
               <span className="w-5 sm:w-8 h-[1.5px] bg-[#C69A4B] shrink-0" />
-              <span className="font-['Montserrat'] font-bold tracking-[0.20em] uppercase text-xs sm:text-[13px] text-[#071A2F]">
+              <span className="font-['Montserrat'] font-bold tracking-[0.20em] uppercase text-xs sm:text-[13px] text-[#071A2F] drop-shadow-xs">
                 LDL DHENZE RESIDENTIAL BUILDING CONSTRUCTION
               </span>
               <span className="w-5 sm:w-8 h-[1.5px] bg-[#C69A4B] shrink-0" />
@@ -118,7 +150,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenAssistant 
             </h1>
 
             {/* Corporate Subtitle & Mission Statement */}
-            <p className="text-[15px] sm:text-[17px] text-slate-600 max-w-[750px] mx-auto leading-relaxed font-sans font-normal mb-7 sm:mb-8">
+            <p className="text-[15px] sm:text-[17px] text-slate-700 max-w-[750px] mx-auto leading-relaxed font-sans font-medium mb-7 sm:mb-8">
               A Philippine development and civil engineering enterprise coordinating disciplined planning, licensed architecture, infrastructure delivery, renewable energy, and intelligent systems.
             </p>
 
@@ -127,7 +159,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenAssistant 
               <button
                 id="hero-explore-company-btn"
                 onClick={() => onNavigate('corporate-profile')}
-                className="h-[42px] px-6 rounded-md font-bold text-xs uppercase tracking-wider bg-[#071A2F] hover:bg-[#0c2847] text-white transition-all shadow-md hover:shadow-lg inline-flex items-center justify-center gap-2"
+                className="h-[42px] px-6 rounded-md font-bold text-xs uppercase tracking-wider bg-[#071A2F] hover:bg-[#0c2847] text-white transition-all shadow-md hover:shadow-lg inline-flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>Explore Our Company</span>
                 <ArrowRight className="w-4 h-4 text-[#C69A4B]" />
@@ -137,7 +169,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenAssistant 
                 id="hero-download-profile-btn"
                 onClick={handleDownloadProfile}
                 disabled={downloading}
-                className="h-[42px] px-6 rounded-md font-bold text-xs uppercase tracking-wider bg-[#C69A4B] hover:bg-[#d8a339] text-[#071A2F] transition-all shadow-md hover:shadow-lg inline-flex items-center justify-center gap-2"
+                className="h-[42px] px-6 rounded-md font-bold text-xs uppercase tracking-wider bg-[#C69A4B] hover:bg-[#d8a339] text-[#071A2F] transition-all shadow-md hover:shadow-lg inline-flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Download className="w-4 h-4 shrink-0" />
                 <span>
@@ -146,24 +178,24 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenAssistant 
               </button>
             </div>
 
-            {/* Trust & Statutory Indicators */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-8 mt-6 border-t border-slate-200 text-xs">
-              <div className="text-left bg-slate-50 border border-slate-200/80 p-3.5 rounded-xl">
+            {/* Trust & Statutory Indicators — Elevated Frosted Glass Cards */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-8 mt-6 border-t border-slate-200/90 text-xs">
+              <div className="text-left bg-white/90 backdrop-blur-md border border-slate-200/90 p-3.5 rounded-xl shadow-xs hover:shadow-md transition-shadow">
                 <div className="text-slate-500 text-[10px] uppercase font-bold tracking-wider">Entity Registration</div>
                 <div className="font-bold text-[#071A2F] mt-0.5">DTI No. 4812272</div>
                 <div className="text-[10px] text-slate-500">2023–2028 Validated</div>
               </div>
-              <div className="text-left bg-slate-50 border border-slate-200/80 p-3.5 rounded-xl">
+              <div className="text-left bg-white/90 backdrop-blur-md border border-slate-200/90 p-3.5 rounded-xl shadow-xs hover:shadow-md transition-shadow">
                 <div className="text-slate-500 text-[10px] uppercase font-bold tracking-wider">Tax Registration</div>
                 <div className="font-bold text-[#071A2F] mt-0.5">BIR Form 2303</div>
                 <div className="text-[10px] text-slate-500">TIN 306-113-062-00000</div>
               </div>
-              <div className="text-left bg-slate-50 border border-slate-200/80 p-3.5 rounded-xl">
+              <div className="text-left bg-white/90 backdrop-blur-md border border-slate-200/90 p-3.5 rounded-xl shadow-xs hover:shadow-md transition-shadow">
                 <div className="text-slate-500 text-[10px] uppercase font-bold tracking-wider">Primary Line (PSIC)</div>
                 <div className="font-bold text-[#C69A4B] mt-0.5">PSIC 42900</div>
                 <div className="text-[10px] text-slate-500">Other Civil Engineering</div>
               </div>
-              <div className="text-left bg-slate-50 border border-slate-200/80 p-3.5 rounded-xl">
+              <div className="text-left bg-white/90 backdrop-blur-md border border-slate-200/90 p-3.5 rounded-xl shadow-xs hover:shadow-md transition-shadow">
                 <div className="text-slate-500 text-[10px] uppercase font-bold tracking-wider">Official Document</div>
                 <div className="font-bold text-emerald-700 mt-0.5">27-Page Profile</div>
                 <div className="text-[10px] text-slate-500">View Online or PDF</div>
