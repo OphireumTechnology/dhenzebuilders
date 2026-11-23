@@ -1,0 +1,4 @@
+# OPHIREUM-IP Source Code Identification
+Ophireum Multimedia Production | DTI 7567003 | Proprietor Leodenis Deveza Languisan | Intended IP holding portfolio Ophireum Technology.
+
+Inventory: OphireumTechnology/dhenzebuilders main 913a48839919e328d6d07d32c301b814460b6327; tracked 226; source-extension candidates 88. Proposed IDs are not verified headers or proof of ownership. Actual header presence, missing identifiers, AI provenance and third-party license status remain unverified. Do not alter code, security, API, database, generated files or third-party notices. Verify authorship, contractor/client rights and licenses before identifying original code; document platform/date/task/human/commit for AI contributions; send uncertain rights for legal review. Use OPH-IP-SRC-[PROJECT]-[UNIQUE-ID] after approval.
